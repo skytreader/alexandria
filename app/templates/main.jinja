@@ -1,0 +1,35 @@
+{#
+This view requires the following variables to be defined:
+  >$title - displayed at the title bar of the browser
+  >$content - can either be the URL of a page to include or text
+   to be echoed
+
+Additionally, if the $content contains text to be echoed, users of this
+view must set a variable $echo_content to TRUE. You should also, ALWAYS,
+load the URL helper.
+#}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+        <title><?= APP_TITLE . " - " . $title ?></title>
+        <base href="<?= base_url() ?>" />
+        <link rel="stylesheet" type="text/css" href="css/librariantheme.css" />
+        {% for style in stylesheets: %}
+                <link rel="stylesheet" type="text/css" href="css/{{ style }}" />
+        {% endfor %}
+        
+        {% for script in scripts: %}
+                <script type="text/javascript" src="scripts/{{ script }}"></script>
+        {% endfor %}
+    </head>
+    <body>
+        <div class="main_box">
+            <img src="images/librarian.png" />
+            {% block navbar %}{% endblock %}
+            <div class="content_box">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>
