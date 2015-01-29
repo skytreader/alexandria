@@ -11,18 +11,18 @@ load the URL helper.
 <html>
     <head>
         <title>Alexandria - {% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="css/librariantheme.css" />
+        <link rel="stylesheet" type="text/css" href="static/styles/librariantheme.css" />
         {% for style in stylesheets: %}
             <link rel="stylesheet" type="text/css" href="css/{{ style }}" />
         {% endfor %}
         
         {% for script in scripts: %}
-            <script type="text/javascript" src="scripts/{{ script }}"></script>
+            <script type="text/javascript" src="static/scripts/{{ script }}"></script>
         {% endfor %}
     </head>
     <body>
         <div class="main_box">
-            <img src="images/librarian.png" />
+            <img src="static/images/librarian.png" />
             {% block navbar %}{% endblock %}
             <div class="content_box">
                 {% block content %}{% endblock %}
