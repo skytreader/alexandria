@@ -1,4 +1,4 @@
-tatement for enabling the development environment
+# Statement for enabling the development environment
 DEBUG = True
 
 # Define the application directory

@@ -1,5 +1,11 @@
 {% extends "main.jinja" %}
+{% macro render_field(field, placeholder=None) %}
+    {{ field(class="search", placeholder=placeholder, **kwargs) }}
+{% endmacro %}
 {% block title %}Home{% endblock %}
 {% block content %}
 	<h1>Hello this is the homepage</h1>
+    <form method="GET" action="." role="form">
+        {{ render_field(form.search_term, placeholder="Book title or a person's name", autofocus="") }}
+    </form>
 {% endblock %}
