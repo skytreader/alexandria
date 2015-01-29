@@ -1,5 +1,5 @@
 {% extends "main.jinja" %}
-{% macro render_field(field, classes="", placeholder=None) %}
+{% macro render_field(field, classes="", placeholder="") %}
     {{ field(class=classes, placeholder=placeholder, **kwargs) }}
 {% endmacro %}
 {% block title %}Log-in{% endblock %}
