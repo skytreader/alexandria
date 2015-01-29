@@ -26,7 +26,12 @@ load the URL helper.
     <body>
         <div class="main_box">
             <img src="static/images/librarian.png" />
-            {% block navbar %}{% endblock %}
+            <div class="navbox">
+                <a class="navbox" href="/home">Search</a>
+                <a class="navbox" href="/about">About</a>
+                <a class="navbox" href="/browse">Browse</a>
+                <a class="navbox" href="/login">Log-in</a>
+            </div>
             <div class="content_box">
                 {% block content %}{% endblock %}
             </div>
