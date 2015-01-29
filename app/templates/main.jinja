@@ -1,8 +1,6 @@
 {#
 This view requires the following variables to be defined:
-  >$title - displayed at the title bar of the browser
-  >$content - can either be the URL of a page to include or text
-   to be echoed
+  title - displayed at the title bar of the browser
 
 Additionally, if the $content contains text to be echoed, users of this
 view must set a variable $echo_content to TRUE. You should also, ALWAYS,
@@ -12,8 +10,7 @@ load the URL helper.
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
     <head>
-        <title><?= APP_TITLE . " - " . $title ?></title>
-        <base href="<?= base_url() ?>" />
+        <title>Alexandria - {{ title }}</title>
         <link rel="stylesheet" type="text/css" href="css/librariantheme.css" />
         {% for style in stylesheets: %}
                 <link rel="stylesheet" type="text/css" href="css/{{ style }}" />
