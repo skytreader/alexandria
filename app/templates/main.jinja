@@ -10,7 +10,7 @@ load the URL helper.
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
     <head>
-        <title>Alexandria - {{ title }}</title>
+        <title>Alexandria - {% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="css/librariantheme.css" />
         {% for style in stylesheets: %}
             <link rel="stylesheet" type="text/css" href="css/{{ style }}" />
