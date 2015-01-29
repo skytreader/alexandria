@@ -1,16 +1,12 @@
-from flask import Flask, render_template, request
+from controllers import librarian
+
+from flask import Flask
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from forms import SearchForm
-
 app = Flask(__name__)
-
 app.config.from_object("config")
 
-db = SQLAlchemy(app)
+app.register_blueprint(librarian)
 
-@app.route("/")
-def index():
-    form = SearchForm(request.form)
-    return render_template("home.jinja", form=form)
+db = SQLAlchemy(app)
