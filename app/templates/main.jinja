@@ -1,6 +1,8 @@
 {#
 This view requires the following variables to be defined:
   title - displayed at the title bar of the browser
+  is_logged_in - True if the user is logged in. Don't worry, controllers
+    should still check.
 
 Additionally, if the $content contains text to be echoed, users of this
 view must set a variable $echo_content to TRUE. You should also, ALWAYS,
@@ -13,9 +15,10 @@ load the URL helper.
         <title>Alexandria - {% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="static/styles/librariantheme.css" />
         {% for style in stylesheets: %}
-            <link rel="stylesheet" type="text/css" href="css/{{ style }}" />
+            <link rel="stylesheet" type="text/css" href="static/styles/{{ style }}" />
         {% endfor %}
         
+        <script type="text/javascript" src="static/scripts/jquery.js"></script>
         {% for script in scripts: %}
             <script type="text/javascript" src="static/scripts/{{ script }}"></script>
         {% endfor %}
