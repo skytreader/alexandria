@@ -1,12 +1,9 @@
 {% extends "main.jinja" %}
-{% macro render_field(field, classes="", placeholder="") %}
-    {{ field(class=classes, placeholder=placeholder, **kwargs) }}
-{% endmacro %}
 {% block title %}Log-in{% endblock %}
 {% block content %}
     <form method="POST" action="." role="form">
-        {{ render_field(form.username, autofocus="") }}
-        {{ render_field(form.password, autofocus="") }}
+        {{ form.username(autofocus="", placeholder="Username") }}
+        {{ form.password(placeholder="Password") }}
         <input type="submit" value="Log-in">
     </form>
 {% endblock %}
