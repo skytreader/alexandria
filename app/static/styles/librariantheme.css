@@ -120,6 +120,11 @@ td.bookspine{
 /*Forms*/
 input.search, select.search, option.search {
 	font-size: 16px;
+    padding: 10px;
+}
+
+.searchbox{
+    width: 70%;
 }
 
 input.btn {
