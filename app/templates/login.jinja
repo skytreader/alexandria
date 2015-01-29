@@ -2,8 +2,10 @@
 {% block title %}Log-in{% endblock %}
 {% block content %}
     <form method="POST" action="." role="form">
-        {{ form.username(autofocus="", placeholder="Username") }}
-        {{ form.password(placeholder="Password") }}
+        Username:<br>
+        {{ form.username(autofocus="", placeholder="Username") }}<br>
+        Password:<br>
+        {{ form.password(placeholder="Password") }}<br>
         <input type="submit" value="Log-in">
     </form>
 {% endblock %}
