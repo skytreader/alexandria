@@ -9,10 +9,10 @@ characters like dashes or whitespace.
 */
 
 /**
-Strips the input string of dashes and/or whitespace.
+Leave only digits.
 */
 function stripExtraneous(isbnInput){
-	return isbnInput.replace(/[\s-]/g, "")
+	return isbnInput.replace(/[\D]/g, "")
 }
 
 //TODO: Abstract ISBN verification.
