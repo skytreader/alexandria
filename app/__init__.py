@@ -10,3 +10,4 @@ app.config.from_object("config")
 app.register_blueprint(librarian)
 
 db = SQLAlchemy(app)
+db.create_all()
