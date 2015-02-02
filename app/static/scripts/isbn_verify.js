@@ -48,6 +48,8 @@ function verifyISBN10(isbn10){
 /**
 Verifies an ISBN13 string. Assume that the argument has already
 been stripped clean of non-ISBN-related characters.
+
+@return true if given string is a valid isbn13 string, false otherwise.
 */
 function verifyISBN13(isbn13){
 	var isbnLength = 13;
