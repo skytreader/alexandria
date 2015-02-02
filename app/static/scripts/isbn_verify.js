@@ -42,7 +42,7 @@ function verifyISBN10(isbn10){
 		runningSum += parseInt(isbn10.charAt(10 - weight)) * weight
 	}
 	
-	return ((runningSum % 11) + checkDigit) == 11
+	return ((runningSum + checkDigit) % 11) == 0;
 }
 
 /**
