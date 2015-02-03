@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template, request
+from flask.ext.login import login_required
 from forms import LoginForm, SearchForm
 
 librarian = Blueprint('librarian', __name__)
