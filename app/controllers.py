@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request
-from flask.ext.login import login_required
+from flask.ext.login import login_required, login_user
 from forms import LoginForm, SearchForm
 
 librarian = Blueprint('librarian', __name__)
@@ -17,7 +17,7 @@ def login():
         user = Librarian.query.filter_by(username=form.username.data).first()
 
         if user and user.password == form.password.data:
-            session["user_id"] = user.id
+            login_user(user)
 
 
     return render_template("login.jinja", form=form)
