@@ -18,11 +18,14 @@ def login():
 
         if user and user.password == form.password.data:
             login_user(user)
-
+            flash("Logged-in succesfully")
+            return redirect(url_for("dashboard"))
+        else:
+            flash("Wrong user credentials")
 
     return render_template("login.jinja", form=form)
 
 @librarian.route("/dashboard/")
 @login_required
 def dashboard():
-    pass
+    return render_template("dashboard.jinja")

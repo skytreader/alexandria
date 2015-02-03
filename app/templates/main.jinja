@@ -30,7 +30,7 @@ load the URL helper.
                 <a class="navbox" href="/">Search</a>
                 <a class="navbox" href="/about">About</a>
                 <a class="navbox" href="/browse">Browse</a>
-                {% if is_logged_in %}
+                {% if current_user.is_authenticated() %}
                     <a class="navbox" href="/librarians">Manage Librarians</a>
                     <a class="navbox" href="/books">Manage Books</a>
                 {% else %}
