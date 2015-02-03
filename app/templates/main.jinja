@@ -30,7 +30,12 @@ load the URL helper.
                 <a class="navbox" href="/">Search</a>
                 <a class="navbox" href="/about">About</a>
                 <a class="navbox" href="/browse">Browse</a>
-                <a class="navbox" href="/login">Log-in</a>
+                {% if is_logged_in %}
+                    <a class="navbox" href="/librarians">Manage Librarians</a>
+                    <a class="navbox" href="/books">Manage Books</a>
+                {% else %}
+                    <a class="navbox" href="/login">Log-in</a>
+                {% endif %}
             </div>
             <div class="content_box">
                 {% block content %}{% endblock %}
