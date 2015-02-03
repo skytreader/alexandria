@@ -1,8 +1,10 @@
 {% extends "main.jinja" %}
 {% block title %}Log-in{% endblock %}
 {% block content %}
-    {{ get_flashed_messages() }}
-    <form method="POST" action="." role="form">
+    {% for message in get_flashed_messages() %}
+        {{ message }}
+    {% endfor %}
+    <form method="POST" action="/login/" role="form">
         Username:<br>
         {{ form.username(autofocus="", placeholder="Username") }}<br>
         Password:<br>
