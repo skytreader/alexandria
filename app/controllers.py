@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user
 from forms import LoginForm, SearchForm
 
@@ -20,13 +20,13 @@ def login():
         if user and user.password == form.password.data:
             login_user(user)
             flash("Logged-in succesfully")
-            return redirect(url_for("dashboard"))
+            return redirect("/dashboard")
         else:
             flash("Wrong user credentials")
 
     return render_template("login.jinja", form=form)
 
-@librarian.route("/dashboard/")
+@librarian.route("/dashboard")
 @login_required
-def dashboard():
+def dash():
     return render_template("dashboard.jinja")
