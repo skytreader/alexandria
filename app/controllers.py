@@ -11,10 +11,11 @@ def index():
 
 @librarian.route("/login/", methods=["GET", "POST"])
 def login():
-    form = LoginForm(request.form)
+    form = LoginForm()
 
     if form.validate_on_submit():
-        user = Librarian.query.filter_by(username=form.username.data).first()
+        from models import Librarians
+        user = Librarians.query.filter_by(username=form.username.data).first()
 
         if user and user.password == form.password.data:
             login_user(user)

@@ -5,6 +5,7 @@
         {{ message }}
     {% endfor %}
     <form method="POST" action="/login/" role="form">
+        {{ form.csrf_token }}
         Username:<br>
         {{ form.username(autofocus="", placeholder="Username") }}<br>
         Password:<br>
