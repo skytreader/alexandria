@@ -33,6 +33,7 @@ load the URL helper.
                 {% if current_user.is_authenticated() %}
                     <a class="navbox" href="/librarians">Manage Librarians</a>
                     <a class="navbox" href="/books">Manage Books</a>
+                    <a class="navbox" href="/logout">Log-out</a>
                 {% else %}
                     <a class="navbox" href="/login">Log-in</a>
                 {% endif %}

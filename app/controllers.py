@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, login_user, logout_user
 from forms import LoginForm, SearchForm
 
 librarian = Blueprint('librarian', __name__)
@@ -30,3 +30,9 @@ def login():
 @login_required
 def dash():
     return render_template("dashboard.jinja")
+
+@librarian.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("librarian.index"))
