@@ -13,9 +13,11 @@ load the URL helper.
 <html>
     <head>
         <title>Alexandria - {% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles/librariantheme.css" />
+        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/librariantheme.css">
         {% for style in stylesheets: %}
-            <link rel="stylesheet" type="text/css" href="/static/styles/{{ style }}" />
+            <link rel="stylesheet" type="text/css" href="/static/styles/{{ style }}">
         {% endfor %}
         
         <script type="text/javascript" src="/static/scripts/jquery.js"></script>
