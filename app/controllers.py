@@ -19,7 +19,6 @@ def login():
 
         if user and user.password == form.password.data:
             login_user(user)
-            flash("Logged-in succesfully")
             return redirect(url_for("librarian.dash"))
         else:
             flash("Wrong user credentials")
