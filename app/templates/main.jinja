@@ -1,8 +1,10 @@
 {#
 This view requires the following variables to be defined:
   title - displayed at the title bar of the browser
-  is_logged_in - True if the user is logged in. Don't worry, controllers
-    should still check.
+  stylesheets - list of css filepaths, to customize look, if applicable. bootstrap
+    themes and the librarian theme is included by default.
+  scripts - list of javascript filepaths for custom behavior, if applicable. jquery
+    is included by default.
 
 Additionally, if the $content contains text to be echoed, users of this
 view must set a variable $echo_content to TRUE. You should also, ALWAYS,
