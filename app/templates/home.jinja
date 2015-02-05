@@ -2,10 +2,10 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 	<h1>Looking for anything?</h1>
-    <div class="input-group input-group-lg" style="width:100%;">
+    <div class="input-group input-group-lg" style="width:90%;">
         <form method="GET" action="." role="form">
-            {# { render_field(form.search_term, classes="search searchbox", placeholder="Book title or a person's name", autofocus="") } #}
-            {{ form.search_term(class="search searchbox", placeholder="Book title or a person's name") }}
+            {{ form.search_term(class="search searchbox form-control", placeholder="Book title or a person's name", style="width:70%;") }}
+            &nbsp;
             <input type="submit" class="search btn btn-default" value="Search">
         </form>
     </div>
