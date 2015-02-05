@@ -69,8 +69,7 @@ div.navbox{
 	word-spacing: 20px;
 	margin-top: 10px;
 	margin-bottom: 10px;
-	padding-top: 5px;
-	padding-bottom: 5px;
+    padding: 5px 12px;
 }
 
 div.block{
