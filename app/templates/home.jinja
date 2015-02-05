@@ -1,10 +1,12 @@
 {% extends "main.jinja" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-	<h1>Hello this is the homepage</h1>
-    <form method="GET" action="." role="form">
-        {# { render_field(form.search_term, classes="search searchbox", placeholder="Book title or a person's name", autofocus="") } #}
-        {{ form.search_term(class="search searchbox", placeholder="Book title or a person's name") }}
-        <input type="submit" class="search btn btn-lg btn-default" value="Search">
-    </form>
+	<h1>Looking for anything?</h1>
+    <div class="input-group input-group-lg" style="width:100%;">
+        <form method="GET" action="." role="form">
+            {# { render_field(form.search_term, classes="search searchbox", placeholder="Book title or a person's name", autofocus="") } #}
+            {{ form.search_term(class="search searchbox", placeholder="Book title or a person's name") }}
+            <input type="submit" class="search btn btn-default" value="Search">
+        </form>
+    </div>
 {% endblock %}
