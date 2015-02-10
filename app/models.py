@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.ext.declarative import declared_attr
 
 class Base(db.Model):
     __abstract__ = True
@@ -38,8 +39,15 @@ class Librarians(Base):
 
 class UserTaggedBase(Base):
     __abstract__ = True
-    creator = db.Column(db.Integer, ForeignKey("librarians.record_id"))
-    last_modifier = db.Column(db.Integer, ForeignKey("librarians.record_id"))
+    #last_modifier = db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
+
+    @declared_attr
+    def creator(self):
+        return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
+
+    @declared_attr
+    def last_modifier(self):
+        return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
 
 class Books(UserTaggedBase):
     __tablename__ = "books"
