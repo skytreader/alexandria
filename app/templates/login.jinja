@@ -5,11 +5,13 @@
         {{ message }}
     {% endfor %}
     <form method="POST" action="/login/" role="form">
+    <div class="input-group input-group-lg">
         {{ form.csrf_token }}
         Username:<br>
-        {{ form.username(autofocus="", placeholder="Username") }}<br>
+        {{ form.username(autofocus="", placeholder="Username", class="form-control") }}<br>
         Password:<br>
-        {{ form.password(placeholder="Password") }}<br>
-        <input type="submit" value="Log-in">
+        {{ form.password(placeholder="Password", class="form-control") }}<br>
+        <input type="submit" value="Log-in" class="form-control btn btn-default">
+    </div>
     </form>
 {% endblock %}
