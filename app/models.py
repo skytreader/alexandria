@@ -52,16 +52,25 @@ class UserTaggedBase(Base):
     def last_modifier(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
 
+class Genres(UserTaggedBase):
+    __tablename__ = "genres"
+    genre_name = db.Column(db.String(20), nullable=False)
+
+    def __init__(self, genre_name):
+        self.genre_name = genre_name
+
 class Books(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False)
     year = db.Column(db.Integer, nullable=False)
+    genre = db.Column(db.Integer, db.ForeignKey("genres.record_id"))
 
-    def __init__(self, isbn, title, year, creator):
+    def __init__(self, isbn, title, year, genre, creator):
         self.isbn = isbn
         self.title = title
         self.year = year
+        self.genre = genre
         self.creator = creator
         self.last_modifier = creator
 
@@ -83,3 +92,60 @@ class Imprints(UserTaggedBase):
     def __init__(self, mother_company, imprint_company):
         self.mother_company = mother_company
         self.imprint_company = imprint_company
+
+class BookPersons(UserTaggedBase):
+    __tablename__ = "book_persons"
+    lastname = db.Column(db.String(255), nullable=False)
+    firstname = db.Column(db.String(255), nullable=False)
+    
+    def __init__(self, lastname, firstname):
+        self.lastname = lastname
+        self.firstname = firstname
+
+class Roles(UserTaggedBase):
+    """
+    I don't understand why this table needs a role_name and a role_display.
+    Seems like another list-type table to me.
+    
+    Just copying it as it is for the meantime.
+    """
+    __tablename__ = "roles"
+    role_name = db.Column(db.String(255), unique=True, nullable=False)
+    role_display = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, rolename, role_name, role_display):
+        self.role_name = role_name
+        self.role_display = role_display
+
+class BookParticipants(UserTaggedBase):
+    """
+    Consider that 99% of books will need the same roles over and over. 
+    """
+    __tablename__ = "book_participants"
+    book_id = db.Column(db.Integer, db.ForeignKey("books.record_id"))
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.record_id"))
+
+    def __init__(self, book_id, person_id, role_id):
+        book_id = book_id
+        person_id = person_id
+        role_id = role_id
+
+class Pseudonyms(UserTaggedBase):
+    """
+    Copied from original schema:
+
+    Is this table ever going into any use?
+    """
+    __tablename__ = "pseudonyms"
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
+    book_id = db.Column(db.Integer, db.ForeignKey("books.record_id"))
+    # Pseudonyms are weird so only require the last!
+    lastname = db.Columns(db.String(255), nullable=False)
+    firstname = db.Columns(db.String(255), nullable=True)
+
+    def __init__(self, person_id, book_id, lastname, firstname):
+        self.person_id = person_id
+        self.book_id = book_id
+        self.lastname = lastname
+        self.firstname = firstname
