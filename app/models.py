@@ -23,6 +23,7 @@ class Librarians(Base):
         return self.username
     
     # TODO Actually implement these!
+    # See https://flask-login.readthedocs.org/en/latest/
     def is_authenticated(self):
         return True
 
@@ -34,3 +35,14 @@ class Librarians(Base):
 
     def get_id(self):
         return self.record_id
+
+class UserTaggedBase(Base):
+    __abstract__ = True
+    creator = db.Column(db.Integer, ForeignKey("librarians.record_id"))
+    last_modifier = db.Column(db.Integer, ForeignKey("librarians.record_id"))
+
+class Books(UserTaggedBase):
+    __tablename__ = "books"
+    isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    year = db.Column(db.Integer, nullable=False)
