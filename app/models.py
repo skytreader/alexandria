@@ -38,8 +38,11 @@ class Librarians(Base):
         return self.record_id
 
 class UserTaggedBase(Base):
+    """
+    Those that will extend this class may take the convention that, upon creation,
+    the last_modifier is the same as the creator.
+    """
     __abstract__ = True
-    #last_modifier = db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
 
     @declared_attr
     def creator(self):
@@ -54,3 +57,10 @@ class Books(UserTaggedBase):
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False)
     year = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, isbn, title, year, creator):
+        self.isbn = isbn
+        self.title = title
+        self.year = year
+        self.creator = creator
+        self.last_modifier = creator
