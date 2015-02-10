@@ -64,3 +64,22 @@ class Books(UserTaggedBase):
         self.year = year
         self.creator = creator
         self.last_modifier = creator
+
+class BookCompanies(UserTaggedBase):
+    """
+    List?! List?! This is better off in NoSQL form!
+    """
+    __tablename__ = "book_companies"
+    company_name = db.Column(db.String(255), nullable=False, unique=True)
+
+    def __init__(self, company_name):
+        self.company_name = company_name
+
+class Imprints(UserTaggedBase):
+    __tablename__ = "imprints"
+    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+
+    def __init__(self, mother_company, imprint_company):
+        self.mother_company = mother_company
+        self.imprint_company = imprint_company
