@@ -9,7 +9,7 @@ def get_or_create(session, model, **kwargs):
         return instance
     else:
         instance = model(**kwargs)
-        db.session.add(instance)
+        session.add(instance)
         return instance
 
 if __name__ == "__main__":

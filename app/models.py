@@ -114,7 +114,7 @@ class Roles(UserTaggedBase):
     role_name = db.Column(db.String(255), unique=True, nullable=False)
     role_display = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, rolename, role_name, role_display):
+    def __init__(self, role_name, role_display):
         self.role_name = role_name
         self.role_display = role_display
 
