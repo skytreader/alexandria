@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
-from forms import LoginForm, SearchForm
+from forms import AddBooksForm, LoginForm, SearchForm
 
 librarian = Blueprint('librarian', __name__)
 
@@ -35,3 +35,8 @@ def dash():
 def logout():
     logout_user()
     return redirect(url_for("librarian.index"))
+
+@librarian.route("/books")
+@login_required
+def books():
+    form = AddBookForm()
