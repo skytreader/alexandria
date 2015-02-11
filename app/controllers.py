@@ -39,4 +39,5 @@ def logout():
 @librarian.route("/books")
 @login_required
 def books():
-    form = AddBookForm()
+    form = AddBooksForm()
+    return render_template("add_books.jinja", form=form)
