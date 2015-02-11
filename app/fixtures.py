@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
-from models import Librarians, Books
+from models import Librarians, Roles
 
 def get_or_create(session, model, **kwargs):
     instance = session.query(model).filter_by(**kwargs).first()
@@ -10,5 +10,11 @@ def get_or_create(session, model, **kwargs):
         db.session.add(instance)
         return instance
 
-session = SQLAlchemy()
-get_or_create(session, Librarians, {"username":"admin", "password":"admin"})
+if __name__ == "__main__":
+    session = SQLAlchemy()
+    get_or_create(session, Librarians, {"username":"admin", "password":"admin"})
+    
+    roles = ("Author", "Illustrator", "Editor", "Translator")
+    
+    for r in roles:
+        get_or_create(session, Roles, {"role_name":r, "role_display":"%s(s)" % r})
