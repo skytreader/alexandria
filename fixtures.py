@@ -6,10 +6,13 @@ from sqlalchemy.orm import sessionmaker
 def get_or_create(session, model, **kwargs):
     instance = session.query(model).filter_by(**kwargs).first()
     if instance:
+        print "Existing instance %s for %s" % (str(kwargs), str(model))
         return instance
     else:
+        print "New instance %s for %s" % (str(kwargs), str(model))
         instance = model(**kwargs)
         session.add(instance)
+        session.commit()
         return instance
 
 if __name__ == "__main__":
