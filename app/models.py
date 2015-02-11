@@ -104,10 +104,11 @@ class BookPersons(UserTaggedBase):
 
 class Roles(UserTaggedBase):
     """
-    I don't understand why this table needs a role_name and a role_display.
-    Seems like another list-type table to me.
-    
-    Just copying it as it is for the meantime.
+    The purpose of this table is to enumerate the contributions we are interested
+    in for the books.
+
+    The role_name is for the actual contribution we are interested in while
+    role_display is for how it is prompted for in the app's forms.
     """
     __tablename__ = "roles"
     role_name = db.Column(db.String(255), unique=True, nullable=False)
@@ -141,8 +142,8 @@ class Pseudonyms(UserTaggedBase):
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
     book_id = db.Column(db.Integer, db.ForeignKey("books.record_id"))
     # Pseudonyms are weird so only require the last!
-    lastname = db.Columns(db.String(255), nullable=False)
-    firstname = db.Columns(db.String(255), nullable=True)
+    lastname = db.Column(db.String(255), nullable=False)
+    firstname = db.Column(db.String(255), nullable=True)
 
     def __init__(self, person_id, book_id, lastname, firstname):
         self.person_id = person_id
