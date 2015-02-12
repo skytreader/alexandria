@@ -15,9 +15,9 @@ def login():
 
     if form.validate_on_submit():
         from models import Librarians
-        user = Librarians.query.filter_by(username=form.username.data).first()
+        user = Librarians.query.filter_by(username=form.librarian_username.data).first()
 
-        if user and user.password == form.password.data:
+        if user and user.password == form.librarian_password.data:
             login_user(user)
             return redirect(url_for("librarian.dash"))
         else:
