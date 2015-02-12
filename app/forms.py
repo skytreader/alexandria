@@ -6,8 +6,8 @@ class SearchForm(Form):
     search_term = TextField("Search for", [Required(message="What are you looking for?")])
 
 class LoginForm(Form):
-    username = TextField("Username", [Required(message="Enter your username")])
-    password = PasswordField("Password", [Required(message="Enter your password")])
+    librarian_username = TextField("Username", [Required(message="Enter your username")])
+    librarian_password = PasswordField("Password", [Required(message="Enter your password")])
 
 class AddBooksForm(Form):
     isbn_message = "ISBN is a book's identifier and can often be found at the book's copyright page or near the barcode."
