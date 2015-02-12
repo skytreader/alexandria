@@ -2,4 +2,63 @@
 {% block title %}Add Books{% endblock %}
 {% block content %}
     <h1>Add Books</h1>
+    <!-- This is the hidden "buffer" form -->
+    <form method="POST" action="/book_adder" role="form">
+        {{ form.csrf_token }}
+        {{ form.isbn() }}
+        {{ form.title() }}
+        {{ form.genre() }}
+        {{ form.authors() }}
+        {{ form.illustrators() }}
+        {{ form.editors() }}
+        {{ form.translators() }}
+        {{ form.publisher() }}
+        {{ form.printer() }}
+        {{ form.year() }}
+    </form>
+
+    <!-- The actual form, to be manipulated by JavaScript -->
+    <div class="block">
+        <h2>Book Information</h2>
+        <label>ISBN:<br>
+        <input type="text" id="isbn-proxy">
+        </label>
+        <label>Title:<br>
+        <input type="text" id="title-proxy">
+        </label>
+        <label>Genre:<br>
+        <input type="text" id="genre-proxy">
+        </label>
+    </div>
+    <div class="block">
+        <h2>Content Creators</h2>
+        <label>Author(s):<br>
+        <input type="text" id="authors-proxy">
+        </label>
+        <label>Illustrator(s):<br>
+        <input type="text" id="illustrators-proxy">
+        </label>
+        <label>Editor(s):<br>
+        <input type="text" id="editors-proxy">
+        </label>
+        <label>Translator(s):<br>
+        <input type="text" id="translators-proxy">
+        </label>
+    </div>
+    <div class="block">
+        <h2>Publishing Information</h2>
+        <label>Publisher:<br>
+        <input type="text" id="publisher-proxy">
+        </label>
+        <label>Printer:<br>
+        <input type="text" id="printer-proxy">
+        </label>
+        <label>Year:<br>
+        <input type="text" id="year-proxy">
+        </label>
+    </div>
+    <br>
+    <div class="block">
+        <input type="button" type="btn btn-default" value="Save Book">
+    </div>
 {% endblock %}
