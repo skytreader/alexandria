@@ -2,8 +2,23 @@
 Functions in this file will deal with the book queue system add-book
 attempts.
 
+As usual, relies on jQuery being loaded.
+
 @author Chad Estioco
 */
+
+/**
+THE BOOK QUEUE. This is the internal representation of the book queue.
+*/
+var bookQueue = [];
+/**
+This script will manipulate ids a lot. We derive certain converntions from the
+actual ids of the hidden form field. This hidden form field is the one that
+is mapped to the Flask form.
+
+This variable is filled on document ready.
+*/
+var realFormIds = [];
 
 /**
 Remove the block that triggered the event.
@@ -67,3 +82,27 @@ function getDetailFormFields(){
 	
 	return fields;
 }
+
+/**
+Fill up the realFormIds variable. No guarantee is made as to the order of the
+elements inserted into realFormIds.
+*/
+function getFormIds(){
+    var allInputs = $("#main-form input");
+    var limit = allInputs.length;
+
+    for(var i = 0; i < limit; i++){
+        var iid = allInputs[i].id;
+        // Exclude the csrf token
+        if(iid == "csrf_token"){
+            continue;
+        }
+
+        window.realFormIds.push(iid);
+    }
+}
+
+$(document).ready(function(){
+    getFormIds();
+    // Start the polling timer.
+});

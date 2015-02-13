@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Add Books</h1>
     <!-- This is the hidden "buffer" form -->
-    <form method="POST" action="/book_adder" role="form">
+    <form method="POST" action="/book_adder" role="form" id="main-form">
         {{ form.csrf_token }}
         {{ form.isbn() }}
         {{ form.title() }}
