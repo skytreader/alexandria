@@ -1,10 +1,8 @@
 /**
-Functions in controller.js deal with the elements in the page. Other scripts will rely
-on the functions in controler.js . If the view ever changes, you should only rework
-the functions in ui.js for everything to work again.
+Functions in this file will deal with the book queue system add-book
+attempts.
 
-(In other words, functions in this file directly "control" the elements in the page
-where this script appears.)
+@author Chad Estioco
 */
 
 /**
@@ -44,17 +42,6 @@ function deleteButton(){
 	container.value = "X";
 	
 	return container;
-}
-
-/**
-Creates a hidden input element with the given value.
-*/
-function createHiddenField(inputName, value){
-	var inputObject = document.createElement("input");
-	inputObject.type = "hidden";
-	inputObject.name = inputName + "[]";
-	inputObject.value = value;
-	return inputObject;
 }
 
 /**
