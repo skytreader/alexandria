@@ -6,13 +6,16 @@ attempts.
 */
 
 /**
-Removes the row which holds the button which triggered
-event e .
+Remove the block that triggered the event.
+
+If the block is already saved to DB, delete the pertaining record as well
+(UI Note: ask user to verify first). If block is not yet saved to DB, just
+delete.
 
 @param e
   The event object.
 */
-function removeRow(e){
+function removeBlock(e){
 	//Get the button
 	var button = e.target;
 	//Get the cell
