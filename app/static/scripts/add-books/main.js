@@ -10,27 +10,27 @@ The global variables are expected to have the following attributes:
 @return The text formatted like a spine of a book.
 */
 function renderSpine(){
-	window.spine = ["title", "authors", "illustrators", "translators", "editors", "publisher", "printer", "year"];
-	var spineText = "";
-	var limit = window.spine.length;
-	
-	for(var i = 0; i < limit; i++){
-		spineText += window.bookDetailsForm[spine[i]].spineDisplay();
-	}
-	
-	return spineText;
+    window.spine = ["title", "authors", "illustrators", "translators", "editors", "publisher", "printer", "year"];
+    var spineText = "";
+    var limit = window.spine.length;
+    
+    for(var i = 0; i < limit; i++){
+        spineText += window.bookDetailsForm[spine[i]].spineDisplay();
+    }
+    
+    return spineText;
 }
 
 /**
 Clears the details form.
 */
 function clear(){
-	var fields = getDetailFormFields();
-	var fieldLimit = fields.length;
-	
-	for(var i = 0; i < fieldLimit; i++){
-		fields[i].value = "";
-	}
+    var fields = getDetailFormFields();
+    var fieldLimit = fields.length;
+    
+    for(var i = 0; i < fieldLimit; i++){
+        fields[i].value = "";
+    }
 }
 
 /**
@@ -42,93 +42,93 @@ specified through argument _lineVal_.
 @param lineVal
 */
 function getLabeledByLine(by, lineVal){
-	return function(){
-		if(lineVal == ""){
-			return "";
-		} else{
-			return "<strong>" + by + " by:</strong> " + lineVal;
-		}
-	}
+    return function(){
+        if(lineVal == ""){
+            return "";
+        } else{
+            return "<strong>" + by + " by:</strong> " + lineVal;
+        }
+    }
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
-	var stripped = stripExtraneous(value);
-	return verifyISBN10(stripped) || verifyISBN13(stripped);
+    var stripped = stripExtraneous(value);
+    return verifyISBN10(stripped) || verifyISBN13(stripped);
 }, "Invalid ISBN input.");
 
 /*
 Just check if it is a 4-digit number.
 */
 $.validator.addMethod("year", function(value, element, param){
-	return /^\d{4}$/.test(value);
+    return /^\d{4}$/.test(value);
 }, "Please enter a valid year.");
 
 $(document).ready(function(){
-	$("#detailsForm").validate({
-		rules:{
-			isbn1:{
-				isbn: true
-			},
-			year1:{
-				year: true
-			}
-		}
-	});
-	
-	$("[name='add']").click(function(){
-		if($("#detailsForm").valid()){
-			addRecord();
-			clear();
-		}
-	});
-	
-	window.booklistTable = $("#booklist", document.bookqueue);
-	window.booklistTableBody = window.booklistTable[0].children[0];
-	
-	window.bookDetailsForm.isbn = $("#isbn", document.addbook);
-	
-	window.bookDetailsForm.title = $("#title", document.addbook);
-	window.bookDetailsForm.title.spineDisplay = function(){return window.bookDetailsForm.title[0].value + "<br />";};
-	
-	window.bookDetailsForm.genre = $("#genre", document.addbook);
-	
-	window.bookDetailsForm.authors = $("#authors", document.addbook);
-	// TODO Too many authors collapses to et. al.
-	window.bookDetailsForm.authors.spineDisplay = function(){
-		var authorsVal = window.bookDetailsForm.authors[0].value;
-		
-		if(authorsVal == ""){
-			return "";
-		} else{
-			return authorsVal + "<br />";
-		}
-	};
-	
-	window.bookDetailsForm.illustrators = $("#illustrators", document.addbook);
-	window.bookDetailsForm.illustrators.spineDisplay = getLabeledByLine("Illustrated",
-	  window.bookDetailsForm.illustrators[0].value);
-	
-	window.bookDetailsForm.editors = $("#editors", document.addbook);
-	window.bookDetailsForm.editors.spineDisplay = getLabeledByLine("Edited", window.bookDetailsForm.editors[0].value);
-	
-	window.bookDetailsForm.translators = $("#translators", document.addbook);
-	window.bookDetailsForm.translators.spineDisplay = getLabeledByLine("Translated",
-	  window.bookDetailsForm.translators[0].value);
-	
-	window.bookDetailsForm.publisher = $("#publisher", document.addbook);
-	window.bookDetailsForm.publisher.spineDisplay = function(){
-		var publisherVal = window.bookDetailsForm.publisher[0].value;
-		return "<strong>Publisher:</strong> " + publisherVal + "<br />";
-	}
-	
-	window.bookDetailsForm.printer = $("#printer", document.addbook);
-	window.bookDetailsForm.printer.spineDisplay = function(){
-		var printerVal = window.bookDetailsForm.printer[0].value;
-		return "<strong>Printer:</strong> " + printerVal + "<br />";
-	}
-	
-	window.bookDetailsForm.year = $("#year", document.addbook);
-	window.bookDetailsForm.year.spineDisplay = function(){
-		return window.bookDetailsForm.year[0].value;
-	}
+    $("#detailsForm").validate({
+        rules:{
+            isbn1:{
+                isbn: true
+            },
+            year1:{
+                year: true
+            }
+        }
+    });
+    
+    $("[name='add']").click(function(){
+        if($("#detailsForm").valid()){
+            addRecord();
+            clear();
+        }
+    });
+    
+    window.booklistTable = $("#booklist", document.bookqueue);
+    window.booklistTableBody = window.booklistTable[0].children[0];
+    
+    window.bookDetailsForm.isbn = $("#isbn", document.addbook);
+    
+    window.bookDetailsForm.title = $("#title", document.addbook);
+    window.bookDetailsForm.title.spineDisplay = function(){return window.bookDetailsForm.title[0].value + "<br />";};
+    
+    window.bookDetailsForm.genre = $("#genre", document.addbook);
+    
+    window.bookDetailsForm.authors = $("#authors", document.addbook);
+    // TODO Too many authors collapses to et. al.
+    window.bookDetailsForm.authors.spineDisplay = function(){
+        var authorsVal = window.bookDetailsForm.authors[0].value;
+        
+        if(authorsVal == ""){
+            return "";
+        } else{
+            return authorsVal + "<br />";
+        }
+    };
+    
+    window.bookDetailsForm.illustrators = $("#illustrators", document.addbook);
+    window.bookDetailsForm.illustrators.spineDisplay = getLabeledByLine("Illustrated",
+      window.bookDetailsForm.illustrators[0].value);
+    
+    window.bookDetailsForm.editors = $("#editors", document.addbook);
+    window.bookDetailsForm.editors.spineDisplay = getLabeledByLine("Edited", window.bookDetailsForm.editors[0].value);
+    
+    window.bookDetailsForm.translators = $("#translators", document.addbook);
+    window.bookDetailsForm.translators.spineDisplay = getLabeledByLine("Translated",
+      window.bookDetailsForm.translators[0].value);
+    
+    window.bookDetailsForm.publisher = $("#publisher", document.addbook);
+    window.bookDetailsForm.publisher.spineDisplay = function(){
+        var publisherVal = window.bookDetailsForm.publisher[0].value;
+        return "<strong>Publisher:</strong> " + publisherVal + "<br />";
+    }
+    
+    window.bookDetailsForm.printer = $("#printer", document.addbook);
+    window.bookDetailsForm.printer.spineDisplay = function(){
+        var printerVal = window.bookDetailsForm.printer[0].value;
+        return "<strong>Printer:</strong> " + printerVal + "<br />";
+    }
+    
+    window.bookDetailsForm.year = $("#year", document.addbook);
+    window.bookDetailsForm.year.spineDisplay = function(){
+        return window.bookDetailsForm.year[0].value;
+    }
 })
