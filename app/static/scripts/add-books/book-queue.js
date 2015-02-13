@@ -102,7 +102,20 @@ function getFormIds(){
     }
 }
 
+/**
+Send the actual, hidden form to the server via AJAX so that the data may be
+saved.
+
+Note: Uses goody jquery form plugin. Don't look surprised.
+*/
+function sendSaveForm(){
+    // TODO
+}
+
 $(document).ready(function(){
     getFormIds();
+
+    $("#main-form").ajaxForm(sendSaveForm);
+
     // Start the polling timer.
 });
