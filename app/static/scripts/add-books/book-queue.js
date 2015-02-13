@@ -88,16 +88,11 @@ Fill up the realFormIds variable. No guarantee is made as to the order of the
 elements inserted into realFormIds.
 */
 function getFormIds(){
-    var allInputs = $("#main-form input");
+    var allInputs = $("#main-form input").not("csrf_token");
     var limit = allInputs.length;
 
     for(var i = 0; i < limit; i++){
         var iid = allInputs[i].id;
-        // Exclude the csrf token
-        if(iid == "csrf_token"){
-            continue;
-        }
-
         window.realFormIds.push(iid);
     }
 }

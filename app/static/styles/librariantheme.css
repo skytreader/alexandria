@@ -43,6 +43,10 @@ p, .text {
 	color: #000000;
 }
 
+label{
+    font-weight: normal;
+}
+
 /*Boxes*/
 
 div.main_box {

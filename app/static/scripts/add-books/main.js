@@ -22,15 +22,21 @@ function renderSpine(){
 }
 
 /**
-Clears the details form.
+Clears the proxy form.
 */
 function clear(){
-    var fields = getDetailFormFields();
-    var fieldLimit = fields.length;
-    
-    for(var i = 0; i < fieldLimit; i++){
-        fields[i].value = "";
-    }
+    $("#proxy-form input").val("")
+}
+
+/**
+Clear the actual form.
+
+It is important to clear the actual form after every send to server. Else,
+we might get mixed data! (Consider the scenario where a record with an illustrator
+follows a record with no illustrator.)
+*/
+function clearActualForm(){
+    $("#main-form input").not("csrf_token").val("");
 }
 
 /**
