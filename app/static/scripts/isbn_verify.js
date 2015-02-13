@@ -12,7 +12,7 @@ characters like dashes or whitespace.
 Leave only digits.
 */
 function stripExtraneous(isbnInput){
-	return isbnInput.replace(/[\D]/g, "")
+    return isbnInput.replace(/[\D]/g, "")
 }
 
 //TODO: Abstract ISBN verification.
@@ -28,21 +28,21 @@ TODO: Document here how ISBN10 is checked.
   ISBN10 string.
 */
 function verifyISBN10(isbn10){
-	var isbnLength = 10;
-	
-	if(isbn10.length != isbnLength){
-		return false;
-	}
-	
-	var checkChar = isbn10.charAt(isbnLength - 1)
-	var checkDigit = checkChar == 'X' ? 10 : parseInt(checkChar)
-	var runningSum = 0
-	
-	for(var weight = 10; weight >= 2; weight--){
-		runningSum += parseInt(isbn10.charAt(10 - weight)) * weight
-	}
-	
-	return ((runningSum + checkDigit) % 11) == 0;
+    var isbnLength = 10;
+    
+    if(isbn10.length != isbnLength){
+        return false;
+    }
+    
+    var checkChar = isbn10.charAt(isbnLength - 1)
+    var checkDigit = checkChar == 'X' ? 10 : parseInt(checkChar)
+    var runningSum = 0
+    
+    for(var weight = 10; weight >= 2; weight--){
+        runningSum += parseInt(isbn10.charAt(10 - weight)) * weight
+    }
+    
+    return ((runningSum + checkDigit) % 11) == 0;
 }
 
 /**
@@ -52,29 +52,29 @@ been stripped clean of non-ISBN-related characters.
 @return true if given string is a valid isbn13 string, false otherwise.
 */
 function verifyISBN13(isbn13){
-	var isbnLength = 13;
-	
-	if(isbn13.length != isbnLength){
-		return false;
-	}
-	
-	var checkDigit = parseInt(isbn13.charAt(isbnLength - 1));
-	var limit = isbnLength - 1;
-	var sumRunner = 0;
-	
-	for(var i = 0; i < limit; i++){
-		var multiplier;
-		
-		if((i % 2) == 0){
-			multiplier = 1;
-		} else{
-			multiplier = 3;
-		}
-		
-		sumRunner += multiplier * parseInt(isbn13.charAt(i));
-	}
-	
-	var checkDigitCalc = (10 - (sumRunner % 10)) % 10;
-	
-	return checkDigitCalc == checkDigit;
+    var isbnLength = 13;
+    
+    if(isbn13.length != isbnLength){
+        return false;
+    }
+    
+    var checkDigit = parseInt(isbn13.charAt(isbnLength - 1));
+    var limit = isbnLength - 1;
+    var sumRunner = 0;
+    
+    for(var i = 0; i < limit; i++){
+        var multiplier;
+        
+        if((i % 2) == 0){
+            multiplier = 1;
+        } else{
+            multiplier = 3;
+        }
+        
+        sumRunner += multiplier * parseInt(isbn13.charAt(i));
+    }
+    
+    var checkDigitCalc = (10 - (sumRunner % 10)) % 10;
+    
+    return checkDigitCalc == checkDigit;
 }
