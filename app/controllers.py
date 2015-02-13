@@ -40,4 +40,5 @@ def logout():
 @login_required
 def books():
     form = AddBooksForm()
-    return render_template("add_books.jinja", form=form)
+    scripts = ("add-books/main.js", "add-books/book-queue.js")
+    return render_template("add_books.jinja", form=form, scripts=scripts)

@@ -1,10 +1,13 @@
 {#
 This view requires the following variables to be defined:
   title - displayed at the title bar of the browser
-  stylesheets - list of css filepaths, to customize look, if applicable. bootstrap
+  stylesheets - list of css filenames, to customize look, if applicable. bootstrap
     themes and the librarian theme is included by default.
-  scripts - list of javascript filepaths for custom behavior, if applicable. jquery
+  scripts - list of javascript filenames for custom behavior, if applicable. jquery
     is included by default.
+  
+For both stylesheets and scripts, it is assumed that the resource is in the
+default resource directory (/static/scripts and static/styles).
 
 Additionally, if the $content contains text to be echoed, users of this
 view must set a variable $echo_content to TRUE. You should also, ALWAYS,
