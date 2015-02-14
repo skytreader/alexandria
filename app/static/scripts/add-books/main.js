@@ -24,7 +24,7 @@ function renderSpine(){
 /**
 Clears the proxy form.
 */
-function clear(){
+function clearProxyForm(){
     $("#proxy-form input").val("")
 }
 
@@ -87,4 +87,7 @@ $(document).ready(function(){
             clear();
         }
     });
+
+    // Event handlers
+    $("#clear-proxy").click(clearProxyForm);
 })
