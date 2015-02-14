@@ -1,4 +1,18 @@
 /**
+THE BOOK QUEUE. This is the internal representation of the book queue.
+*/
+var bookQueue = [];
+
+/**
+This script will manipulate ids a lot. We derive certain converntions from the
+actual ids of the hidden form field. This hidden form field is the one that
+is mapped to the Flask form.
+
+This variable is filled on document ready.
+*/
+var realFormIds = [];
+
+/**
 Renders the "spine" display of the book list. Takes data from global
 variables directly.
 
@@ -34,16 +48,46 @@ function renderSpine(){
 }
 
 /**
+Generates the delete button to be added at the end
+of every row record.
+*/
+function renderDeleteButton(){
+    var container = document.createElement("input");
+    container.onclick = removeRow;
+    container.type = "button";
+    container.className = "btn infrequent";
+    container.value = "X";
+    
+    return container;
+}
+
+/**
 Clears the proxy form.
 */
 function clearProxyForm(){
     $("#proxy-form input").val("")
 }
 
+/**
+Event handler for clicking "Save Book" button in the proxy form.
+*/
 function queueBook(){
     var spine = renderSpine();
     $("#bookq").append(spine);
     clearProxyForm();
+}
+
+/**
+Remove the book spine that triggered the event.
+
+If the block is already saved to DB, delete the pertaining record as well. (UI
+Note: ask user to verify first). If block is not yet saved to DB, just delete.
+
+@param e
+  The event object.
+*/
+function removeBlock(e){
+    // TODO
 }
 
 /**
@@ -75,6 +119,30 @@ function getLabeledByLine(by, lineVal){
     }
 }
 
+/**
+Fill up the realFormIds variable. No guarantee is made as to the order of the
+elements inserted into realFormIds.
+*/
+function getFormIds(){
+    var allInputs = $("#main-form input").not("csrf_token");
+    var limit = allInputs.length;
+
+    for(var i = 0; i < limit; i++){
+        var iid = allInputs[i].id;
+        window.realFormIds.push(iid);
+    }
+}
+
+/**
+Send the actual, hidden form to the server via AJAX so that the data may be
+saved.
+
+Note: Uses goody jquery form plugin. Don't look surprised.
+*/
+function sendSaveForm(){
+    // TODO
+}
+
 $.validator.addMethod("isbn", function(value, element, param){
     var stripped = stripExtraneous(value);
     return verifyISBN10(stripped) || verifyISBN13(stripped);
@@ -88,6 +156,7 @@ $.validator.addMethod("year", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function(){
+    getFormIds();
     $("#detailsForm").validate({
         rules:{
             isbn1:{
@@ -106,7 +175,10 @@ $(document).ready(function(){
         }
     });
 
+    $("#main-form").ajaxForm(sendSaveForm);
+
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(queueBook);
+    // TODO Start the polling timer.
 })
