@@ -10,15 +10,15 @@ The global variables are expected to have the following attributes:
 @return The text formatted like a spine of a book.
 */
 function renderSpine(){
-    window.spine = ["title", "authors", "illustrators", "translators", "editors", "publisher", "printer", "year"];
-    var spineText = "";
-    var limit = window.spine.length;
-    
-    for(var i = 0; i < limit; i++){
-        spineText += window.bookDetailsForm[spine[i]].spineDisplay();
-    }
-    
-    return spineText;
+    var spine = document.createElement("div");
+    spine.className = "unsaved_book queued_block";
+    var allInputs = $("#proxy-form input");
+    var isbn = $(allInputs).filter("#isbn-proxy");
+    var title = $(allInputs).filter("#title-proxy");
+    var authors = $(allInputs).filter("#authors-proxy");
+    spine.innerHTML = isbn.val() + " " + title.val() + " " + authors.val();
+
+    return spine;
 }
 
 /**
@@ -26,6 +26,12 @@ Clears the proxy form.
 */
 function clearProxyForm(){
     $("#proxy-form input").val("")
+}
+
+function queueBook(){
+    var spine = renderSpine();
+    $("#bookq").append(spine);
+    clearProxyForm();
 }
 
 /**
@@ -90,4 +96,5 @@ $(document).ready(function(){
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
+    $("#queue-book").click(queueBook);
 })

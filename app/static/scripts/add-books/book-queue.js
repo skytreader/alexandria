@@ -1,6 +1,6 @@
 /**
 Functions in this file will deal with the book queue system add-book
-attempts.
+logic.
 
 As usual, relies on jQuery being loaded.
 
@@ -60,27 +60,6 @@ function deleteButton(){
     container.value = "X";
     
     return container;
-}
-
-/**
-Returns all the form fields in the detailsForm as an array.
-No order is guaranteed on the return array.
-*/
-function getDetailFormFields(){
-    var fields = new Array();
-    var blockDivs = $("#detailsForm").children(".block");
-    var divLimit = blockDivs.length;
-    
-    for(var i = 0; i < divLimit; i++){
-        var inputs = $(blockDivs[i]).children("input");
-        var inputLimit = inputs.length;
-        
-        for(var j = 0; j < inputLimit; j++){
-            fields.push(inputs[j]);
-        }
-    }
-    
-    return fields;
 }
 
 /**

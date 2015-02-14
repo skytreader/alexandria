@@ -97,7 +97,7 @@ div.saved_book{
     font-weight: bold;
 }
 
-div.empty_set{
+div.empty_set, div.unsaved_book{
     padding 10px;
     background-color: #dadada;
 }
