@@ -16,7 +16,19 @@ function renderSpine(){
     var isbn = $(allInputs).filter("#isbn-proxy");
     var title = $(allInputs).filter("#title-proxy");
     var authors = $(allInputs).filter("#authors-proxy");
-    spine.innerHTML = isbn.val() + " " + title.val() + " " + authors.val();
+
+    var isbnText = document.createElement("h3");
+    isbnText.innerHTML = isbn.val();
+
+    var titleText = document.createElement("h2");
+    titleText.innerHTML = title.val();
+
+    var authorsText = document.createElement("h3");
+    authorsText.innerHTML = authors.val();
+
+    spine.appendChild(isbnText);
+    spine.appendChild(titleText);
+    spine.appendChild(authorsText);
 
     return spine;
 }
