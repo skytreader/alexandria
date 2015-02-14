@@ -166,11 +166,15 @@ input.btn:active {
 	color: #fff;
 }
 
-.btn-default{
+.btn-primary{
 	background-color: #2b2b2b;
     background-image: none;
     text-shadow: none;
 	color: #d2c136;
+}
+
+.btn-primary:hover{
+    background-color: #000;
 }
 
 input.infrequent{
