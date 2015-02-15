@@ -21,7 +21,7 @@ The global variables are expected to have the following attributes:
     A function returning a string. This string will be the one displayed
     on the "spine". Include line breaks (as <br> tags).
 
-@return The text formatted like a spine of a book.
+@return A div element which displays like a spine of a book.
 */
 function renderSpine(){
     var spine = document.createElement("div");
@@ -45,6 +45,28 @@ function renderSpine(){
     spine.appendChild(authorsText);
 
     return spine;
+}
+
+/**
+Append the book described in #proxy-form to the internal queue.
+*/
+function internalizeBook(){
+    var allInputs = $("#proxy-form input");
+    var isbn = $(allInputs).filter("#isbn-proxy");
+    var title = $(allInputs).filter("#title-proxy");
+    var genre = $(allInputs).filter("#genre-proxy");
+    var authors = $(allInputs).filter("#authors-proxy");
+    var illustrators = $(allInputs).filter("#illustrators-proxy");
+    var editors = $(allInputs).filter("#editors-proxy");
+    var translators = $(allInputs).filter("#translators-proxy");
+    var publisher = $(allInputs).filter("#publisher-proxy");
+    var printer = $(allInputs).filter("#printer-proxy");
+    var year = $(allInputs).filter("#year-proxy");
+
+    var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
+      translators, publisher, printer, year);
+
+    window.bookQueue.push(bookObj);
 }
 
 /**
@@ -72,6 +94,10 @@ function clearProxyForm(){
 Event handler for clicking "Save Book" button in the proxy form.
 */
 function queueBook(){
+    if(window.bookQueue.length == 0){
+        $("#bookq").empty();
+    }
+    internalizeBook();
     var spine = renderSpine();
     $("#bookq").append(spine);
     clearProxyForm();
