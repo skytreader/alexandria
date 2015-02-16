@@ -52,16 +52,16 @@ Append the book described in #proxy-form to the internal queue.
 */
 function internalizeBook(){
     var allInputs = $("#proxy-form input");
-    var isbn = $(allInputs).filter("#isbn-proxy");
-    var title = $(allInputs).filter("#title-proxy");
-    var genre = $(allInputs).filter("#genre-proxy");
-    var authors = $(allInputs).filter("#authors-proxy");
-    var illustrators = $(allInputs).filter("#illustrators-proxy");
-    var editors = $(allInputs).filter("#editors-proxy");
-    var translators = $(allInputs).filter("#translators-proxy");
-    var publisher = $(allInputs).filter("#publisher-proxy");
-    var printer = $(allInputs).filter("#printer-proxy");
-    var year = $(allInputs).filter("#year-proxy");
+    var isbn = $(allInputs).filter("#isbn-proxy").val();
+    var title = $(allInputs).filter("#title-proxy").val();
+    var genre = $(allInputs).filter("#genre-proxy").val();
+    var authors = $(allInputs).filter("#authors-proxy").val();
+    var illustrators = $(allInputs).filter("#illustrators-proxy").val();
+    var editors = $(allInputs).filter("#editors-proxy").val();
+    var translators = $(allInputs).filter("#translators-proxy").val();
+    var publisher = $(allInputs).filter("#publisher-proxy").val();
+    var printer = $(allInputs).filter("#printer-proxy").val();
+    var year = $(allInputs).filter("#year-proxy").val();
 
     var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
       translators, publisher, printer, year);
