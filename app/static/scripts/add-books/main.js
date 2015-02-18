@@ -162,12 +162,26 @@ function getFormIds(){
 /**
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
-
-Note: Uses goody jquery form plugin. Don't look surprised.
 */
 function sendSaveForm(){
     // TODO
     console.log("Submitting form");
+    var data = {
+        "isbn": document.getElementById("isbn").value,
+        "title": document.getElementById("title").value,
+        "genre": document.getElementById("genre").value,
+        "authors": document.getElementById("authors").value,
+        "illustrators": document.getElementById("illustrators").value,
+        "editors": document.getElementById("editors").value,
+        "translators": document.getElementById("translators").value,
+        "publisher": document.getElementById("publisher").value,
+        "printer": document.getElementById("printer").value,
+        "year": document.getElementById("year").value
+    }
+    $.ajax("/book_adder", {
+        "type": "POST",
+        "data": data
+    });
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
