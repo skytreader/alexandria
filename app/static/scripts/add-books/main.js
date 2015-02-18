@@ -186,14 +186,22 @@ function sendSaveForm(){
 
 /**
 Fetch a book from the queue and load it to the main form.
+
+@return true if we were able to fetch a Book and load it to the form.
 */
 function loadFromQueueToForm(){
-    var fromQ = window.bookQueue.shift();
-    var limit = window.realFormIds.length;
+    if(window.bookQueue.length){
+        var fromQ = window.bookQueue.shift();
+        var limit = window.realFormIds.length;
 
-    for(var i = 0; i < limit; i++){
-        document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+        for(var i = 0; i < limit; i++){
+            document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+        }
+
+        return true;
     }
+    
+    return false;
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
@@ -233,7 +241,8 @@ $(document).ready(function(){
     $("#queue-book").click(queueBook);
     // TODO Start the polling timer.
     setInterval(function(){
-        loadFromQueueToForm();
-        sendSaveForm();
+        if(loadFromQueueToForm()){
+            sendSaveForm();
+        }
     }, 8000);
 });
