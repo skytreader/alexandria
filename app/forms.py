@@ -25,3 +25,10 @@ class AddBooksForm(Form):
     printer = HiddenField("Printer", [Required(message="Printer")])
     # TODO Clarify this in models!!!
     year = HiddenField("Year", [Required(message="Edition Year")])
+
+    def __str__(self):
+        return "".join((str(self.isbn.raw_data), str(self.title.raw_data),
+          str(self.genre.raw_data), str(self.authors.raw_data),
+          str(self.illustrators.raw_data), str(self.editors.raw_data),
+          str(self.translators.raw_data), str(self.publisher.raw_data),
+          str(self.printer.raw_data), str(self.year.raw_data)))
