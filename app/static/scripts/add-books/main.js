@@ -167,6 +167,7 @@ Note: Uses goody jquery form plugin. Don't look surprised.
 */
 function sendSaveForm(){
     // TODO
+    console.log("Submitting form");
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
@@ -201,10 +202,9 @@ $(document).ready(function(){
         }
     });
 
-    $("#main-form").ajaxForm(sendSaveForm);
-
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(queueBook);
     // TODO Start the polling timer.
-})
+    setInterval(sendSaveForm, 8000);
+});
