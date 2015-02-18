@@ -167,6 +167,7 @@ function sendSaveForm(){
     // TODO
     console.log("Submitting form");
     var data = {
+        "csrf_token": document.getElementById("csrf_token").value,
         "isbn": document.getElementById("isbn").value,
         "title": document.getElementById("title").value,
         "genre": document.getElementById("genre").value,
