@@ -150,7 +150,7 @@ Fill up the realFormIds variable. No guarantee is made as to the order of the
 elements inserted into realFormIds.
 */
 function getFormIds(){
-    var allInputs = $("#main-form input").not("csrf_token");
+    var allInputs = $("#main-form input").not("#csrf_token");
     var limit = allInputs.length;
 
     for(var i = 0; i < limit; i++){
@@ -182,6 +182,18 @@ function sendSaveForm(){
         "type": "POST",
         "data": data
     });
+}
+
+/**
+Fetch a book from the queue and load it to the main form.
+*/
+function loadFromQueueToForm(){
+    var fromQ = window.bookQueue.shift();
+    var limit = window.realFormIds.length;
+
+    for(var i = 0; i < limit; i++){
+        document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+    }
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
@@ -220,5 +232,8 @@ $(document).ready(function(){
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(queueBook);
     // TODO Start the polling timer.
-    setInterval(sendSaveForm, 8000);
+    setInterval(function(){
+        loadFromQueueToForm();
+        sendSaveForm();
+    }, 8000);
 });
