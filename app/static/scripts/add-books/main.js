@@ -105,12 +105,9 @@ function clearProxyForm(){
 Event handler for clicking "Save Book" button in the proxy form.
 */
 function queueBook(){
-    if($("#bookq").length == 1 && window.bookQueue.length == 0){
-        $("#bookq").empty();
-    }
     var spine = renderSpine();
     internalizeBook(spine);
-    $("#bookq").append(spine);
+    window.visualQueue.enqueue(spine);
     clearProxyForm();
 }
 

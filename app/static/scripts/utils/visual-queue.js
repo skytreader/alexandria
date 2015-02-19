@@ -18,6 +18,10 @@ To facilitate the removal of objects, it is recommended that the domElement
 enqueued have an id attribute.
 */
 VisualQueue.prototype.enqueue = function(domElement){
+    if(this.queueCounter == 0){
+        // Remove the default display first, if any
+        $(this.domContainer).empty();
+    }
     $(this.domContainer).append(domElement);
     this.queueCounter++;
 }
