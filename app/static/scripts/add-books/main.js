@@ -13,21 +13,27 @@ This variable is filled on document ready.
 var realFormIds = [];
 
 /**
-Renders the "spine" display of the book list. Takes data from global
-variables directly.
+Problem: We don't have a way to determine if we should display the "Ooops..."
+message from script status quickly. So, we add a visualQueue count.
 
-The global variables are expected to have the following attributes:
-  spineDisplay
-    A function returning a string. This string will be the one displayed
-    on the "spine". Include line breaks (as <br> tags).
+Each time we add to the visual book queue, increment this. Each time we remove
+(clear), decrement.
+*/
+var visualQueueCount = 0;
 
-@return A div element which displays like a spine of a book.
+/**
+Renders the "spine" display of the book list. Takes data from the proxy form
+directly.
+
+@return A div element which displays like a spine of a book. The div
+element has the isbn for its id.
 */
 function renderSpine(){
     var spine = document.createElement("div");
     spine.className = "unsaved_book queued_block";
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy");
+    spine.id = isbn;
     var title = $(allInputs).filter("#title-proxy");
     var authors = $(allInputs).filter("#authors-proxy");
 
@@ -97,7 +103,7 @@ function clearProxyForm(){
 Event handler for clicking "Save Book" button in the proxy form.
 */
 function queueBook(){
-    if(window.bookQueue.length == 0){
+    if($("#bookq").length == 1 && window.bookQueue.length == 0){
         $("#bookq").empty();
     }
     var spine = renderSpine();
@@ -177,7 +183,6 @@ function sendSaveForm(domElement){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
     }
 
-    console.log("Submitting form");
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
         "isbn": document.getElementById("isbn").value,
