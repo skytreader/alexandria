@@ -27,6 +27,7 @@ Remove the specified element from the queue.
 @param elementId
   The id of the DOM element to be removed, specified as a string.
 */
-VisualQueue.prototype.enqueue = function(elementId){
+VisualQueue.prototype.remove = function(elementId){
     $(this.domContainer).remove("#" + elementId);
+    this.queueCounter--;
 }
