@@ -9,6 +9,7 @@ Depends on jQuery.
 
 function VisualQueue(domContainer, defaultDisplay){
     this.domContainer = domContainer;
+    this.domContainer.appendChild(defaultDisplay);
     this.queueCounter = 0;
 }
 

@@ -21,6 +21,8 @@ Each time we add to the visual book queue, increment this. Each time we remove
 */
 var visualQueueCount = 0;
 
+var visualQueue;
+
 /**
 Renders the "spine" display of the book list. Takes data from the proxy form
 directly.
@@ -255,6 +257,17 @@ $(document).ready(function(){
             clear();
         }
     });
+
+    // Initialize the visualQueue
+    var qContainer = document.createElement("span");
+    qContainer.id = "bookq";
+    var defItem = document.createElement("div");
+    defItem.className = "queued_block empty_set";
+    var defText = document.createElement("h3");
+    defText.innerHTML = "Ooops. Nothing yet.";
+    defItem.appendChild(defText);
+    window.visualQueue = new VisualQueue(qContainer, defItem);
+    document.getElementById("qContainer").appendChild(window.visualQueue.domContainer);
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
