@@ -49,8 +49,11 @@ function renderSpine(){
 
 /**
 Append the book described in #proxy-form to the internal queue.
+
+The DOM element representing the book is a required parameter since we use it to
+map the Book object to its visual representation.
 */
-function internalizeBook(){
+function internalizeBook(spineDom){
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy").val();
     var title = $(allInputs).filter("#title-proxy").val();
@@ -64,7 +67,7 @@ function internalizeBook(){
     var year = $(allInputs).filter("#year-proxy").val();
 
     var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
-      translators, publisher, printer, year);
+      translators, publisher, printer, year, spineDom);
 
     window.bookQueue.push(bookObj);
 }
@@ -97,8 +100,8 @@ function queueBook(){
     if(window.bookQueue.length == 0){
         $("#bookq").empty();
     }
-    internalizeBook();
     var spine = renderSpine();
+    internalizeBook(spine);
     $("#bookq").append(spine);
     clearProxyForm();
 }

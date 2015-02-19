@@ -5,10 +5,11 @@ The book class.
 /**
 FIXME Such a long arglist! Is there a pattern to prevent this?
 
-All args are strings.
+All args are strings except for domElement which is the corresponding
+visual representation of the Book in the DOM.
 */
 function Book(isbn, title, genre, authors, illustrators, editors, translators,
-  publisher, printer, year){
+  publisher, printer, year, domElement){
     this.isbn = isbn;
     this.title = title;
     this.genre = genre;
@@ -19,4 +20,5 @@ function Book(isbn, title, genre, authors, illustrators, editors, translators,
     this.publisher = publisher;
     this.printer = printer;
     this.year = year;
+    this.domElement = domElement;
 }
