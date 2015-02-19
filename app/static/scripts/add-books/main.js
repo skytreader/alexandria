@@ -165,9 +165,18 @@ function getFormIds(){
 /**
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
+
+@param domElement
+    The book spine representing the book to be sent, as a DOM element.
 */
-function sendSaveForm(){
+function sendSaveForm(domElement){
     // TODO
+
+    function success(){
+        // CSS changes
+        $(domElement).removeClass("unsaved_book").addClass("saved_book");
+    }
+
     console.log("Submitting form");
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
@@ -184,14 +193,16 @@ function sendSaveForm(){
     }
     $.ajax("/book_adder", {
         "type": "POST",
-        "data": data
+        "data": data,
+        "success": success
     });
 }
 
 /**
 Fetch a book from the queue and load it to the main form.
 
-@return true if we were able to fetch a Book and load it to the form.
+@return the DOM element representing the book, if we are able to fetch a book
+  from the queue. Otherwise, return false.
 */
 function loadFromQueueToForm(){
     if(window.bookQueue.length){
@@ -202,7 +213,7 @@ function loadFromQueueToForm(){
             document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
         }
 
-        return true;
+        return fromQ.domElement;
     }
     
     return false;
@@ -245,8 +256,9 @@ $(document).ready(function(){
     $("#queue-book").click(queueBook);
     // TODO Start the polling timer.
     setInterval(function(){
-        if(loadFromQueueToForm()){
-            sendSaveForm();
+        var foo = loadFromQueueToForm();
+        if(foo){
+            sendSaveForm(foo);
         }
     }, 8000);
 });
