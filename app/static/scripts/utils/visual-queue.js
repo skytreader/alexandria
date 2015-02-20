@@ -7,9 +7,25 @@ Depends on jQuery.
 @author Chad Estioco
 */
 
-function VisualQueue(domContainer, defaultDisplay){
+/**
+Constructor for a visual queue.
+
+@param domContainer
+    The container for the queue in the DOM. Typically a span or a div element.
+@param defs
+    Default parameters object such as
+        defaultDisplay - What to display when the queue is empty. Defaults to
+          null.
+        defautLocation - An existing node in the DOM that will hold the
+          domContainer. Defaults to the document body.
+*/
+function VisualQueue(domContainer, defs){
+    defs = defs ? defs : {};
     this.domContainer = domContainer;
-    this.domContainer.appendChild(defaultDisplay);
+    if(defs["defaultDisplay"]){
+        this.domContainer.appendChild(defs["defaultDisplay"]);
+    }
+    this.superContainer = defs["defaultDisplay"] ? defs["defaultDisplay"] : document.body;
     this.queueCounter = 0;
 }
 
@@ -35,4 +51,11 @@ Remove the specified element from the queue.
 VisualQueue.prototype.remove = function(elementId){
     $(this.domContainer).remove("#" + elementId);
     this.queueCounter--;
+}
+
+/**
+Render the queue to the defaultLocation specified in the constructor.
+*/
+VisualQueue.prototype.render = function(){
+    $(this.superContainer).append(this.domContainer);
 }
