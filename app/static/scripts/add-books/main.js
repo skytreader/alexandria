@@ -198,7 +198,10 @@ function sendSaveForm(domElement){
     $.ajax("/book_adder", {
         "type": "POST",
         "data": data,
-        "success": success
+        "success": success,
+        "statusCode": {
+            500: sendSaveForm
+        }
     });
 }
 
