@@ -1,6 +1,19 @@
 from app import db
 from sqlalchemy.ext.declarative import declared_attr
 
+def get_or_create(model, **kwargs):
+    instance = db.query(model).filter_by(**kwargs).first()
+    if instance:
+        print "Existing instance %s for %s" % (str(kwargs), str(model))
+        return instance
+    else:
+        print "New instance %s for %s" % (str(kwargs), str(model))
+        instance = model(**kwargs)
+        db.add(instance)
+        db.commit()
+        return instance
+
+
 class Base(db.Model):
     __abstract__ = True
     record_id = db.Column(db.Integer, primary_key=True)
