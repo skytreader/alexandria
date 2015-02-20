@@ -25,7 +25,7 @@ function VisualQueue(domContainer, defs){
     if(defs["defaultDisplay"]){
         this.domContainer.appendChild(defs["defaultDisplay"]);
     }
-    this.superContainer = defs["defaultDisplay"] ? defs["defaultDisplay"] : document.body;
+    this.superContainer = defs["defaultLocation"] ? defs["defaultLocation"] : document.body;
     this.queueCounter = 0;
 }
 

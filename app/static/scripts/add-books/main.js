@@ -263,6 +263,8 @@ $(document).ready(function(){
     var defText = document.createElement("h3");
     defText.innerHTML = "Ooops. Nothing yet.";
     defItem.appendChild(defText);
+    var defs = {"defaultDisplay":defItem,
+      "defaultLocation": document.getElementById("qContainer")};
     window.visualQueue = new VisualQueue(qContainer, defItem);
     document.getElementById("qContainer").appendChild(window.visualQueue.domContainer);
 
