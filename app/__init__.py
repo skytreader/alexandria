@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config.from_object("config")
 
 db = SQLAlchemy(app)
-from models import Librarians
+from models import Librarian
 app.register_blueprint(librarian)
 from api import librarian_api
 app.register_blueprint(librarian_api)
@@ -19,4 +19,4 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(userid):
-    return Librarians.query.filter_by(record_id=userid).first()
+    return Librarian.query.filter_by(record_id=userid).first()

@@ -2,7 +2,7 @@ from app import app
 from app.forms import AddBooksForm
 from flask import Blueprint
 from flask.ext.login import current_user, login_required
-from models import get_or_create, Books, Genres, BookCompanies, BookPersons
+from models import get_or_create, Book, Genre, BookCompany, BookPerson
 
 librarian_api = Blueprint("librarian_api", __name__)
 

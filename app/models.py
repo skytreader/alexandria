@@ -21,7 +21,7 @@ class Base(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
       onupdate=db.func.current_timestamp())
 
-class Librarians(Base):
+class Librarian(Base):
     __tablename__ = "librarians"
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
@@ -65,14 +65,14 @@ class UserTaggedBase(Base):
     def last_modifier(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
 
-class Genres(UserTaggedBase):
+class Genre(UserTaggedBase):
     __tablename__ = "genres"
     genre_name = db.Column(db.String(20), nullable=False)
 
     def __init__(self, genre_name):
         self.genre_name = genre_name
 
-class Books(UserTaggedBase):
+class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False)
@@ -87,7 +87,7 @@ class Books(UserTaggedBase):
         self.creator = creator
         self.last_modifier = creator
 
-class BookCompanies(UserTaggedBase):
+class BookCompany(UserTaggedBase):
     """
     List?! List?! This is better off in NoSQL form!
     """
@@ -97,7 +97,7 @@ class BookCompanies(UserTaggedBase):
     def __init__(self, company_name):
         self.company_name = company_name
 
-class Imprints(UserTaggedBase):
+class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
     mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
     imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
@@ -106,7 +106,7 @@ class Imprints(UserTaggedBase):
         self.mother_company = mother_company
         self.imprint_company = imprint_company
 
-class BookPersons(UserTaggedBase):
+class BookPerson(UserTaggedBase):
     __tablename__ = "book_persons"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
@@ -115,7 +115,7 @@ class BookPersons(UserTaggedBase):
         self.lastname = lastname
         self.firstname = firstname
 
-class Roles(UserTaggedBase):
+class Role(UserTaggedBase):
     """
     The purpose of this table is to enumerate the contributions we are interested
     in for the books.
@@ -131,7 +131,7 @@ class Roles(UserTaggedBase):
         self.role_name = role_name
         self.role_display = role_display
 
-class BookParticipants(UserTaggedBase):
+class BookParticipant(UserTaggedBase):
     """
     Consider that 99% of books will need the same roles over and over. 
     """
@@ -145,7 +145,7 @@ class BookParticipants(UserTaggedBase):
         person_id = person_id
         role_id = role_id
 
-class Pseudonyms(UserTaggedBase):
+class Pseudonym(UserTaggedBase):
     """
     Copied from original schema:
 
