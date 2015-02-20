@@ -14,12 +14,12 @@ def book_adder():
 
     if form.validate_on_submit():
         # Genre first
-        genre = get_or_create(Genre, genre_name=form.genre)
+        genre = get_or_create(Genre, genre_name=form.genre.data)
 
         # Book
         book = Book(isbn=form.isbn.data, title=form.title.data, year=form.year.data,
         genre=genre, creator=current_user)
-        db.add(book)
+        db.session.add(book)
 
         # Create the BookPersons
         author_last, author_first = form.authors.data.split(", ")
@@ -53,10 +53,10 @@ def book_adder():
         translator_part = BookParticipant(book.record_id, translator.record_id,
           trans_role.record_id)
 
-        db.add(author_part)
-        db.add(illus_part)
-        db.add(editor_part)
-        db.add(translator_part)
+        db.session.add(author_part)
+        db.session.add(illus_part)
+        db.session.add(editor_part)
+        db.session.add(translator_part)
 
         # Publishing information
         publisher = get_or_create(BookCompany, company_name=form.publisher.data)

@@ -2,15 +2,13 @@ from app import db
 from sqlalchemy.ext.declarative import declared_attr
 
 def get_or_create(model, **kwargs):
-    instance = db.query(model).filter_by(**kwargs).first()
+    instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
-        print "Existing instance %s for %s" % (str(kwargs), str(model))
         return instance
     else:
-        print "New instance %s for %s" % (str(kwargs), str(model))
         instance = model(**kwargs)
-        db.add(instance)
-        db.commit()
+        db.session.add(instance)
+        db.session.commit()
         return instance
 
 
@@ -67,7 +65,7 @@ class UserTaggedBase(Base):
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
-    genre_name = db.Column(db.String(20), nullable=False)
+    genre_name = db.Column(db.String(20), nullable=False, unique=True)
 
     def __init__(self, genre_name):
         self.genre_name = genre_name
