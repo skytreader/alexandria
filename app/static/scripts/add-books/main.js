@@ -268,8 +268,9 @@ $(document).ready(function(){
     defItem.appendChild(defText);
     var defs = {"defaultDisplay":defItem,
       "defaultLocation": document.getElementById("qContainer")};
-    window.visualQueue = new VisualQueue(qContainer, defItem);
-    document.getElementById("qContainer").appendChild(window.visualQueue.domContainer);
+    window.visualQueue = new VisualQueue(qContainer, defs);
+    //document.getElementById("qContainer").appendChild(window.visualQueue.domContainer);
+    window.visualQueue.render();
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
