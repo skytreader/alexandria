@@ -108,6 +108,7 @@ class BookPerson(UserTaggedBase):
     __tablename__ = "book_persons"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
+    __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
     def __init__(self, lastname, firstname):
         self.lastname = lastname

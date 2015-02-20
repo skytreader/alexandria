@@ -1,4 +1,4 @@
-from app.models import Librarians, Roles
+from app.models import Librarian, Role
 from config import SQLALCHEMY_DATABASE_URI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,9 +19,9 @@ if __name__ == "__main__":
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
-    get_or_create(session, Librarians, username="admin", password="admin")
+    get_or_create(session, Librarian, username="admin", password="admin")
     
     roles = ("Author", "Illustrator", "Editor", "Translator")
     
     for r in roles:
-        get_or_create(session, Roles, role_name=r, role_display="%s(s)" % r)
+        get_or_create(session, Role, role_name=r, role_display="%s(s)" % r)
