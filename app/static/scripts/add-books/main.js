@@ -199,9 +199,9 @@ function sendSaveForm(domElement){
         "type": "POST",
         "data": data,
         "success": success,
-        "statusCode": {
-            500: sendSaveForm
-        }
+        //"statusCode": {
+        //    500: sendSaveForm
+        //}
     });
 }
 

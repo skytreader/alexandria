@@ -1,7 +1,8 @@
-from app import db
+from app import db, app
 from sqlalchemy.ext.declarative import declared_attr
 
 def get_or_create(model, **kwargs):
+    app.logger.info(str(kwargs))
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance

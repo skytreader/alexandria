@@ -2,7 +2,7 @@ from app import app, db
 from app.forms import AddBooksForm
 from flask import Blueprint
 from flask.ext.login import current_user, login_required
-from models import get_or_create, Book, BookCompany, BookPerson, Genre, Role
+from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 
 librarian_api = Blueprint("librarian_api", __name__)
 
@@ -18,8 +18,9 @@ def book_adder():
 
         # Book
         book = Book(isbn=form.isbn.data, title=form.title.data, year=form.year.data,
-        genre=genre, creator=current_user)
+        genre=genre.record_id, creator=current_user.get_id())
         db.session.add(book)
+        db.session.commit()
 
         # Create the BookPersons
         author_last, author_first = form.authors.data.split(", ")
@@ -27,14 +28,10 @@ def book_adder():
         editor_last, editor_first = form.editors.data.split(", ")
         trans_last, trans_first = form.translators.data.split(", ")
 
-        author = get_or_create(BookPerson, lastname=author_last,
-          firstname=author_first)
-        illustrator = get_or_create(BookPerson, lastname=illus_last,
-          firstname=illus_first)
-        editor = get_or_create(BookPerson, lastname=editor_last,
-          firstname=editor_first)
-        translator = get_or_create(BookPerson, lastname=trans_last,
-          firstname=trans_first)
+        author = get_or_create(BookPerson, lastname=u"Rushdie", firstname=u"Salman")
+        illustrator = get_or_create(BookPerson, lastname=illus_last, firstname=illus_first)
+        editor = get_or_create(BookPerson, lastname=editor_last, firstname=editor_first)
+        translator = get_or_create(BookPerson, lastname=trans_last, firstname=trans_first)
 
         #FIXME This part is shaky
         #FIXME I think we should cache.
@@ -65,3 +62,10 @@ def book_adder():
         return "Accepted", 200
     
     return "Error", 400
+
+@librarian_api.route("/test")
+@login_required
+def test():
+    author = get_or_create(BookPerson, lastname=u"Calvino", firstname=u"Italo",
+      creator=current_user)
+    return "Accepted", 200
