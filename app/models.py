@@ -1,14 +1,15 @@
 from app import db, app
 from sqlalchemy.ext.declarative import declared_attr
 
-def get_or_create(model, **kwargs):
+def get_or_create(model, will_commit=False, **kwargs):
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
         instance = model(**kwargs)
         db.session.add(instance)
-        db.session.commit()
+        if will_commit:
+            db.session.commit()
         return instance
 
 
