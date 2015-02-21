@@ -2,6 +2,12 @@
 {% block title %}Add Books{% endblock %}
 {% block content %}
     <h1>Add Books</h1>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <input type="checkbox" id="auto-save-toggle" checked>
+        </span>
+        <input type="text" class="form-control special_label" value="Auto-Save" readonly="true">
+    </div>
     <!-- This is the hidden "buffer" form, the actual form mapped from back-end. -->
     <form method="POST" action="/book_adder" role="form" id="main-form">
         {{ form.csrf_token }}

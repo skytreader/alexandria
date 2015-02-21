@@ -277,9 +277,11 @@ $(document).ready(function(){
     $("#queue-book").click(queueBook);
     // TODO Start the polling timer.
     setInterval(function(){
-        var foo = loadFromQueueToForm();
-        if(foo){
-            sendSaveForm(foo);
+        if(document.getElementById("auto-save-toggle").checked){
+            var foo = loadFromQueueToForm();
+            if(foo){
+                sendSaveForm(foo);
+            }
         }
     }, 8000);
 });

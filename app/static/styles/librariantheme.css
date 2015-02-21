@@ -166,6 +166,17 @@ input.btn:active {
 	color: #fff;
 }
 
+/*
+special_labels are input textboxes used as labels to checkboxes. They follow
+bootstrap styling so this just overrides on them.
+
+They are usually readonly text fields hence the !important indicator in cursor.
+*/
+input.special_label{
+    max-width: 30%;
+    cursor: default !important;
+}
+
 .btn-primary{
 	background-color: #2b2b2b;
     background-image: none;
