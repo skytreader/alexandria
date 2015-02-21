@@ -28,7 +28,7 @@ def book_adder():
         editor_last, editor_first = form.editors.data.split(", ")
         trans_last, trans_first = form.translators.data.split(", ")
 
-        author = get_or_create(BookPerson, lastname=u"Rushdie", firstname=u"Salman")
+        author = get_or_create(BookPerson, lastname=author_last, firstname=author_first)
         illustrator = get_or_create(BookPerson, lastname=illus_last, firstname=illus_first)
         editor = get_or_create(BookPerson, lastname=editor_last, firstname=editor_first)
         translator = get_or_create(BookPerson, lastname=trans_last, firstname=trans_first)
@@ -59,13 +59,8 @@ def book_adder():
         publisher = get_or_create(BookCompany, company_name=form.publisher.data)
         printer = get_or_create(BookCompany, company_name=form.printer.data)
 
+        db.session.commit()
+
         return "Accepted", 200
     
     return "Error", 400
-
-@librarian_api.route("/test")
-@login_required
-def test():
-    author = get_or_create(BookPerson, lastname=u"Calvino", firstname=u"Italo",
-      creator=current_user)
-    return "Accepted", 200

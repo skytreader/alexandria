@@ -2,7 +2,6 @@ from app import db, app
 from sqlalchemy.ext.declarative import declared_attr
 
 def get_or_create(model, **kwargs):
-    app.logger.info(str(kwargs))
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
@@ -141,9 +140,13 @@ class BookParticipant(UserTaggedBase):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.record_id"))
 
     def __init__(self, book_id, person_id, role_id):
-        book_id = book_id
-        person_id = person_id
-        role_id = role_id
+        self.book_id = book_id
+        self.person_id = person_id
+        self.role_id = role_id
+    
+    def __str__(self):
+        return "Person %s worked on book %s as the role %s" % \
+          (str(self.person_id), str(self.book_id), str(self.role_id))
 
 class Pseudonym(UserTaggedBase):
     """
