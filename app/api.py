@@ -14,7 +14,8 @@ def book_adder():
 
     if form.validate_on_submit():
         # Genre first
-        genre = get_or_create(Genre, genre_name=form.genre.data)
+        genre = get_or_create(Genre, genre_name=form.genre.data,
+          creator=current_user.get_id())
 
         # Book
         book = Book(isbn=form.isbn.data, title=form.title.data, year=form.year.data,
@@ -28,10 +29,14 @@ def book_adder():
         editor_last, editor_first = form.editors.data.split(", ")
         trans_last, trans_first = form.translators.data.split(", ")
 
-        author = get_or_create(BookPerson, lastname=author_last, firstname=author_first)
-        illustrator = get_or_create(BookPerson, lastname=illus_last, firstname=illus_first)
-        editor = get_or_create(BookPerson, lastname=editor_last, firstname=editor_first)
-        translator = get_or_create(BookPerson, lastname=trans_last, firstname=trans_first)
+        author = get_or_create(BookPerson, lastname=author_last,
+          firstname=author_first, creator=current_user.get_id())
+        illustrator = get_or_create(BookPerson, lastname=illus_last,
+          firstname=illus_first, creator=current_user.get_id())
+        editor = get_or_create(BookPerson, lastname=editor_last,
+          firstname=editor_first, creator=current_user.get_id())
+        translator = get_or_create(BookPerson, lastname=trans_last,
+          firstname=trans_first, creator=current_user.get_id())
 
         #FIXME This part is shaky
         #FIXME I think we should cache.
@@ -42,13 +47,13 @@ def book_adder():
 
         # Assign participation
         author_part = BookParticipant(book.record_id, author.record_id,
-          author_role.record_id)
+          author_role.record_id, creator=current_user.get_id())
         illus_part = BookParticipant(book.record_id, illustrator.record_id,
-          illus_role.record_id)
+          illus_role.record_id, creator=current_user.get_id())
         editor_part = BookParticipant(book.record_id, editor.record_id,
-          editor_role.record_id)
+          editor_role.record_id, creator=current_user.get_id())
         translator_part = BookParticipant(book.record_id, translator.record_id,
-          trans_role.record_id)
+          trans_role.record_id, creator=current_user.get_id())
 
         db.session.add(author_part)
         db.session.add(illus_part)
@@ -56,8 +61,10 @@ def book_adder():
         db.session.add(translator_part)
 
         # Publishing information
-        publisher = get_or_create(BookCompany, company_name=form.publisher.data)
-        printer = get_or_create(BookCompany, company_name=form.printer.data)
+        publisher = get_or_create(BookCompany, company_name=form.publisher.data,
+          creator=current_user.get_id())
+        printer = get_or_create(BookCompany, company_name=form.printer.data,
+          creator=current_user.get_id())
 
         db.session.commit()
 

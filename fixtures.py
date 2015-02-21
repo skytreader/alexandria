@@ -19,9 +19,10 @@ if __name__ == "__main__":
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
-    get_or_create(session, Librarian, username="admin", password="admin")
+    admin_user = get_or_create(session, Librarian, username="admin", password="admin")
     
     roles = ("Author", "Illustrator", "Editor", "Translator")
     
     for r in roles:
-        get_or_create(session, Role, role_name=r, role_display="%s(s)" % r)
+        get_or_create(session, Role, role_name=r, role_display="%s(s)" % r,
+          creator=admin_user.record_id)

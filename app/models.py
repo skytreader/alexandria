@@ -67,8 +67,10 @@ class Genre(UserTaggedBase):
     __tablename__ = "genres"
     genre_name = db.Column(db.String(20), nullable=False, unique=True)
 
-    def __init__(self, genre_name):
+    def __init__(self, genre_name, creator):
         self.genre_name = genre_name
+        self.creator = creator
+        self.last_modifier = creator
 
 class Book(UserTaggedBase):
     __tablename__ = "books"
@@ -92,17 +94,21 @@ class BookCompany(UserTaggedBase):
     __tablename__ = "book_companies"
     company_name = db.Column(db.String(255), nullable=False, unique=True)
 
-    def __init__(self, company_name):
+    def __init__(self, company_name, creator):
         self.company_name = company_name
+        self.creator = creator
+        self.last_modifier = creator
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
     mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
     imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
 
-    def __init__(self, mother_company, imprint_company):
+    def __init__(self, mother_company, imprint_company, creator):
         self.mother_company = mother_company
         self.imprint_company = imprint_company
+        self.creator = creator
+        self.last_modifier = creator
 
 class BookPerson(UserTaggedBase):
     __tablename__ = "book_persons"
@@ -110,9 +116,11 @@ class BookPerson(UserTaggedBase):
     firstname = db.Column(db.String(255), nullable=False)
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
-    def __init__(self, lastname, firstname):
+    def __init__(self, lastname, firstname, creator):
         self.lastname = lastname
         self.firstname = firstname
+        self.creator = creator
+        self.last_modifier = creator
 
 class Role(UserTaggedBase):
     """
@@ -126,9 +134,11 @@ class Role(UserTaggedBase):
     role_name = db.Column(db.String(255), unique=True, nullable=False)
     role_display = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, role_name, role_display):
+    def __init__(self, role_name, role_display, creator):
         self.role_name = role_name
         self.role_display = role_display
+        self.creator = creator
+        self.last_modifier = creator
 
 class BookParticipant(UserTaggedBase):
     """
@@ -139,10 +149,12 @@ class BookParticipant(UserTaggedBase):
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.record_id"))
 
-    def __init__(self, book_id, person_id, role_id):
+    def __init__(self, book_id, person_id, role_id, creator):
         self.book_id = book_id
         self.person_id = person_id
         self.role_id = role_id
+        self.creator = creator
+        self.last_modifier = creator
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
@@ -161,8 +173,10 @@ class Pseudonym(UserTaggedBase):
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
 
-    def __init__(self, person_id, book_id, lastname, firstname):
+    def __init__(self, person_id, book_id, lastname, firstname, creator):
         self.person_id = person_id
         self.book_id = book_id
         self.lastname = lastname
         self.firstname = firstname
+        self.creator = creator
+        self.last_modifier = creator
