@@ -18,7 +18,7 @@ def __create_bookperson(form_data):
     parse = re.split(r",\s+", form_data)
     # FIXME What if it is a single-name pseudonym? E.g., Moebius
     if len(parse) == 2:
-        return get_or_create(BookPerson, firstname=form_data[1], lastname=form_data[0],
+        return get_or_create(BookPerson, firstname=parse[1], lastname=parse[0],
           creator=current_user.get_id())
 
     return None
