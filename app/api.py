@@ -17,11 +17,18 @@ def book_adder():
         genre = get_or_create(Genre, genre_name=form.genre.data,
           creator=current_user.get_id())
 
+        # Publishing information
+        publisher = get_or_create(BookCompany, company_name=form.publisher.data,
+          creator=current_user.get_id())
+        printer = get_or_create(BookCompany, company_name=form.printer.data,
+          creator=current_user.get_id())
+
         # Book
-        book = Book(isbn=form.isbn.data, title=form.title.data, year=form.year.data,
-        genre=genre.record_id, creator=current_user.get_id())
+        book = Book(isbn=form.isbn.data, title=form.title.data,
+          genre=genre.record_id, creator=current_user.get_id(),
+          publisher=publisher.record_id, printer=printer.record_id,
+          publish_year=int(form.year.data))
         db.session.add(book)
-        db.session.commit()
 
         # Create the BookPersons
         author_last, author_first = form.authors.data.split(", ")
@@ -59,12 +66,6 @@ def book_adder():
         db.session.add(illus_part)
         db.session.add(editor_part)
         db.session.add(translator_part)
-
-        # Publishing information
-        publisher = get_or_create(BookCompany, company_name=form.publisher.data,
-          creator=current_user.get_id())
-        printer = get_or_create(BookCompany, company_name=form.printer.data,
-          creator=current_user.get_id())
 
         db.session.commit()
 

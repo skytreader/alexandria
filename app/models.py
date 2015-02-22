@@ -94,11 +94,10 @@ class Book(UserTaggedBase):
     publisher = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
-    def __init__(self, isbn, title, year, genre, creator, printer, publisher,
-      publish_year):
+    def __init__(self, isbn, title, genre, printer, publisher, publish_year,
+      creator):
         self.isbn = isbn
         self.title = title
-        self.year = year
         self.genre = genre
         self.creator = creator
         self.last_modifier = creator
