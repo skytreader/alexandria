@@ -1,5 +1,17 @@
 from app import db, app
+from app.errors import ConstraintError
 from sqlalchemy.ext.declarative import declared_attr
+
+"""
+Year when ISBN was formalized.
+"""
+ISBN_START = 1970
+
+"""
+When the world ends according to the Long Now Foundation.
+"""
+LONG_NOW_WORLD_END = 99999
+
 
 def get_or_create(model, will_commit=False, **kwargs):
     instance = db.session.query(model).filter_by(**kwargs).first()
@@ -77,16 +89,29 @@ class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False)
-    year = db.Column(db.Integer, nullable=False)
     genre = db.Column(db.Integer, db.ForeignKey("genres.record_id"))
+    printer = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+    publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
-    def __init__(self, isbn, title, year, genre, creator):
+    def __init__(self, isbn, title, year, genre, creator, printer, publisher,
+      publish_year):
         self.isbn = isbn
         self.title = title
         self.year = year
         self.genre = genre
         self.creator = creator
         self.last_modifier = creator
+        self.printer = printer
+        self.publisher = publisher
+        
+        # Check the publish year on ORM since not all SQL engines (mySQL, for
+        # one), check constraints. Support the Long Now Foundation!!!
+        if ISBN_START <= publish_year <= LONG_NOW_WORLD_END:
+            self.publish_year = publish_year
+        else:
+            raise ConstraintError("bet. %d and %d" % (ISBN_START, LONG_NOW_WORLD_END),
+              publish_year)
 
 class BookCompany(UserTaggedBase):
     """
