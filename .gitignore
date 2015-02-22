@@ -8,3 +8,4 @@
 *.bak
 dist/
 build/
+db_playground.py
