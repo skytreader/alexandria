@@ -4,11 +4,31 @@ from flask import Blueprint
 from flask.ext.login import current_user, login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 
+import re
+
 librarian_api = Blueprint("librarian_api", __name__)
+
+def __create_bookperson(form_data):
+    """
+    Create a bookperson record from the given form_data. Return the created
+    record, if any. Else return None.
+
+    The record is added to the session but not committed.
+    """
+    parse = re.split(r",\s+", form_data)
+    # FIXME What if it is a single-name pseudonym? E.g., Moebius
+    if len(parse) == 2:
+        return get_or_create(BookPerson, firstname=form_data[1], lastname=form_data[0],
+          creator=current_user.get_id())
+
+    return None
 
 @librarian_api.route("/book_adder", methods=["POST"])
 @login_required
 def book_adder():
+    """
+    Assumes that the data has been stripped clean of leading and trailing spaces.
+    """
     form = AddBooksForm()
     app.logger.info(str(form))
 
@@ -31,19 +51,10 @@ def book_adder():
         db.session.add(book)
 
         # Create the BookPersons
-        author_last, author_first = form.authors.data.split(", ")
-        illus_last, illus_first = form.illustrators.data.split(", ")
-        editor_last, editor_first = form.editors.data.split(", ")
-        trans_last, trans_first = form.translators.data.split(", ")
-
-        author = get_or_create(BookPerson, lastname=author_last,
-          firstname=author_first, creator=current_user.get_id())
-        illustrator = get_or_create(BookPerson, lastname=illus_last,
-          firstname=illus_first, creator=current_user.get_id())
-        editor = get_or_create(BookPerson, lastname=editor_last,
-          firstname=editor_first, creator=current_user.get_id())
-        translator = get_or_create(BookPerson, lastname=trans_last,
-          firstname=trans_first, creator=current_user.get_id())
+        author = __create_bookperson(form.authors.data)
+        illustrator = __create_bookperson(form.illustrators.data)
+        editor = __create_bookperson(form.editors.data)
+        translator = __create_bookperson(form.translators.data)
 
         #FIXME This part is shaky
         #FIXME I think we should cache.
@@ -53,19 +64,25 @@ def book_adder():
         trans_role = Role.query.filter_by(role_name="Translator").first()
 
         # Assign participation
-        author_part = BookParticipant(book.record_id, author.record_id,
-          author_role.record_id, creator=current_user.get_id())
-        illus_part = BookParticipant(book.record_id, illustrator.record_id,
-          illus_role.record_id, creator=current_user.get_id())
-        editor_part = BookParticipant(book.record_id, editor.record_id,
-          editor_role.record_id, creator=current_user.get_id())
-        translator_part = BookParticipant(book.record_id, translator.record_id,
-          trans_role.record_id, creator=current_user.get_id())
+        if author:
+            author_part = BookParticipant(book.record_id, author.record_id,
+              author_role.record_id, creator=current_user.get_id())
+            db.session.add(author_part)
 
-        db.session.add(author_part)
-        db.session.add(illus_part)
-        db.session.add(editor_part)
-        db.session.add(translator_part)
+        if illustrator:
+            illus_part = BookParticipant(book.record_id, illustrator.record_id,
+              illus_role.record_id, creator=current_user.get_id())
+            db.session.add(illus_part)
+
+        if editor:
+            editor_part = BookParticipant(book.record_id, editor.record_id,
+              editor_role.record_id, creator=current_user.get_id())
+            db.session.add(editor_part)
+
+        if translator:
+            translator_part = BookParticipant(book.record_id, translator.record_id,
+              trans_role.record_id, creator=current_user.get_id())
+            db.session.add(translator_part)
 
         db.session.commit()
 
