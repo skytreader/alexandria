@@ -87,14 +87,17 @@ div.queued_block{
     min-height: 128px;
     text-align: center;
     margin: 3px;
-    padding: 5% inherit;
+    padding: 10px;
 }
 
 div.saved_book{
-    padding: 10px;
     background-color: #f07746;
     color: #fff;
     font-weight: bold;
+}
+
+div.error_book{
+    background-color: #ac2929;
 }
 
 div.empty_set, div.unsaved_book{

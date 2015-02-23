@@ -266,6 +266,8 @@ $(document).ready(function(){
     var defText = document.createElement("h3");
     defText.innerHTML = "Ooops. Nothing yet.";
     defItem.appendChild(defText);
+    // Special styles to override from queued_block rule.
+    defItem.style.padding = "5% inherit";
     var defs = {"defaultDisplay":defItem,
       "defaultLocation": document.getElementById("qContainer")};
     window.visualQueue = new VisualQueue(qContainer, defs);
