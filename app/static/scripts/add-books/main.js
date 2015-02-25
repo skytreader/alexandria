@@ -1,7 +1,14 @@
+var REPROCESS_INTERVAL = 8888;
+
 /**
 THE BOOK QUEUE. This is the internal representation of the book queue.
 */
 var bookQueue = [];
+
+/**
+Where the books eligible for reprocessing go.
+*/
+var reprocessQueue = [];
 
 /**
 This script will manipulate ids a lot. We derive certain converntions from the
@@ -186,6 +193,11 @@ function sendSaveForm(domElement){
         $(domElement).removeClass("unsaved_book").addClass("error_book");
     }
 
+    function failRecover(){
+        fail();
+        reprocessQueue.push(domElement);
+    }
+
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
         "isbn": document.getElementById("isbn").value,
@@ -203,12 +215,10 @@ function sendSaveForm(domElement){
         "type": "POST",
         "data": data,
         "success": success,
-        //"statusCode": {
-        //    500: sendSaveForm
-        //}
         "statusCode":{
             400: fail,
-            409: fail
+            409: fail,
+            500: failRecover
         }
     });
 }
@@ -216,7 +226,7 @@ function sendSaveForm(domElement){
 /**
 Fetch a book from the queue and load it to the main form.
 
-@return the DOM element representing the book, if we are able to fetch a book
+@return A Book object  if we are able to fetch a Book object
   from the queue. Otherwise, return false.
 */
 function loadFromQueueToForm(){
@@ -284,7 +294,7 @@ $(document).ready(function(){
         document.getElementById("auto-save-toggle").checked = !document.getElementById("auto-save-toggle").checked;
     });
 
-    // TODO Start the polling timer.
+    // Start the polling interval timers.
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
             var foo = loadFromQueueToForm();
@@ -292,5 +302,10 @@ $(document).ready(function(){
                 sendSaveForm(foo);
             }
         }
-    }, 8000);
+    }, REPROCESS_INTERVAL);
+    
+    setInterval(function(){
+        if(document.getElementById("auto-save-toggle").checked){
+        }
+    }, REPROCESS_INTERVAL);
 });
