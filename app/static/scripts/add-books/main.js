@@ -182,6 +182,10 @@ function sendSaveForm(domElement){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
     }
 
+    function fail(){
+        $(domElement).removeClass("unsaved_book").addClass("error_book");
+    }
+
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
         "isbn": document.getElementById("isbn").value,
@@ -202,6 +206,10 @@ function sendSaveForm(domElement){
         //"statusCode": {
         //    500: sendSaveForm
         //}
+        "statusCode":{
+            400: fail,
+            409: fail
+        }
     });
 }
 

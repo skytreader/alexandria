@@ -98,6 +98,7 @@ div.saved_book{
 
 div.error_book{
     background-color: #ac2929;
+    color: #fff;
 }
 
 div.empty_set, div.unsaved_book{
@@ -113,34 +114,6 @@ a.navbox{
 label.error{
 	display: block;
 	margin-bottom: -10px;
-}
-
-table.booklist{
-	margin-left: 3%;
-	margin-right: 3%;
-	width: 94%;
-	border-collapse: collapse;
-}
-
-table.booklist, tr.booklist{
-	border: solid 1px;
-	vertical-align: middle;
-	text-align: center;
-}
-
-td.booklist{
-	padding: 3px;
-	margin: 0;
-	border: solid 1px;
-}
-
-td.bookrecord{
-	font-size: 12px;
-	border: solid 1px;
-}
-
-td.bookspine{
-	text-align: center;
 }
 
 /*Forms*/
