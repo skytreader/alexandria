@@ -248,6 +248,7 @@ $.validator.addMethod("year", function(value, element, param){
 
 $(document).ready(function(){
     getFormIds();
+    // TODO update!!!
     $("#detailsForm").validate({
         rules:{
             isbn1:{
@@ -256,13 +257,6 @@ $(document).ready(function(){
             year1:{
                 year: true
             }
-        }
-    });
-    
-    $("[name='add']").click(function(){
-        if($("#detailsForm").valid()){
-            addRecord();
-            clear();
         }
     });
 
