@@ -285,6 +285,11 @@ $(document).ready(function(){
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(queueBook);
+
+    $("#autosave_label").click(function(){
+        document.getElementById("auto-save-toggle").checked = !document.getElementById("auto-save-toggle").checked;
+    });
+
     // TODO Start the polling timer.
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
