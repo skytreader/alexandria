@@ -1,9 +1,10 @@
 var PROCESS_INTERVAL = 8888;
+var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
 
 /**
 THE BOOK QUEUE. This is the internal representation of the book queue.
 */
-var bookQueue = [];
+var bookQueue = new Queue();
 
 /**
 Where the books eligible for reprocessing go.
@@ -84,7 +85,7 @@ function internalizeBook(spineDom){
     var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
       translators, publisher, printer, year, spineDom);
 
-    window.bookQueue.push(bookObj);
+    window.bookQueue.enqueue(bookObj);
 }
 
 /**
@@ -223,27 +224,6 @@ function sendSaveForm(domElement){
     });
 }
 
-/**
-Fetch a book from the queue and load it to the main form.
-
-@return A Book object  if we are able to fetch a Book object
-  from the queue. Otherwise, return false.
-*/
-function loadFromQueueToForm(){
-    if(window.bookQueue.length){
-        var fromQ = window.bookQueue.shift();
-        var limit = window.realFormIds.length;
-
-        for(var i = 0; i < limit; i++){
-            document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
-        }
-
-        return fromQ.domElement;
-    }
-    
-    return false;
-}
-
 $.validator.addMethod("isbn", function(value, element, param){
     var stripped = stripExtraneous(value);
     return verifyISBN10(stripped) || verifyISBN13(stripped);
@@ -297,7 +277,7 @@ $(document).ready(function(){
     // Start the polling interval timers.
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
-            var foo = loadFromQueueToForm();
+            var foo = window.bookQueue.dequeue();
             if(foo){
                 sendSaveForm(foo);
             }
@@ -307,5 +287,5 @@ $(document).ready(function(){
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
         }
-    }, PROCESS_INTERVAL);
+    }, REPROCESS_INTERVAL);
 });

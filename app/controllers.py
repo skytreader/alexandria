@@ -40,6 +40,6 @@ def logout():
 @login_required
 def books():
     form = AddBooksForm()
-    scripts = ("jquery.validate.min.js", "jquery.form.min.js", "add-books/main.js",
+    scripts = ("jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
       "add-books/book.js", "utils/visual-queue.js")
     return render_template("add_books.jinja", form=form, scripts=scripts)
