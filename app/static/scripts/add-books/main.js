@@ -1,4 +1,4 @@
-var REPROCESS_INTERVAL = 8888;
+var PROCESS_INTERVAL = 8888;
 
 /**
 THE BOOK QUEUE. This is the internal representation of the book queue.
@@ -194,7 +194,7 @@ function sendSaveForm(domElement){
     }
 
     function failRecover(){
-        fail();
+        $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.push(domElement);
     }
 
@@ -302,10 +302,10 @@ $(document).ready(function(){
                 sendSaveForm(foo);
             }
         }
-    }, REPROCESS_INTERVAL);
+    }, PROCESS_INTERVAL);
     
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
         }
-    }, REPROCESS_INTERVAL);
+    }, PROCESS_INTERVAL);
 });

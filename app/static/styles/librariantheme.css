@@ -102,7 +102,7 @@ div.error_book{
     color: #fff;
 }
 
-div.currently_reprocessing{
+div.reprocess_book{
     background-color: #dbef4d;
     color: #000;
 }
