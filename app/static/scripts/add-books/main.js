@@ -187,17 +187,14 @@ function sendSaveForm(domElement){
     // TODO
 
     function success(){
-        // CSS changes
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
     }
 
     function fail(){
-        console.log("Failing " + domElement);
         $(domElement).removeClass("unsaved_book").addClass("error_book");
     }
 
     function failRecover(){
-        console.log("Fail with recovery " + domElement);
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.push(domElement);
     }
@@ -225,6 +222,30 @@ function sendSaveForm(domElement){
             500: failRecover
         }
     });
+}
+
+/**
+Load from the given queue to the actual form. The queue object is expected to be
+from Queue.js.
+
+@param queue
+    The queue object from which we fetch a book.
+@return
+    True if a book record was loaded successfuly into the actual form.
+*/
+function loadFromQueueToForm(queue){
+    var fromQ = queue.dequeue();
+    if(fromQ){
+        var limit = window.realFormIds.length;
+
+        for(var i = 0; i < limit; i++){
+            document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 $.validator.addMethod("isbn", function(value, element, param){
@@ -280,7 +301,7 @@ $(document).ready(function(){
     // Start the polling interval timers.
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
-            var foo = window.bookQueue.dequeue();
+            var foo = loadFromQueueToForm(window.bookQueue);
             if(foo){
                 sendSaveForm(foo.domElement);
             }
