@@ -70,6 +70,7 @@ The DOM element representing the book is a required parameter since we use it to
 map the Book object to its visual representation.
 */
 function internalizeBook(spineDom){
+    console.log(spineDom);
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy").val();
     var title = $(allInputs).filter("#title-proxy").val();
@@ -281,7 +282,7 @@ $(document).ready(function(){
         if(document.getElementById("auto-save-toggle").checked){
             var foo = window.bookQueue.dequeue();
             if(foo){
-                sendSaveForm(foo);
+                sendSaveForm(foo.domElement);
             }
         }
     }, PROCESS_INTERVAL);
