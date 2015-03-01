@@ -9,7 +9,7 @@ var bookQueue = new Queue();
 /**
 Where the books eligible for reprocessing go.
 */
-var reprocessQueue = [];
+var reprocessQueue = new Queue();
 
 /**
 This script will manipulate ids a lot. We derive certain converntions from the
@@ -194,7 +194,7 @@ function sendSaveForm(domElement){
 
     function failRecover(){
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
-        reprocessQueue.push(domElement);
+        reprocessQueue.enqueue(domElement);
     }
 
     var data = {
@@ -308,6 +308,10 @@ $(document).ready(function(){
     
     setInterval(function(){
         if(document.getElementById("auto-save-toggle").checked){
+            var foo = loadFromQueueToForm(window.reprocessQueue);
+            if(foo){
+                sendSaveForm(foo.domElement);
+            }
         }
     }, REPROCESS_INTERVAL);
 });
