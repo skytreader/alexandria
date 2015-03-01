@@ -43,7 +43,7 @@ function renderSpine(){
     spine.className = "unsaved_book queued_block";
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy");
-    spine.id = isbn;
+    spine.id = isbn.val();
     var title = $(allInputs).filter("#title-proxy");
     var authors = $(allInputs).filter("#authors-proxy");
 
@@ -191,10 +191,12 @@ function sendSaveForm(domElement){
     }
 
     function fail(){
+        console.log("Failing " + domElement);
         $(domElement).removeClass("unsaved_book").addClass("error_book");
     }
 
     function failRecover(){
+        console.log("Fail with recovery " + domElement);
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.push(domElement);
     }
