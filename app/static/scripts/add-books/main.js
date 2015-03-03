@@ -298,6 +298,7 @@ $(document).ready(function(){
 
     // Start the polling interval timers.
     setInterval(function(){
+        console.log("Polling main")
         if(document.getElementById("auto-save-toggle").checked){
             var foo = loadFromQueueToForm(window.bookQueue);
             if(foo){
@@ -307,6 +308,7 @@ $(document).ready(function(){
     }, PROCESS_INTERVAL);
     
     setInterval(function(){
+        console.log("Polling reprocess");
         if(document.getElementById("auto-save-toggle").checked){
             var foo = loadFromQueueToForm(window.reprocessQueue);
             if(foo){
