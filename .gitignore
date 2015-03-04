@@ -8,4 +8,5 @@
 *.bak
 dist/
 build/
+alembic/
 db_playground.py
