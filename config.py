@@ -6,6 +6,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
 SQLALCHEMY_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria'
+SQLALCHEMY_ECHO = DEBUG
 DATABASE_CONNECT_OPTIONS = {"user":"root"}
 
 # Application threads. A common general assumption is
