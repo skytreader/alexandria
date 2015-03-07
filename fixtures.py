@@ -16,7 +16,7 @@ def get_or_create(session, model, **kwargs):
         return instance
 
 if __name__ == "__main__":
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
     session = sessionmaker(bind=engine)()
 
     admin_user = get_or_create(session, Librarian, username="admin", password="admin")
