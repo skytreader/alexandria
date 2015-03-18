@@ -4,8 +4,8 @@ Citing related repos compels me to mention [this one](https://github.com/skytrea
 
 # Dev Set-up
 
-Assuming you have a local mysql database allowing passwordless account `root`,
-create the relevant virtualenv and then,
+Assuming you have a local mysql database `alexandria` accessbile by passwordles
+account `root`, create the relevant virtualenv and then,
 
     pip install -r requirements.txt
     python run.py
