@@ -39,15 +39,15 @@ class Librarian(Base):
     can_read = db.Column(db.Boolean, nullable=False, default=False)
     can_write = db.Column(db.Boolean, nullable=False, default=False)
     can_exec = db.Column(db.Boolean, nullable=False, default=False)
-    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_user_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    def __init__(self, username, password, can_read, can_write, can_exec, is_active):
+    def __init__(self, username, password, can_read, can_write, can_exec, is_user_active):
         self.username = username
         self.password = password
         self.can_read = can_read
         self.can_write = can_write
         self.can_exec = can_exec
-        self.is_active = is_active
+        self.is_user_active = is_user_active
 
     def __repr__(self):
         return self.username
@@ -56,6 +56,9 @@ class Librarian(Base):
     # See https://flask-login.readthedocs.org/en/latest/
     def is_authenticated(self):
         return True
+
+    def is_active(self):
+        return self.is_user_active
 
     def is_anonymous(self):
         return False
