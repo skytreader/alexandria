@@ -15,7 +15,7 @@ def login():
 
     if form.validate_on_submit():
         from models import Librarian
-        user = Librarian.query.filter_by(username=form.librarian_username.data, is_active=True).first()
+        user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
 
         if user and user.password == form.librarian_password.data:
             login_user(user)
