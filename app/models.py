@@ -41,9 +41,13 @@ class Librarian(Base):
     can_exec = db.Column(db.Boolean, nullable=False, default=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, can_read, can_write, can_exec, is_active):
         self.username = username
         self.password = password
+        self.can_read = can_read
+        self.can_write = can_write
+        self.can_exec = can_exec
+        self.is_active = is_active
 
     def __repr__(self):
         return self.username
