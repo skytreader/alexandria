@@ -76,7 +76,7 @@ div.navbox{
 }
 
 div.block{
-	float: left;
+	float: none;
 	padding: 5px;
 	margin: 3px;
 }
@@ -107,8 +107,8 @@ div.reprocess_book{
     color: #000;
 }
 
-div.empty_set, div.unsaved_book{
-    padding 10px;
+div.empty_set, div.unsaved_book, div.grouped_input{
+    padding: 10px;
     background-color: #dadada;
 }
 
