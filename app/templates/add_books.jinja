@@ -1,10 +1,11 @@
 {% extends "main.jinja" %}
 
 {% macro render_creator_listing(creator_title) %}
+{% set listing_label = "".join((creator_title.capitalize(), "(s):")) %}
 <div class="grouped_input">
     <div class="row">
         <div class="col-md-11">
-            <h3>{{ creator_title }}</h3>
+            <h3>{{ listing_label }}</h3>
         </div>
         <div class="col-md-1">
             <i class="fa fa-plus-circle fa-2x"></i>
@@ -12,9 +13,9 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <input type="text" id="authors-proxy" placeholder="Lastname">
+            <input type="text" name="{{ creator_title }}-proxy-lastname" placeholder="Lastname">
             &nbsp;
-            <input type="text" placeholder="First name">
+            <input type="text" name="{{ creator_title }}-proxy-firstname" placeholder="First name">
         </div>
     </div>
 </div>
@@ -60,13 +61,13 @@
         </div>
         <div class="block">
             <h2>Content Creators</h2>
-            {{ render_creator_listing("Author(s):") }}
+            {{ render_creator_listing("author") }}
             <br> 
-            {{ render_creator_listing("Illustrator(s):") }}
+            {{ render_creator_listing("illustrator") }}
             <br>
-            {{ render_creator_listing("Editor(s):") }}
+            {{ render_creator_listing("editor") }}
             <br>
-            {{ render_creator_listing("Translator(s):") }}
+            {{ render_creator_listing("translator") }}
         </div>
         <div class="block">
             <h2>Publishing Information</h2>
