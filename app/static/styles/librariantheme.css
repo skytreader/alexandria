@@ -47,6 +47,10 @@ label{
     font-weight: normal;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 /*Boxes*/
 
 div.main_box {

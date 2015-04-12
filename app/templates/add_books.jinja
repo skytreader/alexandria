@@ -8,14 +8,15 @@
             <h3>{{ listing_label }}</h3>
         </div>
         <div class="col-md-1 content-creator-buttons">
-            <i class="fa fa-plus-circle fa-2x"></i>
+            <i class="fa fa-plus-circle fa-2x clickable"></i>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <input type="text" name="{{ creator_title }}-proxy-lastname" placeholder="Lastname">
-            &nbsp;
-            <input type="text" name="{{ creator_title }}-proxy-firstname" placeholder="First name">
+        <div class="col-md-6">
+            <input type="text" name="{{ creator_title }}-proxy-lastname" placeholder="Lastname" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <input type="text" name="{{ creator_title }}-proxy-firstname" placeholder="First name" class="form-control">
         </div>
     </div>
 </div>
@@ -50,13 +51,13 @@
         <div class="block">
             <h2>Book Information</h2>
             <label>ISBN:<br>
-            <input type="text" id="isbn-proxy">
+            <input type="text" id="isbn-proxy" class="form-control">
             </label>
             <label>Title:<br>
-            <input type="text" id="title-proxy">
+            <input type="text" id="title-proxy" class="form-control">
             </label>
             <label>Genre:<br>
-            <input type="text" id="genre-proxy">
+            <input type="text" id="genre-proxy" class="form-control">
             </label>
         </div>
         <div class="block">
@@ -72,13 +73,13 @@
         <div class="block">
             <h2>Publishing Information</h2>
             <label>Publisher:<br>
-            <input type="text" id="publisher-proxy">
+            <input type="text" id="publisher-proxy" class="form-control">
             </label>
             <label>Printer:<br>
-            <input type="text" id="printer-proxy">
+            <input type="text" id="printer-proxy" class="form-control">
             </label>
             <label>Year:<br>
-            <input type="text" id="year-proxy">
+            <input type="text" id="year-proxy" class="form-control">
             </label>
         </div>
     </span>
