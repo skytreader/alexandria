@@ -1,4 +1,25 @@
 {% extends "main.jinja" %}
+
+{% macro render_creator_listing(creator_title) %}
+<div class="grouped_input">
+    <div class="row">
+        <div class="col-md-11">
+            <h3>{{ creator_title }}</h3>
+        </div>
+        <div class="col-md-1">
+            <i class="fa fa-plus-circle fa-2x"></i>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input type="text" id="authors-proxy" placeholder="Lastname">
+            &nbsp;
+            <input type="text" placeholder="First name">
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
 {% block title %}Add Books{% endblock %}
 {% block content %}
     <h1>Add Books</h1>
@@ -39,62 +60,13 @@
         </div>
         <div class="block">
             <h2>Content Creators</h2>
-            <div class="grouped_input">
-                <div class="row">
-                    <div class="col-md-11">
-                        <h3>Author(s):</h3>
-                    </div>
-                    <div class="col-md-1">
-                        <i class="fa fa-plus-circle fa-2x"></i>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <input type="text" id="authors-proxy" placeholder="Lastname">
-                        &nbsp;
-                        <input type="text" placeholder="First name">
-                    </div>
-                </div>
-            </div>
+            {{ render_creator_listing("Author(s):") }}
             <br> 
-            <div class="grouped_input">
-                <div class="row">
-                    <div class="col-md-11">
-                        <h3>Illustrator(s):</h3>
-                    </div>
-                    <div class="col-md-1">
-                        <i class="fa fa-plus-circle fa-2x"></i>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <input type="text" id="illustrators-proxy" placeholder="Last name">
-                        &nbsp;
-                        <input type="text" placeholder="First name">
-                    </div>
-                </div>
-            </div>
+            {{ render_creator_listing("Illustrator(s):") }}
             <br>
-            <div class="grouped_input">
-                <div>
-                    <h3>Editor(s):
-                        <i class="fa fa-plus-circle"></i>
-                    </h3>
-                </div>
-                <input type="text" id="editors-proxy" placeholder="Last name">
-                &nbsp;
-                <input type="text" placeholder="First name">
-            </div>
+            {{ render_creator_listing("Editor(s):") }}
             <br>
-            <div class="grouped_input"> 
-                <div>
-                    <h3>Translator(s):
-                        <i class="fa fa-plus-circle"></i>
-                    </h3>
-                </div>
-                <input type="text" id="translators-proxy" placeholder="Last name">
-                <input type="text" placeholder="First name">
-            </div>
+            {{ render_creator_listing("Translator(s):") }}
         </div>
         <div class="block">
             <h2>Publishing Information</h2>
