@@ -42,4 +42,5 @@ def books():
     form = AddBooksForm()
     scripts = ("jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
       "add-books/book.js", "utils/visual-queue.js")
-    return render_template("add_books.jinja", form=form, scripts=scripts)
+    styles = ("add_books.css",)
+    return render_template("add_books.jinja", form=form, scripts=scripts, stylesheets=styles)
