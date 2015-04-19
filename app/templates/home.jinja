@@ -5,15 +5,16 @@
     </div>
     <div class="col-md-10">
         <h1>Looking for anything?</h1>
-        <div class="input-group input-group-lg" style="width: 100%">
             <form method="GET" action="." role="form">
-               {{ form.search_term(class="search searchbox form-control",
-                   placeholder="Book title or a person's name",
-                   style="width:90%;") }}
-               &nbsp;
-               <input type="submit" class="search btn btn-primary" value="Search">
+                <div class="input-group input-group-lg" style="width: 100%;">
+                    {{ form.search_term(class="search searchbox form-control",
+                        placeholder="Book title or a person's name",
+                        ) }}
+                    <span class="input-group-btn">
+                        <input type="submit" class="search btn btn-primary" value="Search">
+                    </span>
+                </div>
             </form>
-        </div>
     </div>
     <div class="col-md-1">
     </div>

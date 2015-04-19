@@ -136,13 +136,10 @@ input.search, select.search, option.search {
     width: 70%;
 }
 
-input.btn {
+/*input.btn {
 	padding: 5px;
 	border: solid 1px #2b2b2b;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	margin-right: 5px;
-}
+}*/
 
 input.btn:hover {
 	border-color: #d2c136;
