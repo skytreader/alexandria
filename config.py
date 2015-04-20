@@ -24,3 +24,6 @@ CSRF_SESSION_KEY = "secret"
 
 # Secret key for signing cookies
 SECRET_KEY = "secret"
+
+APP_HOST="0.0.0.0"
+APP_PORT=8080
