@@ -102,6 +102,48 @@ function renderDeleteButton(){
     return container;
 }
 
+function renderContentCreatorInput(creatorType){
+    var rowContainer = document.createElement("div");
+    $(rowContainer).addClass("row");
+    
+    var lastnameCol = document.createElement("div");
+    $(lastnameCol).addClass("col-md-5");
+    
+    // TODO Refactor creating input boxes!
+    var lastnameInput = document.createElement("input");
+    lastnameInput.type("text");
+    lastnameInput.placeholder("Lastname");
+    $(lastnameInput).addClass("form-control");
+    lastnameInput.name = creatorType + "-proxy-lastname";
+
+    lastnameCol.appendChild(lastnameInput);
+
+    var firstnameCol = document.createElement("div");
+    $(lastnameCol).addClass("col-md-5");
+
+    var firstnameInput = document.createElement("input");
+    firstnameInput.type("text");
+    firstnameInput.placeholder("First name");
+    $(firstnameInput).addClass("form-control");
+    firstnameInput.name = creatorType + "-proxy-firstname";
+
+    firstnameCol.appendChild(firstnameInput);
+
+    var deleteCol = document.createElement("div");
+    $(deleteCol).addClass("col-md-2");
+
+    var deleteButton = document.createElement("i");
+    $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
+    
+    deleteCol.appendChild(deleteButton);
+
+    rowContainer.appendChild(lastnameCol);
+    rowContainer.appendChild(firstnameCol);
+    rowContainer.appendChild(deleteCol);
+
+    return rowContainer;
+}
+
 /**
 Clears the proxy form.
 */
