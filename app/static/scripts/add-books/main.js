@@ -102,6 +102,17 @@ function renderDeleteButton(){
     return container;
 }
 
+function renderNameInput(creatorType){
+    var placeholder = creatorType.capitalize();
+    var textbox = document.createElement("input");
+    textbox.type("text");
+    textbox.placeholder(placeholder);
+    $(textbox).addClass("form-control");
+    textbox.name = creatorType + "-proxy-lastname";
+
+    return textbox;
+}
+
 function renderContentCreatorInput(creatorType){
     var rowContainer = document.createElement("div");
     $(rowContainer).addClass("row");
@@ -110,23 +121,13 @@ function renderContentCreatorInput(creatorType){
     $(lastnameCol).addClass("col-md-5");
     
     // TODO Refactor creating input boxes!
-    var lastnameInput = document.createElement("input");
-    lastnameInput.type("text");
-    lastnameInput.placeholder("Lastname");
-    $(lastnameInput).addClass("form-control");
-    lastnameInput.name = creatorType + "-proxy-lastname";
-
+    var lastnameInput = renderNameInput("lastname");
     lastnameCol.appendChild(lastnameInput);
 
     var firstnameCol = document.createElement("div");
     $(lastnameCol).addClass("col-md-5");
 
-    var firstnameInput = document.createElement("input");
-    firstnameInput.type("text");
-    firstnameInput.placeholder("First name");
-    $(firstnameInput).addClass("form-control");
-    firstnameInput.name = creatorType + "-proxy-firstname";
-
+    var firstnameInput = renderNameInput("firstname");
     firstnameCol.appendChild(firstnameInput);
 
     var deleteCol = document.createElement("div");
