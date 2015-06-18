@@ -1,0 +1,37 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+body{
+    font-family: Helvetica, Arial, sans-serif;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    margin-top: -20px;
+}
+
+.search-block{
+    background: url("/static/images/cover.JPG") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 103%;
+    width: 100%;
+    color: #fff;
+    padding: 28px;
+}
+
+.search-row{
+    margin-top: 18%;
+}
+
+.search-col{
+    background-color: rgba(255,255,255,0.8);
+    padding: 28px;
+    border-radius: 28px;
+    border-style: solid;
+    border-width: 4px;
+    border-color: #000;
+}

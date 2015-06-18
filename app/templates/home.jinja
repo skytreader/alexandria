@@ -1,21 +1,31 @@
-{% extends "main.jinja" %}
-{% block title %}Home{% endblock %}
-{% block content %}
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-10">
-        <h1>Looking for anything?</h1>
-            <form method="GET" action="." role="form">
-                <div class="input-group input-group-lg" style="width: 100%;">
-                    {{ form.search_term(class="search searchbox form-control",
-                        placeholder="Book title or a person's name",
-                        ) }}
-                    <span class="input-group-btn">
-                        <input type="submit" class="search btn btn-primary" value="Search">
-                    </span>
+<html>
+    <head>
+        <title>Librarian | Home</title>
+        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/index.css">
+        <script type="text/javascript" src="/static/scripts/jquery.js"></script>
+    </head>
+    <body>
+        <div class="search-block">
+            <div class="row search-row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6 search-col">
+                    <img src="/static/images/librarian.png">
+                    <br>
+                    <br>
+                    <div class="input-group input-group-lg" style="width: 100%">
+                        {{
+                            form.search_term(class="search searchbox form-control",
+                            placeholder="Find by title, author, or publisher")
+                        }}
+                        <span class="input-group-btn">
+                            <input type="submit" class="search btn btn-primary" value="Search">
+                        </span>
+                    </div>
                 </div>
-            </form>
-    </div>
-    <div class="col-md-1">
-    </div>
-{% endblock %}
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+    </body>
+</html>
