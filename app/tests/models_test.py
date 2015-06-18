@@ -6,7 +6,7 @@ import tempfile
 class ModelsTest(unittest.TestCase):
     
     def setUp(self):
-        app.app.init_db(app.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
+        app.init_db(app.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 
     def test_shallow(self):
         self.assertTrue(True)
