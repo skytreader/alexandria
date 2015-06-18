@@ -1,5 +1,5 @@
-from app import db, app
-from app.errors import ConstraintError
+from librarian import db, app
+from librarian.errors import ConstraintError
 from sqlalchemy.ext.declarative import declared_attr
 
 """

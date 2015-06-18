@@ -1,12 +1,12 @@
 import os
-import app
+import librarian
 import unittest
 import tempfile
 
 class ModelsTest(unittest.TestCase):
     
     def setUp(self):
-        app.init_db(app.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
+        librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 
     def test_shallow(self):
         self.assertTrue(True)

@@ -1,5 +1,5 @@
-from app import app, db
-from app.forms import AddBooksForm
+from librarian import app, db
+from librarian.forms import AddBooksForm
 from flask import Blueprint
 from flask.ext.login import current_user, login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
