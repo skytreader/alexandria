@@ -12,5 +12,5 @@ before_install:
     - sudo /etc/init.d/mysql start
     - sudo apt-get install -y mysql-client
     - mysql -uroot -e "CREATE DATABASE alexandria_test;"
-after_success: "COVERALLS_REPO_TOKEN=$coveralls_token coverall"
-after_failure: "COVERALS_REPO_TOKEN=$coveralls_token coverall"
+after_success: "COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
+after_failure: "COVERALS_REPO_TOKEN=$coveralls_token coveralls"
