@@ -37,10 +37,10 @@ load the URL helper.
             <div class="navbox">
                 <a class="navbox" href="/">Search</a>
                 <a class="navbox" href="/about">About</a>
-                <a class="navbox" href="/browse">Browse</a>
+                <a class="navbox" href="/books">Browse Books</a>
                 {% if current_user.is_authenticated() %}
                     <a class="navbox" href="/librarians">Manage Librarians</a>
-                    <a class="navbox" href="/books">Manage Books</a>
+                    <a class="navbox" href="/books/add">Manage Books</a>
                     <a class="navbox" href="/logout">Log-out</a>
                 {% else %}
                     <a class="navbox" href="/login">Log-in</a>
