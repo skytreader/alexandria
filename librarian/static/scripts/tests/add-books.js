@@ -3,6 +3,7 @@ test("content creator render test", function(assert){
     equals(renderedNameField.className, "form-control");
     equals(renderedNameField.type, "text");
     equals(renderedNameField.name, "developer-proxy-lastname");
+    equals(renderedNameField.placeholder, "Lastname");
 
     var developerInput = renderContentCreatorInput("developer");
     var nameInputs = $(developerInput).find(".form-control");

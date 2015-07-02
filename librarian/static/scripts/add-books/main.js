@@ -104,7 +104,7 @@ function renderDeleteButton(){
 }
 
 function renderNameInput(creatorType, namePart){
-    var placeholder = creatorType.capitalize();
+    var placeholder = namePart.capitalize();
     var textbox = document.createElement("input");
     textbox.type = "text";
     textbox.placeholder = placeholder;
@@ -125,7 +125,7 @@ function renderContentCreatorInput(creatorType){
     lastnameCol.appendChild(lastnameInput);
 
     var firstnameCol = document.createElement("div");
-    $(lastnameCol).addClass("col-md-5");
+    $(firstnameCol).addClass("col-md-5");
 
     var firstnameInput = renderNameInput(creatorType, "firstname");
     firstnameCol.appendChild(firstnameInput);
