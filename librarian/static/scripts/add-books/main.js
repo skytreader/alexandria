@@ -1,5 +1,6 @@
 var PROCESS_INTERVAL = 8888;
 var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
+var CREATORS = ["author", "illustrator", "editor", "translator"];
 
 /**
 THE BOOK QUEUE. This is the internal representation of the book queue.
@@ -142,6 +143,13 @@ function renderContentCreatorInput(creatorType){
     rowContainer.appendChild(deleteCol);
 
     return rowContainer;
+}
+
+function rendererFactory(creatorType){
+    return function(){
+        var inputLine = renderContentCreatorInput(creatorType);
+        document.getElementById(creatorType + "-list").appendChild(inputLine);
+    }
 }
 
 /**
@@ -358,4 +366,8 @@ $(document).ready(function(){
             }
         }
     }, REPROCESS_INTERVAL);
+
+    CREATORS.forEach(function(creatorTitle){
+        $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
+    });
 });
