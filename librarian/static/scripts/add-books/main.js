@@ -105,8 +105,8 @@ function renderDeleteButton(){
 function renderNameInput(creatorType, namePart){
     var placeholder = creatorType.capitalize();
     var textbox = document.createElement("input");
-    textbox.type("text");
-    textbox.placeholder(placeholder);
+    textbox.type = "text";
+    textbox.placeholder = placeholder;
     $(textbox).addClass("form-control");
     textbox.name = creatorType + "-proxy-" + namePart;
 
