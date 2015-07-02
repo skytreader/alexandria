@@ -5,7 +5,7 @@ test("content creator render test", function(assert){
     equals(renderedNameField.name, "developer-proxy-lastname");
 
     var developerInput = renderContentCreatorInput("developer");
-    var nameInputs = $(developerInput).find(".name-input");
+    var nameInputs = $(developerInput).find(".form-control");
     
     // There should be at least two items with a class of form-control
     ok(nameInputs.length >= 2);
