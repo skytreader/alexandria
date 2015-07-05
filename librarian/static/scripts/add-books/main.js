@@ -114,6 +114,9 @@ function renderNameInput(creatorType, namePart){
     return textbox;
 }
 
+/**
+Create an "input line" for content creators.
+*/
 function renderContentCreatorInput(creatorType){
     var rowContainer = document.createElement("div");
     $(rowContainer).addClass("row");
@@ -135,6 +138,11 @@ function renderContentCreatorInput(creatorType){
 
     var deleteButton = document.createElement("i");
     $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
+    $(deleteButton).click(function(){
+        if(document.getElementById(creatorType + "-list").children.length != 1){
+            $(this.parentNode.parentNode).remove();
+        }
+    });
     
     deleteCol.appendChild(deleteButton);
 
@@ -145,6 +153,9 @@ function renderContentCreatorInput(creatorType){
     return rowContainer;
 }
 
+/**
+Return a function that generates an input row for a given creatorType.
+*/
 function rendererFactory(creatorType){
     return function(){
         var inputLine = renderContentCreatorInput(creatorType);

@@ -2,7 +2,7 @@
 
 {% macro render_creator_listing(creator_title) %}
 {% set listing_label = "".join((creator_title.capitalize(), "(s):")) %}
-<div class="grouped_input">
+<div class="grouped_input" id="{{ creator_title }}-list">
     <div class="row">
         <div class="col-md-11">
             <h3>{{ listing_label }}</h3>
