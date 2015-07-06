@@ -1,19 +1,22 @@
 from flask.ext.wtf import Form
 from wtforms import HiddenField, PasswordField, TextField
-from wtforms.validators import Required
+from wtforms.validators import Length, Required
 
 class SearchForm(Form):
     search_term = TextField("Search for", [Required(message="What are you looking for?")])
 
 class LoginForm(Form):
-    librarian_username = TextField("Username", [Required(message="Enter your username")])
+    librarian_username = TextField("Username",
+      [Required(message="Enter your username"), Length(max=50)])
     librarian_password = PasswordField("Password", [Required(message="Enter your password")])
 
 class AddBooksForm(Form):
     isbn_message = "ISBN is a book's identifier and can often be found at the book's copyright page or near the barcode."
-    isbn = HiddenField("ISBN", [Required(message=isbn_message)])
-    title = HiddenField("Title", [Required(message="Book's Title")])
-    genre = HiddenField("Genre", [Required(message="Genre")])
+    isbn = HiddenField("ISBN", [Required(message=isbn_message), Length(max=13)])
+    title = HiddenField("Title",
+      [Required(message="Book's Title"), Length(max=255)])
+    genre = HiddenField("Genre",
+      [Required(message="Genre"), Length(max=20)])
 
     # Hardcode for now, so this makes roles.role_display kinda pointless
     authors = HiddenField("Author(s)")
@@ -21,8 +24,10 @@ class AddBooksForm(Form):
     editors = HiddenField("Editor(s)")
     translators = HiddenField("Translator(s):")
 
-    publisher = HiddenField("Publisher", [Required(message="Publisher")])
-    printer = HiddenField("Printer", [Required(message="Printer")])
+    publisher = HiddenField("Publisher",
+      [Required(message="Publisher"), Length(max=255)])
+    printer = HiddenField("Printer",
+      [Required(message="Printer"), Length(max=255)])
     # TODO Clarify this in models!!!
     year = HiddenField("Year", [Required(message="Edition Year")])
 
