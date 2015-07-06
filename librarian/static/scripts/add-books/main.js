@@ -137,7 +137,6 @@ function renderContentCreatorInput(creatorType){
     $(deleteCol).addClass("col-md-2");
 
     var deleteButton = document.createElement("i");
-    deleteButton.name = creatorType + "-del";
     $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
     $(deleteButton).click(recordDeleterFactory(creatorType));
     
@@ -160,7 +159,7 @@ function recordDeleterFactory(creatorType){
         // the time being.
         console.log(creatorType + "-list children length", document.getElementById(creatorType + "-list").children.length);
         if(document.getElementById(creatorType + "-list").children.length == 1){
-            $("[name='" + creatorType + "-del']").addClass("disabled");
+            $("#" + creatorType + "-list .fa-minus-circle").addClass("disabled");
         }
     }
 };
@@ -175,7 +174,7 @@ function rendererFactory(creatorType){
 
         // Since we are adding something, we are sure that the list should now
         // have deletable rows.
-        $("[name='" + creatorType + "-del']").removeClass("disabled");
+        $("#" + creatorType + "-list .fa-minus-circle").removeClass("disabled");
 
         document.getElementById(creatorType + "-list").appendChild(inputLine);
     }
@@ -398,6 +397,6 @@ $(document).ready(function(){
 
     CREATORS.forEach(function(creatorTitle){
         $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
-        $("[name='" + creatorTitle + "-del']").click(recordDeleterFactory(creatorTitle));
+        $("#" + creatorTitle + "-list .fa-minus-circle").click(recordDeleterFactory(creatorTitle));
     });
 });
