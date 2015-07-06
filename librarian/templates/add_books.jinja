@@ -2,7 +2,7 @@
 
 {% macro render_creator_listing(creator_title) %}
 {% set listing_label = "".join((creator_title.capitalize(), "(s):")) %}
-<div class="grouped_input" id="{{ creator_title }}-list">
+<div class="grouped_input" id="{{ creator_title }}-block">
     <div class="row">
         <div class="col-md-11">
             <h3>{{ listing_label }}</h3>
@@ -20,7 +20,7 @@
                 <input type="text" name="{{ creator_title }}-proxy-firstname" placeholder="First name" class="form-control">
             </div>
             <div class="col-md-2">
-                <i class="fa fa-minus-circle fa-2x clickable"></i>
+                <i class="fa fa-minus-circle fa-2x clickable disabled" name="{{ creator_title }}-del"></i>
             </div>
         </div>
     </span>

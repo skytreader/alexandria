@@ -137,12 +137,9 @@ function renderContentCreatorInput(creatorType){
     $(deleteCol).addClass("col-md-2");
 
     var deleteButton = document.createElement("i");
+    deleteButton.name = creatorType + "-del";
     $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
-    $(deleteButton).click(function(){
-        if(document.getElementById(creatorType + "-list").children.length != 1){
-            $(this.parentNode.parentNode).remove();
-        }
-    });
+    $(deleteButton).click(recordDeleterFactory(creatorType));
     
     deleteCol.appendChild(deleteButton);
 
@@ -153,12 +150,33 @@ function renderContentCreatorInput(creatorType){
     return rowContainer;
 }
 
+function recordDeleterFactory(creatorType){
+    return function() {
+        if(document.getElementById(creatorType + "-list").children.length != 1){
+            $(this.parentNode.parentNode).remove();
+        }
+
+        // Check if after removing a row, we should disable deletions for
+        // the time being.
+        console.log(creatorType + "-list children length", document.getElementById(creatorType + "-list").children.length);
+        if(document.getElementById(creatorType + "-list").children.length == 1){
+            $("[name='" + creatorType + "-del']").addClass("disabled");
+        }
+    }
+};
+
 /**
-Return a function that generates an input row for a given creatorType.
+Return a function that generates an input row for a given creatorType. The
+generated function was meant to be called for the click event on the add button.
 */
 function rendererFactory(creatorType){
     return function(){
         var inputLine = renderContentCreatorInput(creatorType);
+
+        // Since we are adding something, we are sure that the list should now
+        // have deletable rows.
+        $("[name='" + creatorType + "-del']").removeClass("disabled");
+
         document.getElementById(creatorType + "-list").appendChild(inputLine);
     }
 }
@@ -380,5 +398,6 @@ $(document).ready(function(){
 
     CREATORS.forEach(function(creatorTitle){
         $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
+        $("[name='" + creatorTitle + "-del']").click(recordDeleterFactory(creatorTitle));
     });
 });

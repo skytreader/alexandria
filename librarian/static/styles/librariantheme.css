@@ -51,6 +51,10 @@ label{
     cursor: pointer;
 }
 
+.disabled {
+    color: #888;
+}
+
 /*Boxes*/
 
 div.main_box {
