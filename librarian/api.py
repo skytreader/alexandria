@@ -24,7 +24,7 @@ def __create_bookperson(form_data):
 
     return None
 
-@librarian_api.route("/book_adder", methods=["POST"])
+@librarian_api.route("/api/book_adder", methods=["POST"])
 @login_required
 def book_adder():
     """
