@@ -1,7 +1,5 @@
-import os
 import librarian
 import unittest
-import tempfile
 
 class ModelsTest(unittest.TestCase):
     
@@ -13,6 +11,3 @@ class ModelsTest(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-if __name__ == "__main__":
-    unittest.main()
