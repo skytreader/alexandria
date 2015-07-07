@@ -14,3 +14,6 @@ class IsbnTests(unittest.TestCase):
         self.assertTrue(librarian.utils.isbn_check(isbn13_correct))
         self.assertFalse(librarian.utils.isbn_check(isbn10_incorrect))
         self.assertFalse(librarian.utils.isbn_check(isbn13_incorrect))
+        
+        self.assertFalse(librarian.utils.isbn_check("lettersabc"))
+        self.assertFalse(librarian.utils.isbn_check("123456789"))
