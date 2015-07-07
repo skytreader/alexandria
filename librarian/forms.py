@@ -1,4 +1,5 @@
 from flask.ext.wtf import Form
+from librarian.custom.forms import JsonField
 from wtforms import HiddenField, PasswordField, TextField
 from wtforms.validators import Length, Required
 
@@ -19,10 +20,10 @@ class AddBooksForm(Form):
       [Required(message="Genre"), Length(max=20)])
 
     # Hardcode for now, so this makes roles.role_display kinda pointless
-    authors = HiddenField("Author(s)")
-    illustrators = HiddenField("Illustrator(s)")
-    editors = HiddenField("Editor(s)")
-    translators = HiddenField("Translator(s):")
+    authors = JsonField("Author(s)")
+    illustrators = JsonField("Illustrator(s)")
+    editors = JsonField("Editor(s)")
+    translators = JsonField("Translator(s):")
 
     publisher = HiddenField("Publisher",
       [Required(message="Publisher"), Length(max=255)])
