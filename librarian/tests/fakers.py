@@ -6,7 +6,14 @@ import string
 
 fake = Faker()
 
-class IsbnProvider(BaseProvider):
+class BookFieldsProvider(BaseProvider):
+    ADJECTIVES = set(("beautiful", "wonderful", "abstruse", "astute", "bad", "good",
+      "austere", "sinister", "jolly", "helpful", "ersatz", "slippery", "penultimate",
+      "unyielding", "intimidating", "wistful", "vile", "carmivorous", "miserable"))
+    NOUNS = set(("computer", "formula", "equation", "waters", "rain", "fight",
+      "hope", "dream", "love", "library", "book", "elevator", "hospital",
+      "village", "academy", "goblet", "chamber", "carnival", "hero"))
+
     def isbn(self, thirteen = True):
         if thirteen:
             isbn = "".join([random.choice(string.digits) for _ in range(12)])
@@ -44,3 +51,8 @@ class IsbnProvider(BaseProvider):
                 return isbn + "X"
             
             return isbn + str(check_digit)
+
+    def title(self):
+        return " ".join(("The",
+          random.choice(BookFieldsProvider.ADJECTIVES).capitalize(),
+          random.choice(BookFieldsProvider.NOUNS).capitalize()))

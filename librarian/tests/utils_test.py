@@ -1,5 +1,5 @@
 from faker import Faker
-from librarian.tests.fakers import IsbnProvider
+from librarian.tests.fakers import BookFieldsProvider
 
 import unittest
 import librarian.utils
@@ -23,10 +23,10 @@ class IsbnTests(unittest.TestCase):
 
     def test_faker(self):
         fake = Faker()
-        fake.add_provider(IsbnProvider)
+        fake.add_provider(BookFieldsProvider)
         # dual-validation
         for i in range(100):
             self.assertTrue(librarian.utils.isbn_check(fake.isbn()))
 
         for i in range(100):
-            self.assertTrue(librarian.utils.isbn_check(fake.isbn()))
+            self.assertTrue(librarian.utils.isbn_check(fake.isbn(False)))
