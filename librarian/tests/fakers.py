@@ -7,12 +7,12 @@ import string
 fake = Faker()
 
 class BookFieldsProvider(BaseProvider):
-    ADJECTIVES = set(("beautiful", "wonderful", "abstruse", "astute", "bad", "good",
+    ADJECTIVES = ("beautiful", "wonderful", "abstruse", "astute", "bad", "good",
       "austere", "sinister", "jolly", "helpful", "ersatz", "slippery", "penultimate",
-      "unyielding", "intimidating", "wistful", "vile", "carmivorous", "miserable"))
-    NOUNS = set(("computer", "formula", "equation", "waters", "rain", "fight",
+      "unyielding", "intimidating", "wistful", "vile", "carmivorous", "miserable")
+    NOUNS = ("computer", "formula", "equation", "waters", "rain", "fight",
       "hope", "dream", "love", "library", "book", "elevator", "hospital",
-      "village", "academy", "goblet", "chamber", "carnival", "hero"))
+      "village", "academy", "goblet", "chamber", "carnival", "hero")
 
     def isbn(self, thirteen = True):
         if thirteen:

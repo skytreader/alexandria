@@ -1,9 +1,9 @@
-import factory
-import faker
-import random
-
+from faker import Faker
 from librarian import models
 from librarian.tests.fakers import BookFieldsProvider
+
+import factory
+import random
 
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
@@ -37,7 +37,7 @@ class BookFactory(factory.Factory):
 
     isbn = fake.isbn()
     title = fake.title()
-    genre = GenreFactory().record_id
-    printer = BookCompanyFactory().record_id
-    publisher = BookCompanyFactory().record_id
+    genre = factory.SubFactory(GenreFactory)
+    printer = factory.SubFactory(BookCompanyFactory)
+    publisher = factory.SubFactory(BookCompanyFactory)
     publish_year = fake.year()
