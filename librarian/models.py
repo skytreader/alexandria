@@ -102,7 +102,6 @@ class Book(UserTaggedBase):
 
     def __init__(self, isbn, title, genre, printer, publisher, publish_year,
       creator):
-        super(Book, self)
         self.isbn = isbn
         self.title = title
         self.genre = genre
