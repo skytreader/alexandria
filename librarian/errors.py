@@ -5,5 +5,5 @@ class ConstraintError(Exception):
         self.operation_value = operation_value
 
     def __str__(self):
-        return "Not respecting constraint %s given %s." % (str(self.constraint_desc,
-          str(self.operation_value)))
+        return "Not respecting constraint %s given %s." % (str(self.constraint_desc),
+          str(self.operation_value))
