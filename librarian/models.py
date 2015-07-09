@@ -102,6 +102,7 @@ class Book(UserTaggedBase):
 
     def __init__(self, isbn, title, genre, printer, publisher, publish_year,
       creator):
+        publish_year = int(publish_year)
         self.isbn = isbn
         self.title = title
         self.genre = genre
@@ -112,7 +113,7 @@ class Book(UserTaggedBase):
         
         # Check the publish year on ORM since not all SQL engines (mySQL, for
         # one), check constraints. Support the Long Now Foundation!!!
-        if ISBN_START <= publish_year <= LONG_NOW_WORLD_END:
+        if ISBN_START <= publish_year and publish_year <= LONG_NOW_WORLD_END:
             self.publish_year = publish_year
         else:
             raise ConstraintError("bet. %d and %d" % (ISBN_START, LONG_NOW_WORLD_END),

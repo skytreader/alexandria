@@ -13,7 +13,8 @@ class ModelsTest(unittest.TestCase):
     def test_book(self):
         proper_book = BookFactory()
 
-        self.assertRaises(ConstraintError, BookFactory, **{'publish_year': ISBN_START})
+        with self.assertRaises(ConstraintError):
+            BookFactory(publish_year = ISBN_START - 1)
 
     def tearDown(self):
         pass
