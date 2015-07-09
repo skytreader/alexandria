@@ -41,3 +41,4 @@ class BookFactory(factory.Factory):
     printer = factory.SubFactory(BookCompanyFactory)
     publisher = factory.SubFactory(BookCompanyFactory)
     publish_year = fake.year()
+    creator = LibrarianFactory(can_write = True)

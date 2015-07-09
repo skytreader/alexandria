@@ -41,7 +41,8 @@ class Librarian(Base):
     can_exec = db.Column(db.Boolean, nullable=False, default=False)
     is_user_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    def __init__(self, username, password, can_read, can_write, can_exec, is_user_active):
+    def __init__(self, username, password, can_read = False, can_write = False,
+      can_exec = False, is_user_active = True):
         self.username = username
         self.password = password
         self.can_read = can_read
@@ -101,6 +102,7 @@ class Book(UserTaggedBase):
 
     def __init__(self, isbn, title, genre, printer, publisher, publish_year,
       creator):
+        super(Book, self)
         self.isbn = isbn
         self.title = title
         self.genre = genre
