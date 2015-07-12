@@ -1,8 +1,12 @@
+from faker import Faker
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookCompanyFactory, GenreFactory
 
 import librarian
 import unittest
+
+fake = Faker()
+fake.add_provider(BookFieldsProvider)
 
 class ApiTests(unittest.TestCase):
     
@@ -15,9 +19,8 @@ class ApiTests(unittest.TestCase):
         publisher_record = BookCompanyFactory()
         printer_record = BookCompanyFactory()
 
-        book_provider = BookFieldsProvider()
         single_author = {
-            "isbn": book_provider.isbn(),
+            "isbn": fake.isbn(),
             "title": "The Carpet Makers",
             "genre": genre_record.genre_name,
             "authors": """[
