@@ -1,5 +1,6 @@
 from librarian import db, app
 from librarian.errors import ConstraintError
+from librarian.utils import isbn_check
 from sqlalchemy.ext.declarative import declared_attr
 
 """
@@ -118,6 +119,9 @@ class Book(UserTaggedBase):
         else:
             raise ConstraintError("bet. %d and %d" % (ISBN_START, LONG_NOW_WORLD_END),
               publish_year)
+
+        if not isbn_check(isbn):
+            raise ConstraintError("Invalid ISBN" , isbn)
 
 class BookCompany(UserTaggedBase):
     """
