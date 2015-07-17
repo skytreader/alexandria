@@ -11,6 +11,9 @@ fake.add_provider(BookFieldsProvider)
 
 class ApiTests(AppTestCase):
     
+    def setUp(self):
+        super(ApiTests, self).setUp()
+    
     def test_book_adder(self):
         genre_record = GenreFactory()
         publisher_record = BookCompanyFactory()

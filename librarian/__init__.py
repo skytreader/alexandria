@@ -9,16 +9,19 @@ app.config.from_object("config")
 db = SQLAlchemy(app)
 
 def init_db(sql_string=None):
+    print "init_db called"
     if sql_string:
         # This is done for Flask SQLAlchemy
         app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_TEST_DATABASE_URI"]
 
-    from models import Librarian
-    app.register_blueprint(librarian)
-    from api import librarian_api
-    app.register_blueprint(librarian_api)
     db.create_all()
     db.session.commit()
+
+def init_blueprints():
+    app.register_blueprint(librarian)
+    from api import librarian_api
+    print "Register API blueprint"
+    app.register_blueprint(librarian_api)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
