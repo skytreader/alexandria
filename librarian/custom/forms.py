@@ -9,7 +9,7 @@ class JsonField(HiddenField):
     """
 
     def pre_validate(self, form):
-        superv = super(JsonField, self).prevalidate(form)
+        superv = super(JsonField, self).pre_validate(form)
         jsonv = True
 
         try:
