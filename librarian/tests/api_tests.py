@@ -1,3 +1,4 @@
+from base import AppTestCase
 from faker import Faker
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookCompanyFactory, GenreFactory
@@ -8,12 +9,8 @@ import unittest
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
 
-class ApiTests(unittest.TestCase):
+class ApiTests(AppTestCase):
     
-    def setUp(self):
-        self.app = librarian.app.test_client()
-        librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
-
     def test_book_adder(self):
         genre_record = GenreFactory()
         publisher_record = BookCompanyFactory()
