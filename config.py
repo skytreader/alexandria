@@ -1,5 +1,14 @@
-# Statement for enabling the development environment
-DEBUG = True
+import os
+
+# Statement for development and test environments
+"""
+DEVEL environment is understood as running a local instance of the app.
+
+TESTING environment on the other hand is understood as running the unit tests
+for the app.
+"""
+DEVEL = True
+TESTING = bool(os.environ.get("TESTING"))
 
 # Define the application directory
 import os
@@ -7,7 +16,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 SQLALCHEMY_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria'
 SQLALCHEMY_TEST_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria_test'
-SQLALCHEMY_ECHO = DEBUG
+SQLALCHEMY_ECHO = DEVEL
 DATABASE_CONNECT_OPTIONS = {"user":"root"}
 
 # Application threads. A common general assumption is
@@ -17,7 +26,7 @@ DATABASE_CONNECT_OPTIONS = {"user":"root"}
 THREADS_PER_PAGE = 2
 
 # Enable protection agains *Cross-site Request Forgery (CSRF)*
-CSRF_ENABLED     = not DEBUG
+CSRF_ENABLED     = not TESTING
 
 # Use a secure, unique and absolutely secret key for
 # signing the data. 

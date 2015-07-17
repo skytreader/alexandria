@@ -1,0 +1,4 @@
+#! /bin/bash
+
+export TESTING=True
+nosetests $1
