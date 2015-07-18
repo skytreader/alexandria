@@ -13,7 +13,7 @@ class JsonField(HiddenField):
         jsonv = True
 
         try:
-            json.loads(self.raw_data[0])
+            json.loads(self.data)
         except ValueError, TypeError:
             jsonv = False
 
