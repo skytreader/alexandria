@@ -1,6 +1,6 @@
 from librarian import app, db
 from librarian.forms import AddBooksForm
-from flask import Blueprint
+from flask import Blueprint, request
 from flask.ext.login import current_user, login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 from sqlalchemy.exc import IntegrityError
@@ -37,8 +37,9 @@ def book_adder():
           Client _must not_ retry.
         500 - Standard server error. Client may retry after some wait period.
     """
-    form = AddBooksForm()
+    form = AddBooksForm(request.form)
     app.logger.info(str(form))
+    app.logger.debug(form.debug_validate())
 
     if form.validate_on_submit():
         try:

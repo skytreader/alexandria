@@ -23,7 +23,7 @@ class AddBooksForm(Form):
     authors = JsonField("Author(s)")
     illustrators = JsonField("Illustrator(s)")
     editors = JsonField("Editor(s)")
-    translators = JsonField("Translator(s):")
+    translators = JsonField("Translator(s)")
 
     publisher = HiddenField("Publisher",
       [Required(message="Publisher"), Length(max=255)])
@@ -33,8 +33,20 @@ class AddBooksForm(Form):
     year = HiddenField("Year", [Required(message="Edition Year")])
 
     def __str__(self):
-        return "".join((str(self.isbn.raw_data), str(self.title.raw_data),
-          str(self.genre.raw_data), str(self.authors.raw_data),
-          str(self.illustrators.raw_data), str(self.editors.raw_data),
-          str(self.translators.raw_data), str(self.publisher.raw_data),
-          str(self.printer.raw_data), str(self.year.raw_data)))
+        return "/".join((str(self.isbn.data), str(self.title.data),
+          str(self.genre.data), str(self.authors.data),
+          str(self.illustrators.data), str(self.editors.data),
+          str(self.translators.data), str(self.publisher.data),
+          str(self.printer.data), str(self.year.data)))
+
+    def debug_validate(self):
+        fields = self.__dict__
+        validations = []
+
+        for varname, val in fields.iteritems():
+            try:
+                validations.insert(0, ": ".join((varname, str(val.validate(self)))))
+            except AttributeError:
+                pass # it wasn't a form field os meh
+
+        return "/".join(validations)
