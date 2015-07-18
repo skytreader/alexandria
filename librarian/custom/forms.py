@@ -13,8 +13,8 @@ class JsonField(HiddenField):
         jsonv = True
 
         try:
-            json.loads(self.raw_data)
-        except ValueError:
+            json.loads(self.raw_data[0])
+        except ValueError, TypeError:
             jsonv = False
 
         return superv and jsonv
