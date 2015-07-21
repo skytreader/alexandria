@@ -1,4 +1,4 @@
-from app.models import Librarian, Role
+from librarian.models import Librarian, Role
 from config import SQLALCHEMY_DATABASE_URI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
