@@ -23,6 +23,7 @@ def get_or_create(model, will_commit=False, **kwargs):
         db.session.add(instance)
         if will_commit:
             db.session.commit()
+        db.session.flush()
         return instance
 
 
