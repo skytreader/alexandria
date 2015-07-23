@@ -1,6 +1,6 @@
 from base import AppTestCase
 from faker import Faker
-from librarian.models import Book
+from librarian.models import Book, Genre
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookCompanyFactory, GenreFactory
 
@@ -19,7 +19,10 @@ class ApiTests(AppTestCase):
         genre_record = GenreFactory()
         publisher_record = BookCompanyFactory()
         printer_record = BookCompanyFactory()
+        
         librarian.db.session.commit()
+        genre_id = librarian.db.session.query(Genre).filter(Genre.genre_name == genre_record.genre_name).first().record_id
+
         isbn = fake.isbn()
 
         # Check that the book does not exist yet
@@ -50,4 +53,4 @@ class ApiTests(AppTestCase):
         the_carpet_makers = librarian.db.session.query(Book).filter(Book.isbn == isbn).first()
         self.assertEquals(isbn, the_carpet_makers.isbn)
         self.assertEquals("The Carpet Makers", the_carpet_makers.title)
-        self.assertEquals(genre_record.record_id, the_carpet_makers.genre)
+        self.assertEquals(genre_id, the_carpet_makers.genre)
