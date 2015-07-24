@@ -5,21 +5,17 @@ from sqlalchemy import orm
 
 import factory
 import factory.alchemy
+import librarian
 import random
 import sqlalchemy
 
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
 
-engine = sqlalchemy.create_engine('mysql://root@127.0.0.1/alexandria_test')
-session = orm.scoped_session(orm.sessionmaker())
-session.configure(bind=engine)
-
-
 class LibrarianFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.Librarian
-        sqlalchemy_session = session
+        sqlalchemy_session = librarian.db.session
 
     username = fake.user_name()
     password = fake.password()
@@ -28,7 +24,7 @@ class LibrarianFactory(factory.alchemy.SQLAlchemyModelFactory):
 class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.Genre
-        sqlalchemy_session = session
+        sqlalchemy_session = librarian.db.session
 
     genre_name = random.choice(("Horror", "Sci-Fi", "Fantasy", "Philosophy"))
     creator = LibrarianFactory()
@@ -37,7 +33,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
 class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.BookCompany
-        sqlalchemy_session = session
+        sqlalchemy_session = librarian.db.session
 
     company_name = fake.company()
     creator = LibrarianFactory()
@@ -46,7 +42,7 @@ class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
 class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.Book
-        sqlalchemy_session = session
+        sqlalchemy_session = librarian.db.session
 
     isbn = fake.isbn()
     title = fake.title()

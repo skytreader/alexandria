@@ -15,15 +15,18 @@ LONG_NOW_WORLD_END = 99999
 
 
 def get_or_create(model, will_commit=False, **kwargs):
+    print "debug " + str(kwargs)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
+        db.session.flush()
+        print "Returning " + str(instance)
         return instance
     else:
         instance = model(**kwargs)
         db.session.add(instance)
+        print "Created " + str(instance)
         if will_commit:
             db.session.commit()
-        db.session.flush()
         return instance
 
 
