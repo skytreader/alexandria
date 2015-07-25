@@ -27,7 +27,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = librarian.db.session
 
     genre_name = random.choice(("Horror", "Sci-Fi", "Fantasy", "Philosophy"))
-    creator = LibrarianFactory()
+    creator = factory.SubFactory(LibrarianFactory)
 
 
 class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -36,7 +36,7 @@ class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = librarian.db.session
 
     company_name = fake.company()
-    creator = LibrarianFactory()
+    creator = factory.SubFactory(LibrarianFactory)
 
 
 class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -50,4 +50,4 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     printer = factory.SubFactory(BookCompanyFactory)
     publisher = factory.SubFactory(BookCompanyFactory)
     publish_year = fake.year()
-    creator = LibrarianFactory(can_write = True)
+    creator = factory.SubFactory(LibrarianFactory)

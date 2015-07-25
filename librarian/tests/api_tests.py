@@ -2,8 +2,9 @@ from base import AppTestCase
 from faker import Faker
 from librarian.models import Book, Genre
 from librarian.tests.fakers import BookFieldsProvider
-from librarian.tests.factories import BookCompanyFactory, GenreFactory
+from librarian.tests.factories import BookCompanyFactory, GenreFactory, LibrarianFactory
 
+import factory
 import librarian
 import unittest
 
@@ -16,12 +17,18 @@ class ApiTests(AppTestCase):
         super(ApiTests, self).setUp()
     
     def test_book_adder_happy(self):
-        genre_record = GenreFactory()
+        _creator = factory.SubFactory(LibrarianFactory)
+        librarian.db.session.add(_creator)
+        import logging
+        genre_record = GenreFactory(creator=_creator)
         librarian.db.session.add(genre_record)
-        publisher_record = BookCompanyFactory()
+        logging.info("genre added")
+        publisher_record = BookCompanyFactory(creator=_creator)
         librarian.db.session.add(publisher_record)
-        printer_record = BookCompanyFactory()
+        logging.info("publisher added")
+        printer_record = BookCompanyFactory(creator=_creator)
         librarian.db.session.add(printer_record)
+        logging.info("printer added")
         
         librarian.db.session.commit()
         genre_id = librarian.db.session.query(Genre).filter(Genre.genre_name == genre_record.genre_name).first().record_id
