@@ -2,14 +2,16 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
 
-librarian = Blueprint('librarian', __name__)
+import librarian
 
-@librarian.route("/")
+librarian_bp = Blueprint('librarian', __name__)
+
+@librarian_bp.route("/")
 def index():
     form = SearchForm(request.form)
     return render_template("home.jinja", form=form)
 
-@librarian.route("/login/", methods=["GET", "POST"])
+@librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
     form = LoginForm()
 
@@ -19,24 +21,29 @@ def login():
 
         if user and user.password == form.librarian_password.data:
             login_user(user)
-            return redirect(url_for("librarian.dash"))
+            next_url = flask.request.args.get("next")
+
+            if not librarian.app.url_map.get(next_url):
+                return abort(400)
+
+            return redirect(next_url or url_for("librarian.dash"))
         else:
             flash("Wrong user credentials")
 
     return render_template("login.jinja", form=form)
 
-@librarian.route("/dashboard")
+@librarian_bp.route("/dashboard")
 @login_required
 def dash():
     return render_template("dashboard.jinja")
 
-@librarian.route("/logout")
+@librarian_bp.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("librarian.index"))
 
-@librarian.route("/books/add")
+@librarian_bp.route("/books/add")
 @login_required
 def books():
     form = AddBooksForm()

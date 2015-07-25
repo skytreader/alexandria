@@ -1,3 +1,4 @@
+from flask.ext.login import UserMixin
 from librarian import db, app
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check
@@ -37,7 +38,7 @@ class Base(db.Model):
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
       onupdate=db.func.current_timestamp())
 
-class Librarian(Base):
+class Librarian(Base, UserMixin):
     __tablename__ = "librarians"
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
@@ -58,17 +59,6 @@ class Librarian(Base):
     def __repr__(self):
         return self.username
     
-    # TODO Actually implement these!
-    # See https://flask-login.readthedocs.org/en/latest/
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return self.is_user_active
-
-    def is_anonymous(self):
-        return False
-
     def get_id(self):
         return self.record_id
 
