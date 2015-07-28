@@ -17,16 +17,17 @@ class ApiTests(AppTestCase):
         super(ApiTests, self).setUp()
     
     def test_book_adder_happy(self):
-        _creator = factory.SubFactory(LibrarianFactory)
+        _creator = LibrarianFactory()
         librarian.db.session.add(_creator)
+        librarian.db.session.flush()
         import logging
-        genre_record = GenreFactory(creator=_creator)
+        genre_record = GenreFactory(creator=_creator.record_id)
         librarian.db.session.add(genre_record)
         logging.info("genre added")
-        publisher_record = BookCompanyFactory(creator=_creator)
+        publisher_record = BookCompanyFactory(creator=_creator.record_id)
         librarian.db.session.add(publisher_record)
         logging.info("publisher added")
-        printer_record = BookCompanyFactory(creator=_creator)
+        printer_record = BookCompanyFactory(creator=_creator.record_id)
         librarian.db.session.add(printer_record)
         logging.info("printer added")
         
