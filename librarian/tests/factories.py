@@ -35,7 +35,7 @@ class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.BookCompany
         sqlalchemy_session = librarian.db.session
 
-    company_name = fake.company()
+    company_name = factory.LazyAttribute(lambda x: fake.company())
     creator = factory.SubFactory(LibrarianFactory)
 
 
