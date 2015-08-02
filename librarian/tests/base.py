@@ -1,3 +1,4 @@
+from flask.ext.testing import TestCase
 from librarian.models import get_or_create, Librarian, Role
 
 import librarian
@@ -8,10 +9,13 @@ librarian.app.config["TESTING"] = True
 librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 librarian.init_blueprints()
 
-class AppTestCase(unittest.TestCase):
+class AppTestCase(TestCase):
+    
+    def create_app(self):
+        return librarian.app
     
     def setUp(self):
-        self.app = librarian.app.test_client()
+        self.app = self.create_app()
         """
         admin_user = Librarian(username="admin", password="admin",
           is_user_active=True, can_read=True, can_write=True, can_exec=True)
