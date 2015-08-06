@@ -2,9 +2,12 @@ from base import AppTestCase
 from faker import Faker
 from librarian.models import Book, Genre
 from librarian.tests.fakers import BookFieldsProvider
-from librarian.tests.factories import BookCompanyFactory, GenreFactory, LibrarianFactory
+from librarian.tests.factories import (
+  BookCompanyFactory, GenreFactory, LibrarianFactory
+)
 
 import factory
+import flask.ext.login
 import librarian
 import unittest
 
@@ -18,6 +21,7 @@ class ApiTests(AppTestCase):
     
     def test_book_adder_happy(self):
         _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
         import logging

@@ -30,6 +30,8 @@ class AppTestCase(unittest.TestCase):
         for r in roles:
             get_or_create(Role, will_commit=True, role_name=r, role_display="%s(s)" % r,
               creator=self.admin_user.record_id)
+        logging.info("#######CHAD########## flushing stuff")
+        librarian.db.session.flush()
 
     def tearDown(self):
         logging.info("#######CHAD########## rollback stuff")

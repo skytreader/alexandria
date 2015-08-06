@@ -6,6 +6,7 @@ from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson
 from sqlalchemy.exc import IntegrityError
 
 import re
+import traceback
 
 librarian_api = Blueprint("librarian_api", __name__)
 
@@ -97,7 +98,8 @@ def book_adder():
             db.session.commit()
 
             return "Accepted", 200
-        except IntegrityError:
+        except IntegrityError, ierr:
+            print traceback.format_exc()
             return "IntegrityError", 409
     
     return "Error", 400
