@@ -65,7 +65,6 @@ class ApiTests(AppTestCase):
         }
 
         single_rv = self.client.post("/api/book_adder", data=single_author)
-        print single_rv.dir()
 
         self.assertEquals(single_rv._status_code, 200)
         the_carpet_makers = librarian.db.session.query(Book).filter(Book.isbn == isbn).first()
