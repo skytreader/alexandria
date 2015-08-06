@@ -26,19 +26,6 @@ class ApiTests(AppTestCase):
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
         login_user(_creator)
-        import logging
-        genre_record = GenreFactory(creator=_creator.record_id)
-        librarian.db.session.add(genre_record)
-        logging.info("genre added")
-        publisher_record = BookCompanyFactory(creator=_creator.record_id)
-        librarian.db.session.add(publisher_record)
-        logging.info("publisher added")
-        printer_record = BookCompanyFactory(creator=_creator.record_id)
-        librarian.db.session.add(printer_record)
-        logging.info("printer added")
-        
-        librarian.db.session.flush()
-        genre_id = librarian.db.session.query(Genre).filter(Genre.genre_name == genre_record.genre_name).first().record_id
 
         isbn = fake.isbn()
 
