@@ -76,10 +76,10 @@ class UserTaggedBase(Base):
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
-    genre_name = db.Column(db.String(20), nullable=False, unique=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
 
-    def __init__(self, genre_name, creator):
-        self.genre_name = genre_name
+    def __init__(self, name, creator):
+        self.name = name
         self.creator = creator
         self.last_modifier = creator
 
@@ -119,10 +119,10 @@ class BookCompany(UserTaggedBase):
     List?! List?! This is better off in NoSQL form!
     """
     __tablename__ = "book_companies"
-    company_name = db.Column(db.String(255), nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
 
-    def __init__(self, company_name, creator):
-        self.company_name = company_name
+    def __init__(self, name, creator):
+        self.name = name
         self.creator = creator
         self.last_modifier = creator
 
@@ -154,16 +154,16 @@ class Role(UserTaggedBase):
     The purpose of this table is to enumerate the contributions we are interested
     in for the books.
 
-    The role_name is for the actual contribution we are interested in while
-    role_display is for how it is prompted for in the app's forms.
+    The name is for the actual contribution we are interested in while
+    display_text is for how it is prompted for in the app's forms.
     """
     __tablename__ = "roles"
-    role_name = db.Column(db.String(255), unique=True, nullable=False)
-    role_display = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    display_text = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, role_name, role_display, creator):
-        self.role_name = role_name
-        self.role_display = role_display
+    def __init__(self, name, display_text, creator):
+        self.name = name
+        self.display_text = display_text
         self.creator = creator
         self.last_modifier = creator
 

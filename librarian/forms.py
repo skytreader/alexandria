@@ -19,7 +19,7 @@ class AddBooksForm(Form):
     genre = HiddenField("Genre",
       [Required(message="Genre"), Length(max=20)])
 
-    # Hardcode for now, so this makes roles.role_display kinda pointless
+    # Hardcode for now, so this makes roles.display_text kinda pointless
     authors = JsonField("Author(s)")
     illustrators = JsonField("Illustrator(s)")
     editors = JsonField("Editor(s)")

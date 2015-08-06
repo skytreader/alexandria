@@ -45,13 +45,13 @@ def book_adder():
     if form.validate_on_submit():
         try:
             # Genre first
-            genre = get_or_create(Genre, genre_name=form.genre.data,
+            genre = get_or_create(Genre, name=form.genre.data,
               creator=current_user.get_id())
 
             # Publishing information
-            publisher = get_or_create(BookCompany, company_name=form.publisher.data,
+            publisher = get_or_create(BookCompany, name=form.publisher.data,
               creator=current_user.get_id())
-            printer = get_or_create(BookCompany, company_name=form.printer.data,
+            printer = get_or_create(BookCompany, name=form.printer.data,
               creator=current_user.get_id())
 
             # Book
@@ -69,10 +69,10 @@ def book_adder():
 
             #FIXME This part is shaky
             #FIXME I think we should cache.
-            author_role = Role.query.filter_by(role_name="Author").first()
-            illus_role = Role.query.filter_by(role_name="Illustrator").first()
-            editor_role = Role.query.filter_by(role_name="Editor").first()
-            trans_role = Role.query.filter_by(role_name="Translator").first()
+            author_role = Role.query.filter_by(name="Author").first()
+            illus_role = Role.query.filter_by(name="Illustrator").first()
+            editor_role = Role.query.filter_by(name="Editor").first()
+            trans_role = Role.query.filter_by(name="Translator").first()
 
             # Assign participation
             if author:

@@ -14,5 +14,5 @@ if __name__ == "__main__":
     roles = ("Author", "Illustrator", "Editor", "Translator")
     
     for r in roles:
-        get_or_create(Role, will_commit=True, role_name=r,
-          role_display="%s(s)" % r, creator=admin_user.record_id)
+        get_or_create(Role, will_commit=True, name=r, display_text="%s(s)" % r,
+          creator=admin_user.id)
