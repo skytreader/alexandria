@@ -95,7 +95,7 @@ def book_adder():
                   trans_role.record_id, creator=current_user.get_id())
                 db.session.add(translator_part)
 
-            db.session.commit()
+            #db.session.commit()
 
             return "Accepted", 200
         except IntegrityError, ierr:

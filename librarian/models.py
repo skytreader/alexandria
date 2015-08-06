@@ -19,7 +19,7 @@ def get_or_create(model, will_commit=False, **kwargs):
     print "debug " + str(kwargs)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
-        db.session.flush()
+        #db.session.flush()
         print "Returning " + str(instance)
         return instance
     else:
