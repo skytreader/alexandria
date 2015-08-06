@@ -28,4 +28,4 @@ login_manager.login_view = "controllers.login"
 @login_manager.user_loader
 def load_user(userid):
     from models import Librarian
-    return Librarian.query.filter_by(record_id=userid).first()
+    return Librarian.query.filter_by(id=userid).first()

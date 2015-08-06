@@ -56,8 +56,8 @@ def book_adder():
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
-              genre=genre.record_id, creator=current_user.get_id(),
-              publisher=publisher.record_id, printer=printer.record_id,
+              genre=genre.id, creator=current_user.get_id(),
+              publisher=publisher.id, printer=printer.id,
               publish_year=int(form.year.data))
             db.session.add(book)
 
@@ -76,23 +76,23 @@ def book_adder():
 
             # Assign participation
             if author:
-                author_part = BookParticipant(book.record_id, author.record_id,
-                  author_role.record_id, creator=current_user.get_id())
+                author_part = BookParticipant(book.id, author.id,
+                  author_role.id, creator=current_user.get_id())
                 db.session.add(author_part)
 
             if illustrator:
-                illus_part = BookParticipant(book.record_id, illustrator.record_id,
-                  illus_role.record_id, creator=current_user.get_id())
+                illus_part = BookParticipant(book.id, illustrator.id,
+                  illus_role.id, creator=current_user.get_id())
                 db.session.add(illus_part)
 
             if editor:
-                editor_part = BookParticipant(book.record_id, editor.record_id,
-                  editor_role.record_id, creator=current_user.get_id())
+                editor_part = BookParticipant(book.id, editor.id,
+                  editor_role.id, creator=current_user.get_id())
                 db.session.add(editor_part)
 
             if translator:
-                translator_part = BookParticipant(book.record_id, translator.record_id,
-                  trans_role.record_id, creator=current_user.get_id())
+                translator_part = BookParticipant(book.id, translator.id,
+                  trans_role.id, creator=current_user.get_id())
                 db.session.add(translator_part)
 
             db.session.commit()

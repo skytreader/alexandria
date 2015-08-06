@@ -30,7 +30,7 @@ def get_or_create(model, will_commit=False, **kwargs):
 
 class Base(db.Model):
     __abstract__ = True
-    record_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
       onupdate=db.func.current_timestamp())
@@ -57,7 +57,7 @@ class Librarian(Base, UserMixin):
         return self.username
     
     def get_id(self):
-        return self.record_id
+        return self.id
 
 class UserTaggedBase(Base):
     """
@@ -68,11 +68,11 @@ class UserTaggedBase(Base):
 
     @declared_attr
     def creator(self):
-        return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
+        return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
     @declared_attr
     def last_modifier(self):
-        return db.Column(db.Integer, db.ForeignKey("librarians.record_id"))
+        return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
@@ -87,9 +87,9 @@ class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False)
-    genre = db.Column(db.Integer, db.ForeignKey("genres.record_id"))
-    printer = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
-    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+    genre = db.Column(db.Integer, db.ForeignKey("genres.id"))
+    printer = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
+    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
     def __init__(self, isbn, title, genre, printer, publisher, publish_year,
@@ -128,8 +128,8 @@ class BookCompany(UserTaggedBase):
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
-    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
-    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.record_id"))
+    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
+    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
 
     def __init__(self, mother_company, imprint_company, creator):
         self.mother_company = mother_company
@@ -172,9 +172,9 @@ class BookParticipant(UserTaggedBase):
     Consider that 99% of books will need the same roles over and over. 
     """
     __tablename__ = "book_participants"
-    book_id = db.Column(db.Integer, db.ForeignKey("books.record_id"))
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
-    role_id = db.Column(db.Integer, db.ForeignKey("roles.record_id"))
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id"))
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id"))
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
     def __init__(self, book_id, person_id, role_id, creator):
         self.book_id = book_id
@@ -194,8 +194,8 @@ class Pseudonym(UserTaggedBase):
     Is this table ever going into any use?
     """
     __tablename__ = "pseudonyms"
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.record_id"))
-    book_id = db.Column(db.Integer, db.ForeignKey("books.record_id"))
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id"))
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id"))
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
