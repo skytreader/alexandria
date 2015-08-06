@@ -1,5 +1,6 @@
 from base import AppTestCase
 from faker import Faker
+from flask.ext.login import login_user
 from librarian.models import Book, Genre
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
@@ -24,6 +25,7 @@ class ApiTests(AppTestCase):
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        login_user(_creator)
         import logging
         genre_record = GenreFactory(creator=_creator.record_id)
         librarian.db.session.add(genre_record)
@@ -62,7 +64,8 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        single_rv = self.app.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/book_adder", data=single_author)
+        print single_rv.dir()
 
         self.assertEquals(single_rv._status_code, 200)
         the_carpet_makers = librarian.db.session.query(Book).filter(Book.isbn == isbn).first()
