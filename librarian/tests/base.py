@@ -1,6 +1,8 @@
 from flask.ext.testing import TestCase
-from librarian.models import get_or_create, Librarian, Role
-
+from librarian.models import (
+  Book, BookCompany, BookParticipant, BookPerson, Genre, Imprint, get_or_create,
+  Librarian, Pseudonym, Role
+)
 import librarian
 import logging
 import unittest
@@ -38,3 +40,10 @@ class AppTestCase(TestCase):
 
     def tearDown(self):
         librarian.db.session.rollback()
+        # Delete the contents of the tables.
+        librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
+        librarian.db.session.commit()
+        Librarian.query.delete()
+        Role.query.delete()
+        librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
+        librarian.db.session.commit()
