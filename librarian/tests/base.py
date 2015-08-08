@@ -36,8 +36,17 @@ class AppTestCase(TestCase):
         librarian.db.session.flush()
 
     def tearDown(self):
+        """
+        Rollback any pending transactions and delete the contents of the tables.
+
+        This is done directly on DB level. Note that the "proper" SQLAlchemy
+        way to do this would be https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/DropEverything
+        but it is unsuitable for unit testing since we drop _everything_.
+
+        (Or it _might_ work but we will have to call `create_all` on setUp which
+        is going to be a waste of time.)
+        """
         librarian.db.session.rollback()
-        # Delete the contents of the tables.
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
         librarian.db.engine.execute("DELETE FROM librarians;")
         librarian.db.engine.execute("DELETE FROM roles;")
