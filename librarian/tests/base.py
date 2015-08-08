@@ -1,8 +1,5 @@
 from flask.ext.testing import TestCase
-from librarian.models import (
-  Book, BookCompany, BookParticipant, BookPerson, Genre, Imprint, get_or_create,
-  Librarian, Pseudonym, Role
-)
+from librarian.models import get_or_create, Librarian, Role
 import librarian
 import logging
 import unittest
@@ -42,8 +39,14 @@ class AppTestCase(TestCase):
         librarian.db.session.rollback()
         # Delete the contents of the tables.
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
-        librarian.db.session.commit()
-        Librarian.query.delete()
-        Role.query.delete()
+        librarian.db.engine.execute("DELETE FROM librarians;")
+        librarian.db.engine.execute("DELETE FROM roles;")
+        librarian.db.engine.execute("DELETE FROM genres;")
+        librarian.db.engine.execute("DELETE FROM books;")
+        librarian.db.engine.execute("DELETE FROM book_companies;")
+        librarian.db.engine.execute("DELETE FROM imprints;")
+        librarian.db.engine.execute("DELETE FROM book_persons;")
+        librarian.db.engine.execute("DELETE FROM book_participants;")
+        librarian.db.engine.execute("DELETE FROM pseudonyms;")
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
         librarian.db.session.commit()
