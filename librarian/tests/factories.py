@@ -17,6 +17,7 @@ class LibrarianFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.Librarian
         sqlalchemy_session = librarian.db.session
 
+    id = factory.Sequence(lambda n: n)
     username = factory.LazyAttribute(lambda x: fake.user_name())
     password = factory.LazyAttribute(lambda x: fake.password())
 
@@ -26,6 +27,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.Genre
         sqlalchemy_session = librarian.db.session
 
+    id = factory.Sequence(lambda n: n)
     name = factory.LazyAttribute(lambda x: random.choice(("Horror", "Sci-Fi", "Fantasy", "Philosophy")))
     creator = factory.SubFactory(LibrarianFactory)
 
@@ -35,6 +37,7 @@ class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.BookCompany
         sqlalchemy_session = librarian.db.session
 
+    id = factory.Sequence(lambda n: n)
     name = factory.LazyAttribute(lambda x: fake.company())
     creator = factory.SubFactory(LibrarianFactory)
 
@@ -44,6 +47,7 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.Book
         sqlalchemy_session = librarian.db.session
 
+    id = factory.Sequence(lambda n: n)
     isbn = fake.isbn()
     title = fake.title()
     genre = factory.SubFactory(GenreFactory)
