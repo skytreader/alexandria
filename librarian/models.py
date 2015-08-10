@@ -44,14 +44,13 @@ class Librarian(Base, UserMixin):
     can_exec = db.Column(db.Boolean, nullable=False, default=False)
     is_user_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    def __init__(self, username, password, can_read = False, can_write = False,
-      can_exec = False, is_user_active = True):
-        self.username = username
-        self.password = password
-        self.can_read = can_read
-        self.can_write = can_write
-        self.can_exec = can_exec
-        self.is_user_active = is_user_active
+    def __init__(self, **kwargs):
+        self.username = kwargs["username"]
+        self.password = kwargs["password"]
+        self.can_read = kwargs.get("can_read", False)
+        self.can_write = kwargs.get("can_write", False)
+        self.can_exec = kwargs.get("can_exec", False)
+        self.is_user_active = kwargs.get("is_user_active", True)
 
     def __repr__(self):
         return self.username
@@ -78,10 +77,10 @@ class Genre(UserTaggedBase):
     __tablename__ = "genres"
     name = db.Column(db.String(20), nullable=False, unique=True)
 
-    def __init__(self, name, creator):
-        self.name = name
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.name = kwargs["name"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
 
 class Book(UserTaggedBase):
     __tablename__ = "books"
@@ -92,21 +91,20 @@ class Book(UserTaggedBase):
     publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
-    def __init__(self, isbn, title, genre, printer, publisher, publish_year,
-      creator):
-        publish_year = int(publish_year)
-        self.isbn = isbn
-        self.title = title
-        self.genre = genre
-        self.creator = creator
-        self.last_modifier = creator
-        self.printer = printer
-        self.publisher = publisher
+    def __init__(self, **kwargs):
+        publish_year = int(kwargs["publish_year"])
+        self.isbn = kwargs["isbn"]
+        self.title = kwargs["title"]
+        self.genre = kwargs["genre"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
+        self.printer = kwargs["printer"]
+        self.publisher = kwargs["publisher"]
         
         # Check the publish year on ORM since not all SQL engines (mySQL, for
         # one), check constraints. Support the Long Now Foundation!!!
         if ISBN_START <= publish_year and publish_year <= LONG_NOW_WORLD_END:
-            self.publish_year = publish_year
+            self.publish_year = kwargs["publish_year"]
         else:
             raise ConstraintError("bet. %d and %d" % (ISBN_START, LONG_NOW_WORLD_END),
               publish_year)
@@ -121,21 +119,21 @@ class BookCompany(UserTaggedBase):
     __tablename__ = "book_companies"
     name = db.Column(db.String(255), nullable=False, unique=True)
 
-    def __init__(self, name, creator):
-        self.name = name
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.name = kwargs["name"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
     mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
     imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
 
-    def __init__(self, mother_company, imprint_company, creator):
-        self.mother_company = mother_company
-        self.imprint_company = imprint_company
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.mother_company = kwargs["mother_company"]
+        self.imprint_company = kwargs["imprint_company"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
 
 class BookPerson(UserTaggedBase):
     __tablename__ = "book_persons"
@@ -143,11 +141,11 @@ class BookPerson(UserTaggedBase):
     firstname = db.Column(db.String(255), nullable=False)
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
-    def __init__(self, lastname, firstname, creator):
-        self.lastname = lastname
-        self.firstname = firstname
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.lastname = kwargs["lastname"]
+        self.firstname = kwargs["firstname"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
 
 class Role(UserTaggedBase):
     """
@@ -161,11 +159,11 @@ class Role(UserTaggedBase):
     name = db.Column(db.String(255), unique=True, nullable=False)
     display_text = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, name, display_text, creator):
-        self.name = name
-        self.display_text = display_text
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.name = kwargs["name"]
+        self.display_text = kwargs["display_text"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
 
 class BookParticipant(UserTaggedBase):
     """
@@ -176,12 +174,12 @@ class BookParticipant(UserTaggedBase):
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
-    def __init__(self, book_id, person_id, role_id, creator):
-        self.book_id = book_id
-        self.person_id = person_id
-        self.role_id = role_id
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.book_id = kwargs["book_id"]
+        self.person_id = kwargs["person_id"]
+        self.role_id = kwargs["role_id"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
@@ -200,10 +198,10 @@ class Pseudonym(UserTaggedBase):
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
 
-    def __init__(self, person_id, book_id, lastname, firstname, creator):
-        self.person_id = person_id
-        self.book_id = book_id
-        self.lastname = lastname
-        self.firstname = firstname
-        self.creator = creator
-        self.last_modifier = creator
+    def __init__(self, **kwargs):
+        self.person_id = kwargs["person_id"]
+        self.book_id = kwargs["book_id"]
+        self.lastname = kwargs["lastname"]
+        self.firstname = kwargs["firstname"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
