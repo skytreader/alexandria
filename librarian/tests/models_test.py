@@ -8,6 +8,11 @@ import unittest
 
 class ModelsTest(AppTestCase):
     
+    def setUp(self):
+        super(ModelsTest, self).setUp()
+        self.gn_query = (librarian.db.session.query(Genre)
+          .filter(Genre.name=="Graphic Novel"))
+    
     def test_book_errors(self):
         with self.assertRaises(ConstraintError):
             BookFactory(publish_year = ISBN_START - 1)
@@ -17,14 +22,17 @@ class ModelsTest(AppTestCase):
             BookFactory(isbn="9783161484105")
 
     def test_get_and_create_commit(self):
-        graphic_novels = (librarian.db.session.query(Genre)
-          .filter(Genre.name=="Graphic Novel").all())
+        graphic_novels = self.gn_query.all()
         self.assertEqual([], graphic_novels)
         
         gn_genre = get_or_create(Genre, will_commit=True, name="Graphic Novel",
           creator=self.admin_user.id)
 
-        templar = (librarian.db.session.query(Genre)
-          .filter(Genre.name=="Graphic Novel").all())
+        self.assertEqual("Graphic Novel", gn_genre.name)
 
-        self.assertEqual(1, len(templar))
+        graphic_novels = self.gn_query.all()
+
+        self.assertEqual(1, len(graphic_novels))
+
+    def test_get_and_create_nocommit(self):
+        pass

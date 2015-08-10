@@ -22,7 +22,6 @@ def get_or_create(model, will_commit=False, **kwargs):
     else:
         instance = model(**kwargs)
         db.session.add(instance)
-        print "Created " + str(instance)
         if will_commit:
             db.session.commit()
         return instance
