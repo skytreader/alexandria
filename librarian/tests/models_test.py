@@ -35,4 +35,14 @@ class ModelsTest(AppTestCase):
         self.assertEqual(1, len(graphic_novels))
 
     def test_get_and_create_nocommit(self):
-        pass
+        graphic_novels = self.gn_query.all()
+        self.assertEqual([], graphic_novels)
+
+        gn_genre = get_or_create(Genre, will_commit=False, name="Graphic Novel",
+          creator = self.admin_user.id)
+
+        self.assertEqual("Graphic Novel", gn_genre.name)
+
+        graphic_novels = self.gn_query.all()
+
+        self.assertEqual([], graphic_novels)
