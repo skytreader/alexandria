@@ -1,7 +1,7 @@
 from base import AppTestCase
 from factories import *
 from librarian.errors import ConstraintError
-from librarian.models import Book, get_or_create, ISBN_START
+from librarian.models import Genre, get_or_create, ISBN_START
 
 import librarian
 import unittest
@@ -16,13 +16,15 @@ class ModelsTest(AppTestCase):
             # This is an invalid ISBN. It should be 978-3-16-148410-0
             BookFactory(isbn="9783161484105")
 
-    def test_get_and_create(self):
-        templar = librarian.db.session.query(Book).filter(Book.title=="Templar").all()
-        self.assertEqual([], templar)
+    def test_get_and_create_commit(self):
+        graphic_novels = (librarian.db.session.query(Genre)
+          .filter(Genre.name=="Graphic Novel").all())
+        self.assertEqual([], graphic_novels)
         
-        templar_book = BookFactory(title="Templar")
-        librarian.db.session.flush()
+        gn_genre = get_or_create(Genre, will_commit=True, name="Graphic Novel",
+          creator=self.admin_user.id)
 
-        templar = librarian.db.session.query(Book).filter(Book.title=="Templar").all()
+        templar = (librarian.db.session.query(Genre)
+          .filter(Genre.name=="Graphic Novel").all())
 
         self.assertEqual(1, len(templar))
