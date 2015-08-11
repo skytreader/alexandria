@@ -28,7 +28,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = librarian.db.session
 
     id = factory.Sequence(lambda n: n)
-    name = factory.LazyAttribute(lambda x: random.choice(("Horror", "Sci-Fi", "Fantasy", "Philosophy")))
+    name = factory.Sequence(lambda n: "Genre%s" % n)
     creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
 
 
