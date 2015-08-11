@@ -1,4 +1,4 @@
-from flask.ext.login import UserMixin
+from flask.ext.login import current_user, UserMixin
 from librarian import db, app
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check
@@ -16,10 +16,27 @@ LONG_NOW_WORLD_END = 99999
 
 
 def get_or_create(model, will_commit=False, **kwargs):
+    """
+    Get the record from the table represented by the given model which
+    corresponds to **kwargs.
+
+    In **kwargs, there is no need to specify the creator of the record; it
+    does not make sense to ask for it given that it might've been created by
+    another user.
+
+    If the logic falls to the creation of a new record, the creator will be set
+    as the current user. If no user is logged-in when this is called, the admin
+    user is used.
+    """
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
+        if "creator" not in kwargs:
+            admin = (db.session.query(Librarian)
+              .filter(Librarian.username=='admin').first())
+            kwargs["creator"] = admin
+
         instance = model(**kwargs)
         if will_commit:
             db.session.add(instance)
@@ -56,6 +73,7 @@ class Librarian(Base, UserMixin):
     
     def get_id(self):
         return self.id
+
 
 class UserTaggedBase(Base):
     """
