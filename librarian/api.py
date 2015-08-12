@@ -1,7 +1,8 @@
+import json
 from librarian import app, db
 from librarian.forms import AddBooksForm
 from flask import Blueprint, request
-from flask.ext.login import current_user, login_required
+from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 from sqlalchemy.exc import IntegrityError
 
@@ -13,17 +14,26 @@ librarian_api = Blueprint("librarian_api", __name__)
 def __create_bookperson(form_data):
     """
     Create a bookperson record from the given form_data. Return the created
-    record, if any. Else return None.
+    records as a list, if any. Else return None.
 
-    The record is added to the session but not committed.
+    form_data is expected to be a JSON list of objects. Each object should have
+    the fields `last_name` and `first_name`.
     """
-    parse = re.split(r",\s+", form_data)
-    # FIXME What if it is a single-name pseudonym? E.g., Moebius
-    if len(parse) == 2:
-        return get_or_create(BookPerson, firstname=parse[1], lastname=parse[0],
-          creator=current_user.get_id())
+    from flask.ext.login import current_user
+    try:
+        parse = json.loads(form_data)
+        persons_created = []
 
-    return None
+        for parson in parse:
+            persons_created.insert(0, get_or_create(BookPerson, will_commit=True,
+              firstname=parson["first_name"], lastname=parson["last_name"],
+              creator=current_user.get_id()))
+
+        return persons_created
+    except ValueError:
+        # For errors in pasing JSON
+        return None
+
 
 @librarian_api.route("/api/book_adder", methods=["POST"])
 @login_required
@@ -44,15 +54,16 @@ def book_adder():
 
     if form.validate_on_submit():
         try:
+            from flask.ext.login import current_user
             # Genre first
-            genre = get_or_create(Genre, name=form.genre.data,
+            genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
               creator=current_user.get_id())
 
             # Publishing information
-            publisher = get_or_create(BookCompany, name=form.publisher.data,
-              creator=current_user.get_id())
-            printer = get_or_create(BookCompany, name=form.printer.data,
-              creator=current_user.get_id())
+            publisher = get_or_create(BookCompany, will_commit=True,
+              name=form.publisher.data, creator=current_user.get_id())
+            printer = get_or_create(BookCompany, will_commit=True,
+              name=form.printer.data, creator=current_user.get_id())
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
@@ -62,10 +73,10 @@ def book_adder():
             db.session.add(book)
 
             # Create the BookPersons
-            author = __create_bookperson(form.authors.data)
-            illustrator = __create_bookperson(form.illustrators.data)
-            editor = __create_bookperson(form.editors.data)
-            translator = __create_bookperson(form.translators.data)
+            authors = __create_bookperson(form.authors.data)
+            illustrators = __create_bookperson(form.illustrators.data)
+            editors = __create_bookperson(form.editors.data)
+            translators = __create_bookperson(form.translators.data)
 
             #FIXME This part is shaky
             #FIXME I think we should cache.
@@ -75,25 +86,26 @@ def book_adder():
             trans_role = Role.query.filter_by(name="Translator").first()
 
             # Assign participation
-            if author:
+            for author in authors:
                 author_part = BookParticipant(book_id=book.id,
                   person_id=author.id, role_id=author_role.id,
                   creator=current_user.get_id())
+                db.session.add(author)
                 db.session.add(author_part)
 
-            if illustrator:
+            for illustrator in illustrators:
                 illus_part = BookParticipant(book_id=book.id,
                   person_id=illustrator.id, role_id=illus_role.id,
                   creator=current_user.get_id())
                 db.session.add(illus_part)
 
-            if editor:
+            for editor in editors:
                 editor_part = BookParticipant(book_id=book.id,
                   person_id=editor.id, role_id=editor_role.id,
                   creator=current_user.get_id())
                 db.session.add(editor_part)
 
-            if translator:
+            for translator in translators:
                 translator_part = BookParticipant(book_id=book.id,
                   person_id=translator.id, role_id=trans_role.id,
                   creator=current_user.get_id())

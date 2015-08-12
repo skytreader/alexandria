@@ -25,7 +25,6 @@ class ApiTests(AppTestCase):
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
-        login_user(_creator)
 
         isbn = fake.isbn()
 
