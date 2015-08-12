@@ -22,17 +22,21 @@ def get_or_create(model, will_commit=False, **kwargs):
 
     In **kwargs, there is no need to specify the creator of the record; it
     does not make sense to ask for it given that it might've been created by
-    another user.
+    another user. If it is given as a parameter, it will be ignored in the
+    "get" part of this method.
 
     If the logic falls to the creation of a new record, the creator will be set
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
+    given_creator = kwargs.pop("creator", None)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
-        if "creator" not in kwargs:
+        if given_creator:
+            kwargs["creator"] = given_creator
+        else:
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
             kwargs["creator"] = admin

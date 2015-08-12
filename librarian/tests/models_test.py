@@ -22,17 +22,20 @@ class ModelsTest(AppTestCase):
             BookFactory(isbn="9783161484105")
 
     def test_get_or_create_commit(self):
+        other_librarian = LibrarianFactory()
+        librarian.db.session.flush()
         graphic_novels = self.gn_query.all()
         self.assertEqual([], graphic_novels)
         
         gn_genre = get_or_create(Genre, will_commit=True, name="Graphic Novel",
-          creator=self.admin_user.id)
+          creator=other_librarian.id)
 
         self.assertEqual("Graphic Novel", gn_genre.name)
 
         graphic_novels = self.gn_query.all()
 
         self.assertEqual(1, len(graphic_novels))
+        self.assertEqual(gn_genre, graphic_novels[0])
 
     def test_get_or_create_nocommit(self):
         graphic_novels = self.gn_query.all()
@@ -48,6 +51,7 @@ class ModelsTest(AppTestCase):
         self.assertEqual([], graphic_novels)
 
     def test_get_or_create_preexisting(self):
+        other_librarian = LibrarianFactory()
         horror = Genre(name="Horror", creator=self.admin_user.id)
         librarian.db.session.add(horror)
         librarian.db.session.flush()
@@ -59,6 +63,11 @@ class ModelsTest(AppTestCase):
 
         horror_goc = get_or_create(Genre, name="Horror")
         self.assertEqual("Horror", horror_goc.name)
+
+        # Test that creator should be ignored when getting via get_or_create
+        horror_other = get_or_create(Genre, name="Horror",
+          creator=other_librarian.id)
+        self.assertEqual(horror_goc, horror_other)
     
     def test_get_or_create_insuff(self):
         templar = (librarian.db.session.query(Book)
