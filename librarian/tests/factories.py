@@ -48,10 +48,10 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = librarian.db.session
 
     id = factory.Sequence(lambda n: n)
-    isbn = fake.isbn()
-    title = fake.title()
+    isbn = factory.LazyAttribute(lambda x: fake.isbn())
+    title = factory.LazyAttribute(lambda x: fake.title())
     genre = factory.LazyAttribute(lambda x: GenreFactory().id)
     printer = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     publisher = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
-    publish_year = fake.year()
+    publish_year = factory.LazyAttribute(lambda x: fake.year())
     creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
