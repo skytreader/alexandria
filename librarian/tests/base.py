@@ -15,6 +15,7 @@ class AppTestCase(TestCase):
     
     def setUp(self):
         self.app = self.create_app()
+        self.ROLE_IDS = {}
         """
         admin_user = Librarian(username="admin", password="admin",
           is_user_active=True, can_read=True, can_write=True, can_exec=True)
@@ -31,8 +32,9 @@ class AppTestCase(TestCase):
         roles = ("Author", "Illustrator", "Editor", "Translator")
         
         for r in roles:
-            get_or_create(Role, will_commit=True, name=r, display_text="%s(s)" % r,
-              creator=self.admin_user.id)
+            _r = get_or_create(Role, will_commit=True, name=r,
+              display_text="%s(s)" % r, creator=self.admin_user.id)
+            self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
 
     def tearDown(self):
