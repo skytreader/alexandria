@@ -84,6 +84,13 @@ class ApiTests(AppTestCase):
 
             return {"first_name": first_name, "last_name": last_name}
 
+        def verify_bookperson_inserted(persons, role, bookid):
+            for p in persons:
+                _p = self.verify_inserted(BookPerson, firstname=p["first_name"],
+                  lastname=p["last_name"])
+                self.verify_inserted(BookParticipant, person_id=_p.id,
+                  role_id=self.ROLE_IDS[role], book_id=bookid)
+
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
@@ -114,10 +121,8 @@ class ApiTests(AppTestCase):
         self.assertEqual(200, req_val.status_code)
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
-
-        for auth in authors:
-            _auth = self.verify_inserted(BookPerson, firstname=auth["first_name"],
-              lastname=auth["last_name"])
-            self.verify_inserted(BookParticipant, person_id=_auth.id,
-              role_id=self.ROLE_IDS["Author"], book_id=created_book.id)
-
+        
+        verify_bookperson_inserted(authors, "Author", created_book.id)
+        verify_bookperson_inserted(illustrators, "Illustrator", created_book.id)
+        verify_bookperson_inserted(editors, "Editor", created_book.id)
+        verify_bookperson_inserted(translators, "Translator", created_book.id)
