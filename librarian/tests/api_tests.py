@@ -116,15 +116,8 @@ class ApiTests(AppTestCase):
           .filter(Book.isbn==isbn).first())
 
         for auth in authors:
-            auth = (librarian.db.session.query(BookPerson)
-              .filter(BookPerson.firstname==auth["first_name"])
-              .filter(BookPerson.lastname==auth["last_name"]).all())
-            
-            self.assertEqual(1, len(auth))
-            
-            participant = (librarian.db.session.query(BookParticipant)
-              .filter(BookParticipant.person_id==auth[0].id)
-              .filter(BookParticipant.role_id==self.ROLE_IDS["Author"])
-              .filter(BookParticipant.book_id==created_book.id).all())
+            _auth = self.verify_inserted(BookPerson, firstname=auth["first_name"],
+              lastname=auth["last_name"])
+            self.verify_inserted(BookParticipant, person_id=_auth.id,
+              role_id=self.ROLE_IDS["Author"], book_id=created_book.id)
 
-            self.assertEqual(1, len(participant))

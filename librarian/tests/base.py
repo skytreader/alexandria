@@ -40,10 +40,12 @@ class AppTestCase(TestCase):
     def verify_inserted(self, model, **kwargs):
         """
         Verify that the record described by **kwargs is inserted into the table
-        represented by the given model.
+        represented by the given model. Returns the inserted record (if the
+        assert succeeds.
         """
         record = librarian.db.session.query(model).filter_by(**kwargs).first()
         self.assertTrue(record is not None)
+        return record
 
     def verify_does_not_exist(self, model, **kwargs):
         """
