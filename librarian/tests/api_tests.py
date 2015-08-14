@@ -70,27 +70,26 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
+    def make_name_object(self):
+        name = fake.name().split()
+        is_roman_num = PROLLY_ROMAN_NUM.match(name[-1])
+        last_name = " ".join(name[-1:]) if is_roman_num else name[-1]
+        first_name = name[0]
+
+        return {"first_name": first_name, "last_name": last_name}
+
+    def verify_bookperson_inserted(self, persons, role, bookid):
+        for p in persons:
+            _p = self.verify_inserted(BookPerson, firstname=p["first_name"],
+              lastname=p["last_name"])
+            self.verify_inserted(BookParticipant, person_id=_p.id,
+              role_id=self.ROLE_IDS[role], book_id=bookid)
+
     def test_multiple_book_people(self):
         """
         Test adding multiple people for the fields where person names are
         expected. We can assume that records are "fresh".
         """
-
-        def make_name_object():
-            name = fake.name().split()
-            is_roman_num = PROLLY_ROMAN_NUM.match(name[-1])
-            last_name = " ".join(name[-1:]) if is_roman_num else name[-1]
-            first_name = name[0]
-
-            return {"first_name": first_name, "last_name": last_name}
-
-        def verify_bookperson_inserted(persons, role, bookid):
-            for p in persons:
-                _p = self.verify_inserted(BookPerson, firstname=p["first_name"],
-                  lastname=p["last_name"])
-                self.verify_inserted(BookParticipant, person_id=_p.id,
-                  role_id=self.ROLE_IDS[role], book_id=bookid)
-
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
@@ -99,10 +98,10 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object() for _ in range(4)]
-        illustrators = [make_name_object() for _ in range(4)]
-        editors = [make_name_object() for _ in range(4)]
-        translators = [make_name_object() for _ in range(4)]
+        authors = [self.make_name_object() for _ in range(4)]
+        illustrators = [self.make_name_object() for _ in range(4)]
+        editors = [self.make_name_object() for _ in range(4)]
+        translators = [self.make_name_object() for _ in range(4)]
 
         req_data = {
             "isbn": isbn,
@@ -122,7 +121,42 @@ class ApiTests(AppTestCase):
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
         
-        verify_bookperson_inserted(authors, "Author", created_book.id)
-        verify_bookperson_inserted(illustrators, "Illustrator", created_book.id)
-        verify_bookperson_inserted(editors, "Editor", created_book.id)
-        verify_bookperson_inserted(translators, "Translator", created_book.id)
+        self.verify_bookperson_inserted(authors, "Author", created_book.id)
+        self.verify_bookperson_inserted(illustrators, "Illustrator", created_book.id)
+        self.verify_bookperson_inserted(editors, "Editor", created_book.id)
+        self.verify_bookperson_inserted(translators, "Translator", created_book.id)
+
+    def test_repeat_people(self):
+        """
+        Test that API call should still succeed even if the people have been
+        added before.
+        """
+
+        def insert_bookpersons(persons):
+            for p in persons:
+                bp = BookPerson(firstname=p["first_name"],
+                  lastname=p["last_name"], creator=self.admin_user.id)
+                librarian.db.session.add(bp)
+
+            librarian.db.session.flush()
+
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        isbn = fake.isbn()
+        title = fake.title()
+
+        authors = [self.make_name_object() for _ in range(4)]
+        insert_bookpersons(authors)
+        for auth in authors:
+            self.verify_inserted(BookPerson, firstname=auth["first_name"],
+              lastname=auth["last_name"])
+      
+        illustrators = [self.make_name_object() for _ in range(4)]
+        insert_bookpersons(illustrators)
+        editors = [self.make_name_object() for _ in range(4)]
+        insert_bookpersons(editors)
+        translators = [self.make_name_object() for _ in range(4)]
+        insert_bookpersons(translators)
