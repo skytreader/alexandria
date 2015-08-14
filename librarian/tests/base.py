@@ -37,6 +37,22 @@ class AppTestCase(TestCase):
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
 
+    def verify_inserted(self, model, **kwargs):
+        """
+        Verify that the record described by **kwargs is inserted into the table
+        represented by the given model.
+        """
+        record = librarian.db.session.query(model).filter_by(**kwargs).first()
+        self.assertTrue(record is not None)
+
+    def verify_does_not_exist(self, model, **kwargs):
+        """
+        Verify that the record described by **kwargs is not yet in the table
+        represented by the given model.
+        """
+        record = librarian.db.session.query(model).filter_by(**kwargs).first()
+        self.assertTrue(record is None)
+
     def tearDown(self):
         """
         Rollback any pending transactions and delete the contents of the tables.
