@@ -167,3 +167,19 @@ class ApiTests(AppTestCase):
         translators = [self.make_name_object() for _ in range(4)]
         insert_bookpersons(translators)
         map(verify_bookperson, translators)
+
+        req_data = {
+            "isbn": isbn,
+            "title": title,
+            "genre": "Multinational",
+            "authors": json.dumps(authors),
+            "illustrators": json.dumps(illustrators),
+            "editors": json.dumps(editors),
+            "translators": json.dumps(translators),
+            "publisher": "Scholastic",
+            "printer": "UP Press",
+            "year": "2013"
+        }
+
+        req_val = self.client.post("/api/book_adder", data=req_data)
+        self.assertEqual(200, req_val.status_code)
