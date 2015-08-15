@@ -139,6 +139,10 @@ class ApiTests(AppTestCase):
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
+        
+        def verify_bookperson(p):
+            self.verify_inserted(BookPerson, firstname=p["first_name"],
+              lastname=p["last_name"])
 
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
@@ -150,13 +154,16 @@ class ApiTests(AppTestCase):
 
         authors = [self.make_name_object() for _ in range(4)]
         insert_bookpersons(authors)
-        for auth in authors:
-            self.verify_inserted(BookPerson, firstname=auth["first_name"],
-              lastname=auth["last_name"])
+        map(verify_bookperson, authors)
       
         illustrators = [self.make_name_object() for _ in range(4)]
         insert_bookpersons(illustrators)
+        map(verify_bookperson, illustrators)
+        
         editors = [self.make_name_object() for _ in range(4)]
         insert_bookpersons(editors)
+        map(verify_bookperson, editors)
+        
         translators = [self.make_name_object() for _ in range(4)]
         insert_bookpersons(translators)
+        map(verify_bookperson, translators)
