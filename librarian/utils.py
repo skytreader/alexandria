@@ -1,3 +1,4 @@
+import librarian
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
@@ -33,3 +34,6 @@ def isbn_check(isbn):
             return (check % 10) == 0
 
     return False
+
+def route_exists(route):
+    return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())

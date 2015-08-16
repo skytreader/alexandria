@@ -1,7 +1,9 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
+from utils import route_exists
 
+import flask
 import librarian
 
 librarian_bp = Blueprint('librarian', __name__)
@@ -23,8 +25,8 @@ def login():
             login_user(user)
             next_url = flask.request.args.get("next")
 
-            if not librarian.app.url_map.get(next_url):
-                return abort(400)
+            if next_url and not route_exists(next_url):
+                return flask.abort(400)
 
             return redirect(next_url or url_for("librarian.dash"))
         else:
