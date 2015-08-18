@@ -28,7 +28,7 @@ def login():
             if next_url and not route_exists(next_url):
                 return flask.abort(400)
 
-            return redirect(next_url or url_for("librarian.dash"))
+            return redirect(next_url or url_for("librarian.dash"), code=302)
         else:
             flash("Wrong user credentials")
 
