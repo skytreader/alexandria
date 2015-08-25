@@ -70,7 +70,7 @@ Get a ;ist of persons and return a string to display them..
 function listNames(nameList){
     var names = [];
     for(var i = 0; i < nameList.length; i++){
-        creators.push(nameList[i].lastname + ", " + nameList[i].firstname);
+        names.push(nameList[i].lastname + ", " + nameList[i].firstname);
     }
 
     return  names.join("; ");
@@ -86,12 +86,12 @@ same.
 Returns a list of Person objects.
 */
 function getCreatorNames(creator){
-    var creatorsLastname = $(creator + "-proxy-lastname");
-    var creatorsFirstname = $(creator + "-proxy-firstname");
+    var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
+    var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
     var persons = [];
 
     for(var i = 0; i < creatorsLastname.length; i++){
-        persons.push(new Person(creatorsLastname[i], creatorsFirstname[i]));
+        persons.push(new Person(creatorsLastname[i].value, creatorsFirstname[i].value));
     }
 
     return persons;
