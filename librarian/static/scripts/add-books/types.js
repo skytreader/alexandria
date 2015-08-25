@@ -1,5 +1,5 @@
 /**
-The book class.
+Contains the types needed for adding books.
 */
 
 /**
