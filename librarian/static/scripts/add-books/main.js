@@ -357,6 +357,15 @@ function loadFromQueueToForm(queue){
     return false;
 }
 
+/**
+TODO I thought of this method to automate my testing but I realized this could
+also be useful for a "reprocess" feature. If saving a book fails, you can reload
+the book's record into the form and redo what you think failed.
+*/
+function loadToForm(reqData){
+    $("#isbn-proxy").val(reqData.isbn);
+}
+
 $.validator.addMethod("isbn", function(value, element, param){
     var stripped = stripExtraneous(value);
     return verifyISBN10(stripped) || verifyISBN13(stripped);
