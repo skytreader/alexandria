@@ -3,6 +3,7 @@
 */__pycache__/*
 *.sw?
 *~
+*.out
 *.log
 *.log.*
 *.bak
