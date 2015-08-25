@@ -22,3 +22,8 @@ function Book(isbn, title, genre, authors, illustrators, editors, translators,
     this.year = year;
     this.domElement = domElement;
 }
+
+function Person(lastname, firstname){
+    this.firstname = firstname;
+    this.lastname = lastname;
+}

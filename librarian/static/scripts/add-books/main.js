@@ -55,13 +55,46 @@ function renderSpine(){
     titleText.innerHTML = title.val();
 
     var authorsText = document.createElement("h3");
-    authorsText.innerHTML = authors.val();
+    authorsText.innerHTML = listNames(getCreatorNames("author"));
 
     spine.appendChild(isbnText);
     spine.appendChild(titleText);
     spine.appendChild(authorsText);
 
     return spine;
+}
+
+/**
+Get a ;ist of persons and return a string to display them..
+*/
+function listNames(nameList){
+    var names = [];
+    for(var i = 0; i < nameList.length; i++){
+        creators.push(nameList[i].lastname + ", " + nameList[i].firstname);
+    }
+
+    return  names.join("; ");
+}
+
+/**
+Get all the names entered for the given creator.
+
+This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
+it must be uuaranteed that the order of lastnames and firstnames returned is the
+same.
+
+Returns a list of Person objects.
+*/
+function getCreatorNames(creator){
+    var creatorsLastname = $(creator + "-proxy-lastname");
+    var creatorsFirstname = $(creator + "-proxy-firstname");
+    var persons = [];
+
+    for(var i = 0; i < creatorsLastname.length; i++){
+        persons.push(new Person(creatorsLastname[i], creatorsFirstname[i]));
+    }
+
+    return persons;
 }
 
 /**
