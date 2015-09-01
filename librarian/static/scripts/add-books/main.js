@@ -363,7 +363,35 @@ also be useful for a "reprocess" feature. If saving a book fails, you can reload
 the book's record into the form and redo what you think failed.
 */
 function loadToForm(reqData){
+    
+    function insertAllCreators(all, type){
+        console.log("inserting", all);
+        console.log("with type", type);
+        for(var i = 0; i < all.length; i++){
+            if(i != 0){
+                var creatorInput = renderContentCreatorInput(type);
+                $(creatorInput).find("[name='" + type + "-proxy-lastname']")
+                  .val(all[i].last_name);
+                $(creatorInput).find("[name='" + type + "-proxy-firstname']")
+                  .val(all[i].first_name);
+                document.getElementById(type + "-list").appendChild(creatorInput);
+            } else{
+                $("[name='" + type + "-proxy-lastname']").val(all[i].last_name);
+                $("[name='" + type + "-proxy-firstname']").val(all[i].first_name);
+            }
+        }
+    }
+
     $("#isbn-proxy").val(reqData.isbn);
+    $("#title-proxy").val(reqData.title);
+    $("#genre-proxy").val(reqData.genre);
+    $("#publisher-proxy").val(reqData.publisher);
+    $("#printer-proxy").val(reqData.printer);
+    $("#year-proxy").val(reqData.year);
+    insertAllCreators(reqData.authors, "author");
+    insertAllCreators(reqData.illustrators, "illustrator");
+    insertAllCreators(reqData.editors, "editor");
+    insertAllCreators(reqData.translators, "translator");
 }
 
 $.validator.addMethod("isbn", function(value, element, param){

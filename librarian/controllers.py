@@ -3,6 +3,7 @@ from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
 from utils import route_exists
 
+import config
 import flask
 import librarian
 
@@ -49,7 +50,11 @@ def logout():
 @login_required
 def books():
     form = AddBooksForm()
-    scripts = ("jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
-      "add-books/types.js", "utils/visual-queue.js", "utils/misc.js")
+    scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
+      "add-books/types.js", "utils/visual-queue.js", "utils/misc.js"]
+
+    if config.DEVEL:
+        scripts.insert(0, "add-books/testdata.js")
+
     styles = ("add_books.css",)
     return render_template("add_books.jinja", form=form, scripts=scripts, stylesheets=styles)
