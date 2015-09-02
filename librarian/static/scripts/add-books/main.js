@@ -277,6 +277,10 @@ Fill up the realFormIds variable. No guarantee is made as to the order of the
 elements inserted into realFormIds.
 */
 function getFormIds(){
+    
+    function constructNotString(){
+    }
+
     var allInputs = $("#main-form input").not("#csrf_token");
     var limit = allInputs.length;
 
@@ -308,9 +312,11 @@ function sendSaveForm(domElement){
         reprocessQueue.enqueue(domElement);
     }
 
+    console.log("printer is", document.getElementById("printer").value);
+
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
-        "isbn": document.getElementById("isbn").value,
+        "isbn": stripExtraneous(document.getElementById("isbn").value),
         "title": document.getElementById("title").value,
         "genre": document.getElementById("genre").value,
         "authors": document.getElementById("authors").value,
@@ -365,8 +371,6 @@ the book's record into the form and redo what you think failed.
 function loadToForm(reqData){
     
     function insertAllCreators(all, type){
-        console.log("inserting", all);
-        console.log("with type", type);
         for(var i = 0; i < all.length; i++){
             if(i != 0){
                 var creatorInput = renderContentCreatorInput(type);

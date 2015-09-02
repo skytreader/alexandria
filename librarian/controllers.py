@@ -51,7 +51,7 @@ def logout():
 def books():
     form = AddBooksForm()
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
-      "add-books/types.js", "utils/visual-queue.js", "utils/misc.js"]
+      "add-books/types.js", "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js"]
 
     if config.DEVEL:
         scripts.insert(0, "add-books/testdata.js")
