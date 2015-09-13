@@ -198,22 +198,6 @@ function recordDeleterFactory(creatorType){
 };
 
 /**
-Return a function that generates an input row for a given creatorType. The
-generated function was meant to be called for the click event on the add button.
-*/
-function rendererFactory(creatorType){
-    return function(){
-        var inputLine = renderContentCreatorInput(creatorType);
-
-        // Since we are adding something, we are sure that the list should now
-        // have deletable rows.
-        $("#" + creatorType + "-list .fa-minus-circle").removeClass("disabled");
-
-        document.getElementById(creatorType + "-list").appendChild(inputLine);
-    }
-}
-
-/**
 Clears the proxy form.
 */
 function clearProxyForm(){
@@ -252,24 +236,6 @@ follows a record with no illustrator.)
 */
 function clearActualForm(){
     $("#main-form input").not("csrf_token").val("");
-}
-
-/**
-Returns a function that returns a by line, labeled with
-argument _by_. The names displayed with the by line is
-specified through argument _lineVal_.
-
-@param by
-@param lineVal
-*/
-function getLabeledByLine(by, lineVal){
-    return function(){
-        if(lineVal == ""){
-            return "";
-        } else{
-            return "<strong>" + by + " by:</strong> " + lineVal;
-        }
-    }
 }
 
 /**
@@ -411,6 +377,22 @@ $.validator.addMethod("year", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function(){
+    /**
+    Return a function that generates an input row for a given creatorType. The
+    generated function was meant to be called for the click event on the add button.
+    */
+    function rendererFactory(creatorType){
+        return function(){
+            var inputLine = renderContentCreatorInput(creatorType);
+    
+            // Since we are adding something, we are sure that the list should now
+            // have deletable rows.
+            $("#" + creatorType + "-list .fa-minus-circle").removeClass("disabled");
+    
+            document.getElementById(creatorType + "-list").appendChild(inputLine);
+        }
+    }
+
     getFormIds();
     // TODO update!!!
     $("#detailsForm").validate({
