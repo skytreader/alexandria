@@ -120,6 +120,7 @@ function internalizeBook(spineDom){
       translators, publisher, printer, year, spineDom);
 
     window.bookQueue.enqueue(bookObj);
+    console.log("enqueued to bookQueue", bookObj);
 }
 
 /**
@@ -239,24 +240,6 @@ function clearActualForm(){
 }
 
 /**
-Fill up the realFormIds variable. No guarantee is made as to the order of the
-elements inserted into realFormIds.
-*/
-function getFormIds(){
-    
-    function constructNotString(){
-    }
-
-    var allInputs = $("#main-form input").not("#csrf_token");
-    var limit = allInputs.length;
-
-    for(var i = 0; i < limit; i++){
-        var iid = allInputs[i].id;
-        window.realFormIds.push(iid);
-    }
-}
-
-/**
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
 
@@ -277,8 +260,6 @@ function sendSaveForm(domElement){
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.enqueue(domElement);
     }
-
-    console.log("printer is", document.getElementById("printer").value);
 
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
@@ -303,30 +284,6 @@ function sendSaveForm(domElement){
             500: failRecover
         }
     });
-}
-
-/**
-Load from the given queue to the actual form. The queue object is expected to be
-from Queue.js.
-
-@param queue
-    The queue object from which we fetch a book.
-@return
-    True if a book record was loaded successfuly into the actual form.
-*/
-function loadFromQueueToForm(queue){
-    var fromQ = queue.dequeue();
-    if(fromQ){
-        var limit = window.realFormIds.length;
-
-        for(var i = 0; i < limit; i++){
-            document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
-        }
-
-        return fromQ;
-    }
-
-    return false;
 }
 
 /**
@@ -393,7 +350,34 @@ $(document).ready(function(){
         }
     }
 
-    getFormIds();
+    /**
+    Load from the given queue to the actual form. The queue object is expected to 
+    be from Queue.js.
+    
+    @param queue
+        The queue object from which we fetch a book.
+    @return
+        True if a book record was loaded successfuly into the actual form.
+    */
+    function loadFromQueueToForm(queue){
+        var fromQ = queue.dequeue();
+    
+        if(fromQ){
+            var limit = window.realFormIds.length;
+    
+            for(var i = 0; i < limit; i++){
+                console.log(window.realFormIds[i]);
+                console.log(document.getElementById(window.realFormIds[i]).value);
+                console.log("=====");
+                document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+            }
+    
+            return fromQ;
+        }
+    
+        return false;
+    }
+
     // TODO update!!!
     $("#detailsForm").validate({
         rules:{
