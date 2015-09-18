@@ -120,7 +120,6 @@ function internalizeBook(spineDom){
       translators, publisher, printer, year, spineDom);
 
     window.bookQueue.enqueue(bookObj);
-    console.log("enqueued to bookQueue", bookObj);
 }
 
 /**
@@ -191,7 +190,6 @@ function recordDeleterFactory(creatorType){
 
         // Check if after removing a row, we should disable deletions for
         // the time being.
-        console.log(creatorType + "-list children length", document.getElementById(creatorType + "-list").children.length);
         if(document.getElementById(creatorType + "-list").children.length == 1){
             $("#" + creatorType + "-list .fa-minus-circle").addClass("disabled");
         }
@@ -237,6 +235,20 @@ follows a record with no illustrator.)
 */
 function clearActualForm(){
     $("#main-form input").not("csrf_token").val("");
+}
+
+/**
+Fill up the realFormIds variable. No guarantee is made as to the order of the
+elements inserted into realFormIds.
+*/
+function getFormIds(){
+    var allInputs = $("#main-form input").not("#csrf_token");
+    var limit = allInputs.length;
+
+    for(var i = 0; i < limit; i++){
+        var iid = allInputs[i].id;
+        window.realFormIds.push(iid);
+    }
 }
 
 /**
@@ -333,6 +345,8 @@ $.validator.addMethod("year", function(value, element, param){
     return /^\d{4}$/.test(value);
 }, "Please enter a valid year.");
 
+window.getFormIds();
+
 $(document).ready(function(){
     /**
     Return a function that generates an input row for a given creatorType. The
@@ -366,9 +380,6 @@ $(document).ready(function(){
             var limit = window.realFormIds.length;
     
             for(var i = 0; i < limit; i++){
-                console.log(window.realFormIds[i]);
-                console.log(document.getElementById(window.realFormIds[i]).value);
-                console.log("=====");
                 document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
             }
     

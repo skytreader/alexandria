@@ -13,3 +13,7 @@ test("content creator render test", function(assert){
     ok(nameInputs.length >= 2);
     ok(delButton.length == 1);
 });
+
+test("realFormIds is populated", function(assert){
+    ok(window.realFormIds.length > 0);
+});
