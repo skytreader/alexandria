@@ -16,10 +16,9 @@ var reprocessQueue = new Queue();
 This script will manipulate ids a lot. We derive certain converntions from the
 actual ids of the hidden form field. This hidden form field is the one that
 is mapped to the Flask form.
-
-This variable is filled on document ready.
 */
-var realFormIds = [];
+var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
+  "editors", "translators"];
 
 /**
 Problem: We don't have a way to determine if we should display the "Ooops..."
@@ -238,20 +237,6 @@ function clearActualForm(){
 }
 
 /**
-Fill up the realFormIds variable. No guarantee is made as to the order of the
-elements inserted into realFormIds.
-*/
-function getFormIds(){
-    var allInputs = $("#main-form input").not("#csrf_token");
-    var limit = allInputs.length;
-
-    for(var i = 0; i < limit; i++){
-        var iid = allInputs[i].id;
-        window.realFormIds.push(iid);
-    }
-}
-
-/**
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
 
@@ -344,8 +329,6 @@ Just check if it is a 4-digit number.
 $.validator.addMethod("year", function(value, element, param){
     return /^\d{4}$/.test(value);
 }, "Please enter a valid year.");
-
-window.getFormIds();
 
 $(document).ready(function(){
     /**
