@@ -15,10 +15,10 @@ var reprocessQueue = new Queue();
 /**
 This script will manipulate ids a lot. We derive certain converntions from the
 actual ids of the hidden form field. This hidden form field is the one that
-is mapped to the Flask form.
+is mapped to the Flask form. These are the fields to be included in the request.
 */
 var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
-  "editors", "translators"];
+  "editors", "translators", "year", "publisher", "printer"];
 
 /**
 Problem: We don't have a way to determine if we should display the "Ooops..."
@@ -101,16 +101,20 @@ Append the book described in #proxy-form to the internal queue.
 
 The DOM element representing the book is a required parameter since we use it to
 map the Book object to its visual representation.
+
+@param spineDom
+    The DOM element representing the book spine. This is just necessary for
+    mapping.
 */
 function internalizeBook(spineDom){
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy").val();
     var title = $(allInputs).filter("#title-proxy").val();
     var genre = $(allInputs).filter("#genre-proxy").val();
-    var authors = $(allInputs).filter("#authors-proxy").val();
-    var illustrators = $(allInputs).filter("#illustrators-proxy").val();
-    var editors = $(allInputs).filter("#editors-proxy").val();
-    var translators = $(allInputs).filter("#translators-proxy").val();
+    var authors = JSON.stringify(getCreatorNames("author"));
+    var illustrators = JSON.stringify(getCreatorNames("illustrator"));
+    var editors = JSON.stringify(getCreatorNames("editor"));
+    var translators = JSON.stringify(getCreatorNames("translator"));
     var publisher = $(allInputs).filter("#publisher-proxy").val();
     var printer = $(allInputs).filter("#printer-proxy").val();
     var year = $(allInputs).filter("#year-proxy").val();
@@ -200,16 +204,6 @@ Clears the proxy form.
 */
 function clearProxyForm(){
     $("#proxy-form input").val("")
-}
-
-/**
-Event handler for clicking "Save Book" button in the proxy form.
-*/
-function queueBook(){
-    var spine = renderSpine();
-    internalizeBook(spine);
-    window.visualQueue.enqueue(spine);
-    clearProxyForm();
 }
 
 /**
@@ -361,9 +355,11 @@ $(document).ready(function(){
     
         if(fromQ){
             var limit = window.realFormIds.length;
+            console.log("fromQ is", fromQ);
     
             for(var i = 0; i < limit; i++){
                 document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+                console.log("got this", fromQ[window.realFormIds[i]]);
             }
     
             return fromQ;
@@ -402,7 +398,12 @@ $(document).ready(function(){
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
-    $("#queue-book").click(queueBook);
+    $("#queue-book").click(function(){
+        var spine = renderSpine();
+        internalizeBook(spine);
+        window.visualQueue.enqueue(spine);
+        clearProxyForm();
+    });
 
     $("#autosave_label").click(function(){
         document.getElementById("auto-save-toggle").checked = !document.getElementById("auto-save-toggle").checked;
@@ -410,7 +411,7 @@ $(document).ready(function(){
 
     // Start the polling interval timers.
     setInterval(function(){
-        console.log("Polling main")
+        console.debug("Polling main")
         if(document.getElementById("auto-save-toggle").checked){
             var foo = loadFromQueueToForm(window.bookQueue);
             if(foo){
@@ -420,7 +421,7 @@ $(document).ready(function(){
     }, PROCESS_INTERVAL);
     
     setInterval(function(){
-        console.log("Polling reprocess");
+        console.debug("Polling reprocess");
         if(document.getElementById("auto-save-toggle").checked){
             var foo = loadFromQueueToForm(window.reprocessQueue);
             if(foo){

@@ -26,7 +26,7 @@ def __create_bookperson(form_data):
 
         for parson in parse:
             persons_created.insert(0, get_or_create(BookPerson, will_commit=True,
-              firstname=parson["first_name"], lastname=parson["last_name"],
+              firstname=parson["firstname"], lastname=parson["lastname"],
               creator=current_user.get_id()))
 
         return persons_created
