@@ -289,9 +289,9 @@ function loadToForm(reqData){
             if(i != 0){
                 var creatorInput = renderContentCreatorInput(type);
                 $(creatorInput).find("[name='" + type + "-proxy-lastname']")
-                  .val(all[i].last_name);
+                  .val(all[i].lastname);
                 $(creatorInput).find("[name='" + type + "-proxy-firstname']")
-                  .val(all[i].first_name);
+                  .val(all[i].firstname);
                 document.getElementById(type + "-list").appendChild(creatorInput);
             } else{
                 $("[name='" + type + "-proxy-lastname']").val(all[i].last_name);

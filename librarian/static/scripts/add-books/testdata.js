@@ -1,9 +1,9 @@
 var FORM_DATA = {
     "isbn": "978-0765305930",
     "title": "The Carpet Makers",
-    "genre": "Science Fiction",
+    "genre": "Fantasy",
     "authors": [
-        {"last_name": "Eschenbach", "first_name": "Andreas"}
+        {"lastname": "Eschenbach", "firstname": "Andreas"}
      ],
      "illustrators": [],
      "editors": [],
@@ -11,4 +11,22 @@ var FORM_DATA = {
      "publisher": "Tor",
      "printer": "Tor",
      "year": "2005"
+}
+
+var SANDMAN = {
+    "isbn": "1401231233",
+    "title": "Fables and Reflections",
+    "genre": "Graphic Novel",
+    "authors": [
+        {"lastname": "Gaiman", "firstname": "Neil"}
+    ],
+    "illustrators": [
+        {"lastname": "Russell", "firstname": "P. Craig"},
+        {"lastname": "Thompson", "firstname": "Jill"}
+    ],
+    "editors": [],
+    "translators": [],
+    "publisher": "Vertigo",
+    "printer": "Vertigo",
+    "year": "2011"
 }
