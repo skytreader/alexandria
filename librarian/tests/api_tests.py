@@ -47,8 +47,8 @@ class ApiTests(AppTestCase):
             "genre": "io9",
             "authors": """[
                 {
-                    "last_name": "Eschenbach",
-                    "first_name": "Andreas"
+                    "lastname": "Eschenbach",
+                    "firstname": "Andreas"
                 }
             ]""",
             "illustrators": "[]",
@@ -76,12 +76,12 @@ class ApiTests(AppTestCase):
         last_name = " ".join(name[-1:]) if is_roman_num else name[-1]
         first_name = name[0]
 
-        return {"first_name": first_name, "last_name": last_name}
+        return {"firstname": first_name, "lastname": last_name}
 
     def verify_bookperson_inserted(self, persons, role, bookid):
         for p in persons:
-            _p = self.verify_inserted(BookPerson, firstname=p["first_name"],
-              lastname=p["last_name"])
+            _p = self.verify_inserted(BookPerson, firstname=p["firstname"],
+              lastname=p["lastname"])
             self.verify_inserted(BookParticipant, person_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
@@ -134,15 +134,15 @@ class ApiTests(AppTestCase):
 
         def insert_bookpersons(persons):
             for p in persons:
-                bp = BookPerson(firstname=p["first_name"],
-                  lastname=p["last_name"], creator=self.admin_user.id)
+                bp = BookPerson(firstname=p["firstname"],
+                  lastname=p["lastname"], creator=self.admin_user.id)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
         
         def verify_bookperson(p):
-            self.verify_inserted(BookPerson, firstname=p["first_name"],
-              lastname=p["last_name"])
+            self.verify_inserted(BookPerson, firstname=p["firstname"],
+              lastname=p["lastname"])
 
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
