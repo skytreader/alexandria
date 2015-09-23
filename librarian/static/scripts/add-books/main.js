@@ -294,8 +294,8 @@ function loadToForm(reqData){
                   .val(all[i].firstname);
                 document.getElementById(type + "-list").appendChild(creatorInput);
             } else{
-                $("[name='" + type + "-proxy-lastname']").val(all[i].last_name);
-                $("[name='" + type + "-proxy-firstname']").val(all[i].first_name);
+                $("[name='" + type + "-proxy-lastname']").val(all[i].lastname);
+                $("[name='" + type + "-proxy-firstname']").val(all[i].firstname);
             }
         }
     }
