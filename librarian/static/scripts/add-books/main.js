@@ -90,7 +90,11 @@ function getCreatorNames(creator){
     var persons = [];
 
     for(var i = 0; i < creatorsLastname.length; i++){
-        persons.push(new Person(creatorsLastname[i].value, creatorsFirstname[i].value));
+        var firstname = creatorsFirstname[i].value.trim();
+        var lastname = creatorsLastname[i].value.trim();
+        if(firstname != "" && lastname != ""){
+            persons.push(new Person(lastname, firstname));
+        }
     }
 
     return persons;
