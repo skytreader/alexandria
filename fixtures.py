@@ -3,10 +3,7 @@ from config import SQLALCHEMY_DATABASE_URI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-if __name__ == "__main__":
-    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
-    session = sessionmaker(bind=engine)()
-
+def insert_fixtures(engine, session):
     admin_user = get_or_create(Librarian, True, username="admin",
       password="admin", is_user_active=True, can_read=True, can_write=True,
       can_exec=True)
@@ -16,3 +13,9 @@ if __name__ == "__main__":
     for r in roles:
         get_or_create(Role, will_commit=True, name=r, display_text="%s(s)" % r,
           creator=admin_user.id)
+
+if __name__ == "__main__":
+    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+    session = sessionmaker(bind=engine)()
+
+    insert_fixtures(engine, session)

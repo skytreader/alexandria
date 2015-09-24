@@ -2,6 +2,8 @@ from config import SQLALCHEMY_DATABASE_URI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from fixtures import insert_fixtures
+
 if __name__ == "__main__":
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
@@ -17,3 +19,5 @@ if __name__ == "__main__":
     engine.execute("TRUNCATE TABLE pseudonyms;")
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
+
+    insert_fixtures(engine, session)
