@@ -96,7 +96,7 @@ class UserTaggedBase(Base):
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
-    name = db.Column(db.String(20), nullable=False, unique=True)
+    name = db.Column(db.String(40), nullable=False, unique=True)
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
@@ -106,7 +106,7 @@ class Genre(UserTaggedBase):
 class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
-    title = db.Column(db.String(255), nullable=False)
+    title = db.Column(db.String(255), nullable=False, index=True)
     genre = db.Column(db.Integer, db.ForeignKey("genres.id"))
     printer = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
     publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id"))

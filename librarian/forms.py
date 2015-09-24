@@ -17,7 +17,7 @@ class AddBooksForm(Form):
     title = HiddenField("Title",
       [Required(message="Book's Title"), Length(max=255)])
     genre = HiddenField("Genre",
-      [Required(message="Genre"), Length(max=20)])
+      [Required(message="Genre"), Length(max=40)])
 
     # Hardcode for now, so this makes roles.display_text kinda pointless
     authors = JsonField("Author(s)")
@@ -28,7 +28,7 @@ class AddBooksForm(Form):
     publisher = HiddenField("Publisher",
       [Required(message="Publisher"), Length(max=255)])
     printer = HiddenField("Printer",
-      [Required(message="Printer"), Length(max=255)])
+      [Length(max=255)])
     # TODO Clarify this in models!!!
     year = HiddenField("Year", [Required(message="Edition Year")])
 

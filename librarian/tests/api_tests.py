@@ -183,3 +183,31 @@ class ApiTests(AppTestCase):
 
         req_val = self.client.post("/api/book_adder", data=req_data)
         self.assertEqual(200, req_val.status_code)
+
+    def test_no_printer(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        single_author = {
+            "isbn": "9780062330260",
+            "title": "Trigger Warning",
+            "genre": "Short Story Collection",
+            "authors": """[
+                {
+                    "lastname": "Gaiman",
+                    "firstname": "Neil"
+                }
+            ]""",
+            "illustrators": "[]",
+            "editors": "[]",
+            "translators": "[]",
+            "publisher": "Wiliam Morrow",
+            "printer": "",
+            "year": "2015"
+        }
+
+        single_rv = self.client.post("/api/book_adder", data=single_author)
+
+        self.assertEquals(single_rv._status_code, 200)
