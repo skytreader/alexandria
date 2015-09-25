@@ -316,7 +316,7 @@ function loadToForm(reqData){
     insertAllCreators(reqData.translators, "translator");
 }
 
-$.validator.addMethod("isbn", function(value, element, param){
+$.validator.addMethod("isbnVal", function(value, element, param){
     var stripped = stripExtraneous(value);
     return verifyISBN10(stripped) || verifyISBN13(stripped);
 }, "Invalid ISBN input.");
@@ -324,7 +324,7 @@ $.validator.addMethod("isbn", function(value, element, param){
 /*
 Just check if it is a 4-digit number.
 */
-$.validator.addMethod("year", function(value, element, param){
+$.validator.addMethod("yearVal", function(value, element, param){
     return /^\d{4}$/.test(value);
 }, "Please enter a valid year.");
 
@@ -373,13 +373,14 @@ $(document).ready(function(){
     }
 
     // TODO update!!!
-    $("#detailsForm").validate({
+    $("#proxy-form").validate({
         rules:{
-            isbn1:{
-                isbn: true
+            "isbn-rule":{
+                isbnVal: true,
+                required: true
             },
-            year1:{
-                year: true
+            yearRule:{
+                yearVal: true
             }
         }
     });
@@ -403,10 +404,12 @@ $(document).ready(function(){
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(function(){
-        var spine = renderSpine();
-        internalizeBook(spine);
-        window.visualQueue.enqueue(spine);
-        clearProxyForm();
+        if($("#proxy-form").valid()){
+            var spine = renderSpine();
+            internalizeBook(spine);
+            window.visualQueue.enqueue(spine);
+            clearProxyForm();
+        }
     });
 
     $("#autosave_label").click(function(){
