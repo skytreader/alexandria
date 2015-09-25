@@ -125,9 +125,8 @@ a.navbox{
 	word-spacing: normal;
 }
 
-label.error{
-	display: block;
-	margin-bottom: -10px;
+label.input-holder{
+    width: 97%;
 }
 
 /*Forms*/
