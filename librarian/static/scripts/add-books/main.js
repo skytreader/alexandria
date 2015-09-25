@@ -377,7 +377,8 @@ $(document).ready(function(){
         rules:{
             "isbn-rule":{
                 isbnVal: true,
-                required: true
+                required: true,
+                maxlength: 13
             },
             "year-rule":{
                 yearVal: true,
