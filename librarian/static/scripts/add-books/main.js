@@ -379,8 +379,19 @@ $(document).ready(function(){
                 isbnVal: true,
                 required: true
             },
-            yearRule:{
-                yearVal: true
+            "year-rule":{
+                yearVal: true,
+                required: true
+            },
+            "genre-rule":{
+                required: true,
+                maxlength: 40
+            },
+            "title-rule":{
+                required: true
+            },
+            "publisher-rule":{
+                required: true
             }
         }
     });
