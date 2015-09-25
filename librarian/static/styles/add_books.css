@@ -1,3 +1,8 @@
 div.content-creator-buttons{
     padding-top: 18px;
 }
+
+div.legend{
+    padding: 0.3em;
+    display: inline-block;
+}

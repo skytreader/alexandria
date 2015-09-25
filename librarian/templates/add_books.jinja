@@ -109,6 +109,30 @@
     <hr>
     <h2>Books Entered</h2>
     <p>It may take some time to process all your books.</p>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="legend unsaved_book" id="unsaved-count">
+            </div>
+            Entered Books
+        </div>
+        <div class="col-md-3">
+            <div class="legend saved_book" id="saved-count">
+            </div>
+            Saved
+        </div>
+        <div class="col-md-3">
+            <div class="legend error_book" id="error-count">
+            </div>
+            Failed
+        </div>
+        <div class="col-md-3">
+            <div class="legend reprocess_book" id="reprocessed-count">
+            </div>
+            Malformed
+        </div>
+    </div>
+
     <span id="qContainer">
     </span>
 {% endblock %}

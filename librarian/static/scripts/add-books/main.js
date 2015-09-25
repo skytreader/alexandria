@@ -31,6 +31,17 @@ var visualQueueCount = 0;
 
 var visualQueue;
 
+var booksSaved = 0;
+var booksErrorNoRetry = 0;
+var booksReprocessable = 0;
+
+function updateStatCounts(){
+    $("#unsaved-count").text("" + visualQueueCount);
+    $("#saved-count").text("" + booksSaved);
+    $("#error-count").text("" + booksErrorNoRetry);
+    $("#reprocessed-count").text("" + booksReprocessable);
+}
+
 /**
 Renders the "spine" display of the book list. Takes data from the proxy form
 directly.
@@ -245,15 +256,18 @@ function sendSaveForm(domElement){
 
     function success(){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
+        window.booksSaved++;
     }
 
     function fail(){
         $(domElement).removeClass("unsaved_book").addClass("error_book");
+        window.booksErrorNoRetry++;
     }
 
     function failRecover(){
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.enqueue(domElement);
+        window.booksReprocessable++;
     }
 
     var data = {
@@ -277,7 +291,8 @@ function sendSaveForm(domElement){
             400: fail,
             409: fail,
             500: failRecover
-        }
+        },
+        "complete": updateStatCounts
     });
 }
 
@@ -372,7 +387,6 @@ $(document).ready(function(){
         return false;
     }
 
-    // TODO update!!!
     $("#proxy-form").validate({
         rules:{
             "isbn-rule":{
@@ -397,6 +411,8 @@ $(document).ready(function(){
         }
     });
 
+    updateStatCounts();
+
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
@@ -420,6 +436,8 @@ $(document).ready(function(){
             var spine = renderSpine();
             internalizeBook(spine);
             window.visualQueue.enqueue(spine);
+            window.visualQueueCount++;
+            updateStatCounts();
             clearProxyForm();
         }
     });
