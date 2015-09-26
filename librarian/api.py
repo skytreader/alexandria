@@ -127,3 +127,7 @@ def book_adder():
 @librarian_api.route("/api/util/servertime")
 def servertime():
     return {"now": str(datetime.now(tz=pytz.utc).isoformat())}
+
+@librarian_api.route("/api/get_books")
+def get_books():
+    return {}
