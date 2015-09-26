@@ -48,7 +48,7 @@ def logout():
 
 @librarian_bp.route("/books/add")
 @login_required
-def books():
+def add_books():
     form = AddBooksForm()
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
       "add-books/types.js", "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js"]
@@ -58,3 +58,8 @@ def books():
 
     styles = ("add_books.css",)
     return render_template("add_books.jinja", form=form, scripts=scripts, stylesheets=styles)
+
+@librarian_bp.route("/books")
+def show_books():
+    scripts = ("show-books/main.js",)
+    return render_template("books.jinja", scripts=scripts)
