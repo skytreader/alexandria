@@ -1,4 +1,8 @@
 import json
+import pytz
+
+from datetime import datetime
+
 from librarian import app, db
 from librarian.forms import AddBooksForm
 from flask import Blueprint, request
@@ -119,3 +123,7 @@ def book_adder():
             return "IntegrityError", 409
     
     return "Error", 400
+
+@librarian_api.route("/api/util/servertime")
+def servertime():
+    return {"now": str(datetime.now(tz=pytz.utc).isoformat())}
