@@ -1,7 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
-from librarian.api import get_books
 from utils import route_exists
 
 import config
@@ -62,5 +61,8 @@ def add_books():
 
 @librarian_bp.route("/books")
 def show_books():
+    from librarian.api import get_books
+
+    books = get_books()
     scripts = ("show-books/main.js",)
     return render_template("books.jinja", scripts=scripts)

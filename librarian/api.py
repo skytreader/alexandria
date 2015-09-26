@@ -130,4 +130,6 @@ def servertime():
 
 @librarian_api.route("/api/get_books")
 def get_books():
+    books = db.session.query(Book).all()
+    app.logger.info("Got these books" + str(books))
     return {}
