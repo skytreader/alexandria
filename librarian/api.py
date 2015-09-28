@@ -1,3 +1,4 @@
+import flask
 import json
 import pytz
 
@@ -126,10 +127,20 @@ def book_adder():
 
 @librarian_api.route("/api/util/servertime")
 def servertime():
-    return {"now": str(datetime.now(tz=pytz.utc).isoformat())}
+    return flask.jsonify({"now": str(datetime.now(tz=pytz.utc).isoformat())})
 
 @librarian_api.route("/api/get_books")
 def get_books():
     books = db.session.query(Book).all()
     app.logger.info("Got these books" + str(books))
-    return {}
+    return flask.jsonify({})
+
+@librarian_api.route("/api/list/genres")
+def list_genres():
+    """
+    Returns a list of all the genres in the DB so far.
+    """
+    genres = db.session.query(Genre.name).all()
+    genres = map(lambda x: x[0], genres)
+    app.logger.info("Got these generes" + str(genres))
+    return flask.jsonify({"data": genres})

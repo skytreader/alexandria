@@ -35,11 +35,31 @@ var booksSaved = 0;
 var booksErrorNoRetry = 0;
 var booksReprocessable = 0;
 
+var BOOK_PERSONS_LASTNAME = [];
+var BOOK_PERSONS_FIRSTNAME = [];
+var COMPANIES = [];
+var GENRES = [];
+
 function updateStatCounts(){
     $("#unsaved-count").text("" + visualQueueCount);
     $("#saved-count").text("" + booksSaved);
     $("#error-count").text("" + booksErrorNoRetry);
     $("#reprocessed-count").text("" + booksReprocessable);
+}
+
+/**
+I am not sure if this is a good idea.
+*/
+function fillGenres(){
+    $.ajax("/api/list/genres", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            window.GENRES = data["data"];
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillGenres, 8000);
+        }
+    });
 }
 
 /**
