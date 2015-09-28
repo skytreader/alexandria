@@ -14,6 +14,16 @@ from sqlalchemy.exc import IntegrityError
 import re
 import traceback
 
+"""
+Convention:
+/api/* - large methods, might take some time, usually database transactions (with
+lots of writes)
+/api/get/* - get a list of objects that are composite of DB tables
+/api/list/* - get a list of objects from a single table in the DB.
+/api/util/* - for utility functions. These functions are usually generi and can
+find use in any project.
+"""
+
 librarian_api = Blueprint("librarian_api", __name__)
 
 def __create_bookperson(form_data):
@@ -129,18 +139,30 @@ def book_adder():
 def servertime():
     return flask.jsonify({"now": str(datetime.now(tz=pytz.utc).isoformat())})
 
-@librarian_api.route("/api/get_books")
+@librarian_api.route("/api/get/books")
 def get_books():
     books = db.session.query(Book).all()
     app.logger.info("Got these books" + str(books))
     return flask.jsonify({})
 
+def __get_first(x):
+    return x[0]
+
 @librarian_api.route("/api/list/genres")
 def list_genres():
-    """
-    Returns a list of all the genres in the DB so far.
-    """
     genres = db.session.query(Genre.name).all()
-    genres = map(lambda x: x[0], genres)
-    app.logger.info("Got these generes" + str(genres))
+    genres = map(__get_first, genres)
+    app.logger.info("Got these genres" + str(genres))
     return flask.jsonify({"data": genres})
+
+@librarian_api.route("/api/list/companies")
+def list_companies():
+    companies = db.session.query(BookCompany.name).all()
+    companies = map(__get_first, companies)
+    return flask.jsonify({"data": companies})
+
+@librarian_api.route("/api/list/persons")
+def list_persons():
+    persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
+    persons = map(__get_first, persons)
+    return flask.jsonify({"data": persons})

@@ -7,6 +7,7 @@ from librarian.tests.factories import (
   BookCompanyFactory, GenreFactory, LibrarianFactory
 )
 
+import dateutil.parser
 import factory
 import flask.ext.login
 import json
@@ -211,3 +212,9 @@ class ApiTests(AppTestCase):
         single_rv = self.client.post("/api/book_adder", data=single_author)
 
         self.assertEquals(single_rv._status_code, 200)
+
+    def test_servertime(self):
+        servertime = self.client.get("/api/util/servertime")
+        self.assertEquals(servertime._status_code, 200)
+        data = json.loads(servertime.data)
+        self.assertTrue(dateutil.parser.parse(data["now"]))
