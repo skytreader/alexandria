@@ -1,3 +1,4 @@
+from factory.fuzzy import FuzzyText
 from faker import Faker
 from librarian import models
 from librarian.tests.fakers import BookFieldsProvider
@@ -11,6 +12,8 @@ import sqlalchemy
 
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
+
+fuzzy_text = FuzzyText()
 
 class LibrarianFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
@@ -54,4 +57,15 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     printer = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     publisher = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     publish_year = factory.LazyAttribute(lambda x: fake.year())
+    creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+
+
+class BookPersonFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = models.BookPerson
+        sqlalchemy_session = librarian.db.session
+
+    id = factory.Sequence(lambda n: n)
+    lastname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
+    firstname = factory.LazyAttribute(lambda x:fuzzy_text.fuzz())
     creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)

@@ -164,5 +164,5 @@ def list_companies():
 @librarian_api.route("/api/list/persons")
 def list_persons():
     persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
-    persons = map(__get_first, persons)
+    persons = map(lambda p: {"lastname": p[1], "firstname": p[0]}, persons)
     return flask.jsonify({"data": persons})

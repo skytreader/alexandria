@@ -4,8 +4,9 @@ from flask.ext.login import login_user
 from librarian.models import Book, BookCompany, BookParticipant, BookPerson, Genre
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
-  BookCompanyFactory, GenreFactory, LibrarianFactory
+  BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
 )
+from librarian.tests.utils import make_name_object
 
 import dateutil.parser
 import factory
@@ -18,8 +19,6 @@ import unittest
 
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
-
-PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
 
 class ApiTests(AppTestCase):
     
@@ -71,14 +70,6 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
-    def make_name_object(self):
-        name = fake.name().split()
-        is_roman_num = PROLLY_ROMAN_NUM.match(name[-1])
-        last_name = " ".join(name[-1:]) if is_roman_num else name[-1]
-        first_name = name[0]
-
-        return {"firstname": first_name, "lastname": last_name}
-
     def verify_bookperson_inserted(self, persons, role, bookid):
         for p in persons:
             _p = self.verify_inserted(BookPerson, firstname=p["firstname"],
@@ -99,10 +90,10 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [self.make_name_object() for _ in range(4)]
-        illustrators = [self.make_name_object() for _ in range(4)]
-        editors = [self.make_name_object() for _ in range(4)]
-        translators = [self.make_name_object() for _ in range(4)]
+        authors = [make_name_object(fake.name()) for _ in range(4)]
+        illustrators = [make_name_object(fake.name()) for _ in range(4)]
+        editors = [make_name_object(fake.name()) for _ in range(4)]
+        translators = [make_name_object(fake.name()) for _ in range(4)]
 
         req_data = {
             "isbn": isbn,
@@ -153,19 +144,19 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [self.make_name_object() for _ in range(4)]
+        authors = [make_name_object(fake.name()) for _ in range(4)]
         insert_bookpersons(authors)
         map(verify_bookperson, authors)
       
-        illustrators = [self.make_name_object() for _ in range(4)]
+        illustrators = [make_name_object(fake.name()) for _ in range(4)]
         insert_bookpersons(illustrators)
         map(verify_bookperson, illustrators)
         
-        editors = [self.make_name_object() for _ in range(4)]
+        editors = [make_name_object(fake.name()) for _ in range(4)]
         insert_bookpersons(editors)
         map(verify_bookperson, editors)
         
-        translators = [self.make_name_object() for _ in range(4)]
+        translators = [make_name_object(fake.name()) for _ in range(4)]
         insert_bookpersons(translators)
         map(verify_bookperson, translators)
 
@@ -218,3 +209,60 @@ class ApiTests(AppTestCase):
         self.assertEquals(servertime._status_code, 200)
         data = json.loads(servertime.data)
         self.assertTrue(dateutil.parser.parse(data["now"]))
+
+    def test_list_genres(self):
+        genres = [GenreFactory() for _ in range(8)]
+
+        for g in genres:
+            librarian.db.session.add(g)
+
+        librarian.db.session.flush()
+        expected_genre_set = set([g.name for g in genres])
+
+        list_genres = self.client.get("/api/list/genres")
+        data = json.loads(list_genres.data)
+        genre_set = set(data["data"])
+
+        self.assertEqual(expected_genre_set, genre_set)
+
+    def test_list_companies(self):
+        companies = [BookCompanyFactory() for _ in range(8)]
+
+        for c in companies:
+            librarian.db.session.add(c)
+
+        librarian.db.session.flush()
+        expected_company_set = set([c.name for c in companies])
+
+        list_companies = self.client.get("/api/list/companies")
+        data = json.loads(list_companies.data)
+        company_set = set(data["data"])
+
+        self.assertEqual(expected_company_set, company_set)
+
+    def test_list_persons(self):
+        class Person:
+            def __init__(self, lastname, firstname):
+                self.lastname = lastname
+                self.firstname = firstname
+
+            def __eq__(self, p):
+                return p.lastname == self.lastname and p.firstname == self.firstname
+
+            def __hash__(self):
+                # FIXME
+                return hash(self.lastname) + hash(self.firstname)
+
+        persons = [BookPersonFactory() for _ in range(8)]
+
+        for p in persons:
+            librarian.db.session.add(p)
+
+        librarian.db.session.flush()
+        expected_person_set = set([Person(p.lastname, p.firstname) for p in persons])
+
+        list_persons = self.client.get("/api/list/persons")
+        data = json.loads(list_persons.data)
+        person_set = set([Person(p["lastname"], p["firstname"]) for p in data["data"]])
+
+        self.assertEqual(expected_person_set, person_set)
