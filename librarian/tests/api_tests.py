@@ -250,8 +250,13 @@ class ApiTests(AppTestCase):
                 return p.lastname == self.lastname and p.firstname == self.firstname
 
             def __hash__(self):
-                # FIXME
-                return hash(self.lastname) + hash(self.firstname)
+                return hash((self.lastname, self.firstname))
+            
+            def __str__(self):
+                return self.lastname + ", " + self.firstname
+
+        empty = json.loads(self.client.get("/api/list/persons").data)
+        self.assertEqual(len(empty["data"]), 0)
 
         persons = [BookPersonFactory() for _ in range(8)]
 
