@@ -90,10 +90,10 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object(fake.name()) for _ in range(4)]
-        illustrators = [make_name_object(fake.name()) for _ in range(4)]
-        editors = [make_name_object(fake.name()) for _ in range(4)]
-        translators = [make_name_object(fake.name()) for _ in range(4)]
+        authors = [make_name_object() for _ in range(4)]
+        illustrators = [make_name_object() for _ in range(4)]
+        editors = [make_name_object() for _ in range(4)]
+        translators = [make_name_object() for _ in range(4)]
 
         req_data = {
             "isbn": isbn,
@@ -144,19 +144,19 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object(fake.name()) for _ in range(4)]
+        authors = [make_name_object() for _ in range(4)]
         insert_bookpersons(authors)
         map(verify_bookperson, authors)
       
-        illustrators = [make_name_object(fake.name()) for _ in range(4)]
+        illustrators = [make_name_object() for _ in range(4)]
         insert_bookpersons(illustrators)
         map(verify_bookperson, illustrators)
         
-        editors = [make_name_object(fake.name()) for _ in range(4)]
+        editors = [make_name_object() for _ in range(4)]
         insert_bookpersons(editors)
         map(verify_bookperson, editors)
         
-        translators = [make_name_object(fake.name()) for _ in range(4)]
+        translators = [make_name_object() for _ in range(4)]
         insert_bookpersons(translators)
         map(verify_bookperson, translators)
 

@@ -1,12 +1,10 @@
+from factory.fuzzy import FuzzyText
+
 import re
 import string
 
 PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
+fuzzy_text = FuzzyText()
 
-def make_name_object(n):
-    name = n.split()
-    is_roman_num = PROLLY_ROMAN_NUM.match(name[-1])
-    last_name = " ".join(name[-1:]) if is_roman_num else name[-1]
-    first_name = name[0]
-
-    return {"firstname": first_name, "lastname": last_name}
+def make_name_object():
+    return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
