@@ -207,6 +207,17 @@ class BookParticipant(UserTaggedBase):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.person_id), str(self.book_id), str(self.role_id))
 
+class Printers(UserTaggedBase):
+    __tablename__ = "printers"
+    company_id = db.Column(db.Integer, db.primary_key = True, db.ForeignKey("book_companies.id"))
+    book_id = db.Column(db.Integer, db.primary_key = True, db.ForeignKey("books.id"))
+
+    def __init__(self, **kwargs):
+        self.book_id = kwargs["book_id"]
+        self.company_id = kwargs["company_id"]
+        self.creator = kwargs["creator"]
+        self.last_modifier = kwargs["creator"]
+
 class Pseudonym(UserTaggedBase):
     """
     Copied from original schema:
