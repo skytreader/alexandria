@@ -44,7 +44,7 @@ def upgrade():
     admin_id = admin[librarians_table.c.id]
     has_printers = conn.execute(select([books_table, book_companies_table])
       .where(book_companies_table.c.name == "")
-      .where(books_table.c.printer == book_companies_table.c.id))
+      .where(books_table.c.printer == book_companies_table.c.id)).fetchall()
 
     for bwp in has_printers:
         book_id = bwp[books_table.c.id]
