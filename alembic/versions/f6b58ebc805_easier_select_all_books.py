@@ -42,14 +42,15 @@ def upgrade():
       .where(librarians_table.c.username == "admin")
       .limit(1)).fetchone()
     admin_id = admin[librarians_table.c.id]
-    has_printers = conn.execute(select([books_table, book_companies_table])
+    has_printers = conn.execute(select(columns=[books_table, book_companies_table],
+      use_labels=True)
       .where(book_companies_table.c.name == "")
       .where(books_table.c.printer == book_companies_table.c.id)).fetchall()
 
     for bwp in has_printers:
         book_id = bwp[books_table.c.id]
-        company_id = bwp[book_companies.c.id]
-        conn.execute(printers.insert(), company_id=company_id, book_id=book_id,
+        company_id = bwp[book_companies_table.c.id]
+        conn.execute(printers_table.insert(), company_id=company_id, book_id=book_id,
           creator=admin_id)
 
 
