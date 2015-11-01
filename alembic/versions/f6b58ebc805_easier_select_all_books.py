@@ -53,6 +53,38 @@ def upgrade():
         conn.execute(printers_table.insert(), company_id=company_id, book_id=book_id,
           creator=admin_id)
 
+    op.drop_column("books", "printer")
+
 
 def downgrade():
+    conn = op.get_bind();
+    meta = MetaData(bind=conn)
+
+    printers_table = Table("printers", meta, autoload=True)
+    books_table = Table("Books", meta, autoload=True)
+    book_companies_table = Table("book_companies", meta, autoload=True)
+    librarians_table = Table("librarians", meta, autoload=True)
+
+    op.add_column("books", sa.Column("printer", sa.Integer,
+      sa.ForeignKey("book_companies.id")))
+
+    # get the admin user
+    adminq = conn.execute(select([librarians_table.c.id])
+      .where(librarians_table.c.username=="admin").limit(1)).fetchone()
+    admin_id = adminq[0]
+
+    # create the null book_company
+    conn.execute(book_companies_table.insert(), name="", creator=admin_id)
+    null_co_q = conn.execute(select([book_companies_table.c.id])
+      .where(book_companiestable.c.name=="").limit(1)).fetchone()
+    null_co_id = null_co_q[0]
+
+    # get all books with printers
+    books_with_printers = conn.execute(select([printers_table.c.book_id, printers_table.c.company_id],
+      use_labels=True).fetch_all()
+    book_printer_map = {}
+
+    for bwp in books_with_printers:
+        book_printer_map[bwp[printers_table.c.book_id]] = bwp[printers_table.c.company_id]
+
     op.drop_table("printers")

@@ -209,8 +209,8 @@ class BookParticipant(UserTaggedBase):
 
 class Printers(UserTaggedBase):
     __tablename__ = "printers"
-    company_id = db.Column(db.Integer, db.primary_key = True, db.ForeignKey("book_companies.id"))
-    book_id = db.Column(db.Integer, db.primary_key = True, db.ForeignKey("books.id"))
+    company_id = db.Column(db.Integer, primary_key = True, db.ForeignKey("book_companies.id"))
+    book_id = db.Column(db.Integer, primary_key = True, db.ForeignKey("books.id"))
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
