@@ -81,15 +81,15 @@ def downgrade():
 
     # get all books with printers
     books_with_printers = conn.execute(select([printers_table.c.book_id, printers_table.c.company_id],
-      use_labels=True).fetch_all()
+      use_labels=True)).fetch_all()
 
     for bwp in books_with_printers:
         conn.execute(books_table.update()
           .values(printer=bwp[printers_table.c.company_id])
-          .where(books_table.c.id = bwp[printers_table.c.book_id]))
+          .where(books_table.c.id == bwp[printers_table.c.book_id]))
 
     # Point everyone else to the null company
     conn.execute(books_table.update().values(printer=null_co_id)
-      .where(books_table.c.id = ""))
+      .where(books_table.c.id == ""))
 
     op.drop_table("printers")
