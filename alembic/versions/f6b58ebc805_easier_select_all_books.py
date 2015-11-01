@@ -53,7 +53,9 @@ def upgrade():
         conn.execute(printers_table.insert(), company_id=company_id, book_id=book_id,
           creator=admin_id)
 
+    op.execute("SET FOREIGN_KEY_CHECKS = 0;")
     op.drop_column("books", "printer")
+    op.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
 
 def downgrade():
