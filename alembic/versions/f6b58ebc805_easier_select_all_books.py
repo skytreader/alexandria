@@ -64,7 +64,7 @@ def downgrade():
     meta = MetaData(bind=conn)
     
     op.add_column("books", sa.Column("printer", sa.Integer,
-      sa.ForeignKey("book_companies.id")))
+      sa.ForeignKey("book_companies.id", name="books_ibfk_2")))
 
     printers_table = Table("printers", meta, autoload=True)
     books_table = Table("books", meta, autoload=True)
