@@ -79,12 +79,12 @@ def downgrade():
     # create the null book_company
     conn.execute(book_companies_table.insert(), name="", creator=admin_id)
     null_co_q = conn.execute(select([book_companies_table.c.id])
-      .where(book_companiestable.c.name=="").limit(1)).fetchone()
+      .where(book_companies_table.c.name=="").limit(1)).fetchone()
     null_co_id = null_co_q[0]
 
     # get all books with printers
     books_with_printers = conn.execute(select([printers_table.c.book_id, printers_table.c.company_id],
-      use_labels=True)).fetch_all()
+      use_labels=True)).fetchall()
 
     for bwp in books_with_printers:
         conn.execute(books_table.update()
