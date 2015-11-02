@@ -16,6 +16,7 @@ if __name__ == "__main__":
     engine.execute("TRUNCATE TABLE imprints;")
     engine.execute("TRUNCATE TABLE book_persons;")
     engine.execute("TRUNCATE TABLE book_participants;")
+    engine.execute("TRUNCATE TABLE printers;")
     engine.execute("TRUNCATE TABLE pseudonyms;")
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
