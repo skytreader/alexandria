@@ -53,9 +53,11 @@ def upgrade():
         conn.execute(printers_table.insert(), company_id=company_id, book_id=book_id,
           creator=admin_id)
 
-    op.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    # delete the null company
+    conn.execute(book_companies_table.delete().where(book_companies_table.c.name=="").limit(1))
+
+    op.execute("ALTER TABLE books DROP FOREIGN KEY books_ibfk_2;")
     op.drop_column("books", "printer")
-    op.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
 
 def downgrade():
@@ -63,7 +65,7 @@ def downgrade():
     meta = MetaData(bind=conn)
 
     printers_table = Table("printers", meta, autoload=True)
-    books_table = Table("Books", meta, autoload=True)
+    books_table = Table("books", meta, autoload=True)
     book_companies_table = Table("book_companies", meta, autoload=True)
     librarians_table = Table("librarians", meta, autoload=True)
 
