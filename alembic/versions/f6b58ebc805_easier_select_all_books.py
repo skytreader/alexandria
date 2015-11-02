@@ -62,14 +62,14 @@ def upgrade():
 def downgrade():
     conn = op.get_bind();
     meta = MetaData(bind=conn)
+    
+    op.add_column("books", sa.Column("printer", sa.Integer,
+      sa.ForeignKey("book_companies.id")))
 
     printers_table = Table("printers", meta, autoload=True)
     books_table = Table("books", meta, autoload=True)
     book_companies_table = Table("book_companies", meta, autoload=True)
     librarians_table = Table("librarians", meta, autoload=True)
-
-    op.add_column("books", sa.Column("printer", sa.Integer,
-      sa.ForeignKey("book_companies.id")))
 
     # get the admin user
     adminq = conn.execute(select([librarians_table.c.id])
