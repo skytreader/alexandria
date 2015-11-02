@@ -53,10 +53,9 @@ def upgrade():
         conn.execute(printers_table.insert(), company_id=company_id, book_id=book_id,
           creator=admin_id)
 
-    # delete the null company
-    conn.execute(book_companies_table.delete().where(book_companies_table.c.name=="").limit(1))
-
     op.execute("ALTER TABLE books DROP FOREIGN KEY books_ibfk_2;")
+    # delete the null company
+    conn.execute(book_companies_table.delete().where(book_companies_table.c.name==""))
     op.drop_column("books", "printer")
 
 
