@@ -21,8 +21,10 @@ import sqlalchemy as sa
 def upgrade():
     op.create_table(
         "printers",
-        sa.Column("company_id", sa.Integer(), sa.ForeignKey("book_companies.id"), primary_key = True),
-        sa.Column("book_id", sa.Integer(), sa.ForeignKey("books.id"), primary_key = True),
+        sa.Column("company_id", sa.Integer(), sa.ForeignKey("book_companies.id",
+          name="printers_ibfk_1"), primary_key = True),
+        sa.Column("book_id", sa.Integer(), sa.ForeignKey("books.id",
+          name="printers_ibfk_2"), primary_key = True),
         sa.Column("creator", sa.Integer(), sa.ForeignKey("librarians.id")),
         sa.Column("last_modifier", sa.Integer(), sa.ForeignKey("librarians.id")),
         sa.Column("date_created", sa.DateTime(), default=sa.func.current_timestamp()),

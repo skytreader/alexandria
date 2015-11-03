@@ -107,9 +107,10 @@ class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
-    genre = db.Column(db.Integer, db.ForeignKey("genres.id"))
-    printer = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
-    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
+    genre = db.Column(db.Integer, db.ForeignKey("genres.id",
+      name="books_ibfk_1"))
+    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+      name="books_ibfk_3"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
     def __init__(self, **kwargs):
@@ -148,8 +149,10 @@ class BookCompany(UserTaggedBase):
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
-    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
-    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id"))
+    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+      name="imprints_ibfk_1"))
+    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+      name="imprints_ibfk_2"))
 
     def __init__(self, **kwargs):
         self.mother_company = kwargs["mother_company"]
@@ -192,9 +195,12 @@ class BookParticipant(UserTaggedBase):
     Consider that 99% of books will need the same roles over and over. 
     """
     __tablename__ = "book_participants"
-    book_id = db.Column(db.Integer, db.ForeignKey("books.id"))
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id"))
-    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id",
+      name="book_participants_ibfk_1"))
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+      name="book_participants_ibfk_2"))
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
+      nmae="book_pariticipants_ibfk_3"))
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
@@ -209,8 +215,10 @@ class BookParticipant(UserTaggedBase):
 
 class Printers(UserTaggedBase):
     __tablename__ = "printers"
-    company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id"), primary_key = True)
-    book_id = db.Column(db.Integer, db.ForeignKey("books.id"), primary_key = True)
+    company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+      name="printers_ibfk_1"), primary_key = True)
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id",
+      name="printers_ibfk_2"), primary_key = True)
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
@@ -225,8 +233,10 @@ class Pseudonym(UserTaggedBase):
     Is this table ever going into any use?
     """
     __tablename__ = "pseudonyms"
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id"))
-    book_id = db.Column(db.Integer, db.ForeignKey("books.id"))
+    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+      name="pseudonyms_ibfk_1"))
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id",
+      name="pseudonyms_ibfk_2"))
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
