@@ -145,8 +145,21 @@ def get_books():
       BookPerson.firstname, Role.name).filter(Book.id==BookParticipant.book_id)
       .filter(BookParticipant.person_id==BookPerson.id)
       .filter(BookParticipant.role_id == Role.id).all())
-    app.logger.info("Got these books" + str(books))
-    return flask.jsonify({})
+    app.logger.debug("Got these books" + str(books))
+    structured_catalog = {}
+    
+    for book in books:
+        record_exists = structured_catalog.get(book[0])
+
+        if record_exists:
+            structured_catalog[book[0]][book[4].lower()] = {"lastname": book[2], "firstname": book[3]}
+        else:
+            fmt = {"title": book[1],
+              book[4].lower(): {"lastname": book[2], "firstname": book[3]}}
+
+            structured_catalog[book[0]] = fmt
+
+    return flask.jsonify(structured_catalog)
 
 def __get_first(x):
     return x[0]
