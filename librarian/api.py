@@ -141,7 +141,10 @@ def servertime():
 
 @librarian_api.route("/api/get/books")
 def get_books():
-    books = db.session.query(Book).all()
+    books = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
+      BookPerson.firstname, Role.name).filter(Book.id==BookParticipant.book_id)
+      .filter(BookParticipant.person_id==BookPerson.id)
+      .filter(BookParticipant.role_id == Role.id).all())
     app.logger.info("Got these books" + str(books))
     return flask.jsonify({})
 

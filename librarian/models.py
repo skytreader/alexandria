@@ -200,7 +200,7 @@ class BookParticipant(UserTaggedBase):
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
       name="book_participants_ibfk_2"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
-      nmae="book_pariticipants_ibfk_3"))
+      name="book_pariticipants_ibfk_3"))
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
