@@ -15,7 +15,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
 SQLALCHEMY_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria'
-SQLALCHEMY_TEST_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria_test'
+SQLALCHEMY_TEST_DATABASE_URI = 'mysql://root@127.0.0.1:3306/alexandria_test'
 SQLALCHEMY_ECHO = DEVEL
 DATABASE_CONNECT_OPTIONS = {"user":"root"}
 
@@ -37,4 +37,4 @@ CSRF_SESSION_KEY = "secret"
 SECRET_KEY = "secret"
 
 APP_HOST="0.0.0.0"
-APP_PORT=8080
+APP_PORT=7070
