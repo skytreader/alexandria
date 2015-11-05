@@ -64,6 +64,7 @@ class AppTestCase(TestCase):
         librarian.db.engine.execute("DELETE FROM imprints;")
         librarian.db.engine.execute("DELETE FROM book_persons;")
         librarian.db.engine.execute("DELETE FROM book_participants;")
+        librarian.db.engine.execute("DELETE FROM printers;")
         librarian.db.engine.execute("DELETE FROM pseudonyms;")
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
         librarian.db.session.commit()

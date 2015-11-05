@@ -13,6 +13,7 @@ import factory
 import flask.ext.login
 import json
 import librarian
+import random
 import re
 import string
 import unittest
@@ -271,3 +272,45 @@ class ApiTests(AppTestCase):
         person_set = set([Person(p["lastname"], p["firstname"]) for p in data["data"]])
 
         self.assertEqual(expected_person_set, person_set)
+
+    def test_get_books(self):
+        book_persons = [BookPersonFactory() for _ in range(8)]
+
+        for bp in book_persons:
+            librarian.db.session.add(bp)
+
+        books = [BookFactory() for _ in range(12)]
+
+        for b in books:
+            librarian.db.session.add(b)
+
+        library = {}
+        # Randomly assign persons to books as roles
+        roles = self.ROLE_IDS.keys()
+
+        for _ in range(32):
+            rand_book = random.choice(books)
+            rand_person = random.choice(book_persons)
+            rand_role = random.choice(roles)
+
+            if library.get(rand_book.isbn):
+                if library[rand_book.isbn].get(rand_role):
+                    pass
+                else:
+                    library[rand_book.isbn][rand_role] = {"lastname": rand_person. lastname,
+                      "firstname": rand_person.firstname}
+
+                    bp = BookParticipant(book_id=rand_book.id,
+                      person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role])
+                    librarian.db.session.add(bp)
+            else:
+                library[rand_book.isbn]["title"] = rand_book.title
+                library[rand_book.isbn][rand_role] = {"lastname": rand_person.lastname,
+                  "firstname": rand_person.firstname}
+                bp = BookParticipant(book_id=rand_book.id,
+                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role])
+
+        librarian.db.session.flush()
+
+        get_books = self.client.get("/api/get/books")
+        self.assertEquals(library, get_books)
