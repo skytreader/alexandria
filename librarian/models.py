@@ -213,7 +213,7 @@ class BookParticipant(UserTaggedBase):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.person_id), str(self.book_id), str(self.role_id))
 
-class Printers(UserTaggedBase):
+class Printer(UserTaggedBase):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="printers_ibfk_1"), primary_key = True)
