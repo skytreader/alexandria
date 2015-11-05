@@ -1,4 +1,5 @@
 #! /bin/bash
 
 export TESTING=True
+alembic -c alembic-test.ini upgrade head
 nosetests $1
