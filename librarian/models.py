@@ -108,9 +108,9 @@ class Book(UserTaggedBase):
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
     genre = db.Column(db.Integer, db.ForeignKey("genres.id",
-      name="books_ibfk_1"))
+      name="book_genre_fk"))
     publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="books_ibfk_3"))
+      name="book_book_company_fk1"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START)
 
     def __init__(self, **kwargs):
@@ -150,9 +150,9 @@ class BookCompany(UserTaggedBase):
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
     mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprints_ibfk_1"))
+      name="imprint_book_company_fk1"))
     imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprints_ibfk_2"))
+      name="imprint_book_company_fk1"))
 
     def __init__(self, **kwargs):
         self.mother_company = kwargs["mother_company"]
@@ -196,11 +196,11 @@ class BookParticipant(UserTaggedBase):
     """
     __tablename__ = "book_participants"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="book_participants_ibfk_1"))
+      name="book_participant_book_fk1"))
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
-      name="book_participants_ibfk_2"))
+      name="book_participant_book_person_fk1"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
-      name="book_pariticipants_ibfk_3"))
+      name="book_pariticipant_role_fk1"))
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
@@ -216,9 +216,9 @@ class BookParticipant(UserTaggedBase):
 class Printer(UserTaggedBase):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="printers_ibfk_1"), primary_key = True)
+      name="printer_book_company_fk1"), primary_key = True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="printers_ibfk_2"), primary_key = True)
+      name="printer_book_fk1"), primary_key = True)
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
@@ -234,9 +234,9 @@ class Pseudonym(UserTaggedBase):
     """
     __tablename__ = "pseudonyms"
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
-      name="pseudonyms_ibfk_1"))
+      name="pseudonym_book_person_fk1"))
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="pseudonyms_ibfk_2"))
+      name="pseudonym_book_fk1"))
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)

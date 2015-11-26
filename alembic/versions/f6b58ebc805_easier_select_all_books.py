@@ -22,9 +22,9 @@ def upgrade():
     op.create_table(
         "printers",
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("book_companies.id",
-          name="printers_ibfk_1"), primary_key = True),
+          name="printer_book_company_fk1"), primary_key = True),
         sa.Column("book_id", sa.Integer(), sa.ForeignKey("books.id",
-          name="printers_ibfk_2"), primary_key = True),
+          name="printer_book_fk1"), primary_key = True),
         sa.Column("creator", sa.Integer(), sa.ForeignKey("librarians.id")),
         sa.Column("last_modifier", sa.Integer(), sa.ForeignKey("librarians.id")),
         sa.Column("date_created", sa.DateTime(), default=sa.func.current_timestamp()),
@@ -66,7 +66,7 @@ def downgrade():
     meta = MetaData(bind=conn)
     
     op.add_column("books", sa.Column("printer", sa.Integer,
-      sa.ForeignKey("book_companies.id", name="books_ibfk_2")))
+      sa.ForeignKey("book_companies.id", name="book_book_company_fk2")))
 
     printers_table = Table("printers", meta, autoload=True)
     books_table = Table("books", meta, autoload=True)
