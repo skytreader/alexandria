@@ -152,7 +152,7 @@ class Imprint(UserTaggedBase):
     mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk1"))
     imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprint_book_company_fk1"))
+      name="imprint_book_company_fk2"))
 
     def __init__(self, **kwargs):
         self.mother_company = kwargs["mother_company"]
