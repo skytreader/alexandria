@@ -312,8 +312,10 @@ class ApiTests(AppTestCase):
                 bp = BookParticipant(book_id=rand_book.id,
                   person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
                   creator=self.admin_user.id)
+                librarian.db.session.add(bp)
 
-        librarian.db.session.flush()
+        librarian.db.session.commit()
 
         get_books = self.client.get("/api/get/books")
-        self.assertEquals(library, get_books)
+        self.assertEquals(200, get_books._status_code)
+        self.assertEquals(library, get_books.data)
