@@ -122,6 +122,7 @@ class Book(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.printer = kwargs["printer"]
         self.publisher = kwargs["publisher"]
+        self.id = kwargs.get("id")
         
         # Check the publish year on ORM since not all SQL engines (mySQL, for
         # one), check constraints. Support the Long Now Foundation!!!
@@ -167,10 +168,15 @@ class BookPerson(UserTaggedBase):
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
     def __init__(self, **kwargs):
+        print "kwargs is", kwargs
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
         self.creator = kwargs["creator"]
         self.last_modifier = kwargs["creator"]
+        self.id = kwargs.get("id")
+
+    def __str__(self):
+        return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
 
 class Role(UserTaggedBase):
     """
