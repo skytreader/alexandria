@@ -4,7 +4,7 @@ from flask.ext.login import login_user
 from librarian.models import Book, BookCompany, BookParticipant, BookPerson, Genre
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
-  BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
+  BookFactory, BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
 )
 from librarian.tests.utils import make_name_object
 
@@ -301,14 +301,17 @@ class ApiTests(AppTestCase):
                       "firstname": rand_person.firstname}
 
                     bp = BookParticipant(book_id=rand_book.id,
-                      person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role])
+                      person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
+                      creator=self.admin_user.id)
                     librarian.db.session.add(bp)
             else:
+                library[rand_book.isbn] = {}
                 library[rand_book.isbn]["title"] = rand_book.title
                 library[rand_book.isbn][rand_role] = {"lastname": rand_person.lastname,
                   "firstname": rand_person.firstname}
                 bp = BookParticipant(book_id=rand_book.id,
-                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role])
+                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
+                  creator=self.admin_user.id)
 
         librarian.db.session.flush()
 

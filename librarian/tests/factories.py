@@ -57,6 +57,7 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     publisher = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     publish_year = factory.LazyAttribute(lambda x: fake.year())
     creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    printer = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
 
 
 class BookPersonFactory(factory.alchemy.SQLAlchemyModelFactory):
