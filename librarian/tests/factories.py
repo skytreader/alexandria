@@ -65,11 +65,7 @@ class BookPersonFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = models.BookPerson
         sqlalchemy_session = librarian.db.session
 
-    def f(n):
-        print "sequence called with", n
-        return n
-
-    id = factory.Sequence(f)
+    id = factory.Sequence(lambda x: x)
     lastname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
     firstname = factory.LazyAttribute(lambda x:fuzzy_text.fuzz())
     creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)

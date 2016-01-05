@@ -274,15 +274,14 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
-        book_persons = [BookPersonFactory() for _ in range(1)]
+        book_persons = [BookPersonFactory() for _ in range(12)]
         person_ids = [bp.firstname for bp in book_persons]
 
         for bp in book_persons:
             bp.creator = self.admin_user.id
-            print "Adding book person with creator", bp.creator
             librarian.db.session.add(bp)
 
-        books = [BookFactory() for _ in range(1)]
+        books = [BookFactory() for _ in range(12)]
         book_isbns = [b.isbn for b in books]
 
         for b in books:
@@ -293,13 +292,11 @@ class ApiTests(AppTestCase):
         # Randomly assign persons to books as roles
         roles = self.ROLE_IDS.keys()
 
-        for _ in range(1):
+        for _ in range(32):
             rand_isbn = random.choice(book_isbns)
             rand_book = librarian.db.session.query(Book).filter(Book.isbn == rand_isbn).first()
             rand_person_id = random.choice(person_ids)
-            print "Query for person with id", rand_person_id
             rand_person = librarian.db.session.query(BookPerson).filter(BookPerson.firstname == rand_person_id).first()
-            print "That person is", rand_person
             rand_role = random.choice(roles)
 
             if library.get(rand_isbn):
@@ -321,7 +318,6 @@ class ApiTests(AppTestCase):
                   "firstname": rand_person.firstname}
 
                 book = librarian.db.session.query(Book).filter(Book.id == rand_book.id).first()
-                print "We have", book
                 bp = BookParticipant(book_id=rand_book.id,
                   person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
                   creator=self.admin_user.id)
@@ -333,6 +329,4 @@ class ApiTests(AppTestCase):
         get_books = self.client.get("/api/get/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)
-        print "library is", library
-        print "data is", ret_data
         self.assertEquals(library, ret_data)

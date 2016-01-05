@@ -122,7 +122,6 @@ class Book(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.printer = kwargs["printer"]
         self.publisher = kwargs["publisher"]
-        self.id = kwargs.get("id")
         
         # Check the publish year on ORM since not all SQL engines (mySQL, for
         # one), check constraints. Support the Long Now Foundation!!!
