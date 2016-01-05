@@ -26,7 +26,7 @@ class ApiTests(AppTestCase):
     def setUp(self):
         super(ApiTests, self).setUp()
     
-    def rtest_book_adder_happy(self):
+    def test_book_adder_happy(self):
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
@@ -78,7 +78,7 @@ class ApiTests(AppTestCase):
             self.verify_inserted(BookParticipant, person_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
-    def rtest_multiple_book_people(self):
+    def test_multiple_book_people(self):
         """
         Test adding multiple people for the fields where person names are
         expected. We can assume that records are "fresh".
@@ -119,7 +119,7 @@ class ApiTests(AppTestCase):
         self.verify_bookperson_inserted(editors, "Editor", created_book.id)
         self.verify_bookperson_inserted(translators, "Translator", created_book.id)
 
-    def rtest_repeat_people(self):
+    def test_repeat_people(self):
         """
         Test that API call should still succeed even if the people have been
         added before.
@@ -177,7 +177,7 @@ class ApiTests(AppTestCase):
         req_val = self.client.post("/api/book_adder", data=req_data)
         self.assertEqual(200, req_val.status_code)
 
-    def rtest_no_printer(self):
+    def test_no_printer(self):
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
@@ -205,13 +205,13 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(single_rv._status_code, 200)
 
-    def rtest_servertime(self):
+    def test_servertime(self):
         servertime = self.client.get("/api/util/servertime")
         self.assertEquals(servertime._status_code, 200)
         data = json.loads(servertime.data)
         self.assertTrue(dateutil.parser.parse(data["now"]))
 
-    def rtest_list_genres(self):
+    def test_list_genres(self):
         genres = [GenreFactory() for _ in range(8)]
 
         for g in genres:
@@ -226,7 +226,7 @@ class ApiTests(AppTestCase):
 
         self.assertEqual(expected_genre_set, genre_set)
 
-    def rtest_list_companies(self):
+    def test_list_companies(self):
         companies = [BookCompanyFactory() for _ in range(8)]
 
         for c in companies:
@@ -241,7 +241,7 @@ class ApiTests(AppTestCase):
 
         self.assertEqual(expected_company_set, company_set)
 
-    def rtest_list_persons(self):
+    def test_list_persons(self):
         class Person:
             def __init__(self, lastname, firstname):
                 self.lastname = lastname
@@ -275,35 +275,38 @@ class ApiTests(AppTestCase):
 
     def test_get_books(self):
         book_persons = [BookPersonFactory() for _ in range(1)]
+        person_ids = [bp.firstname for bp in book_persons]
 
         for bp in book_persons:
             bp.creator = self.admin_user.id
+            print "Adding book person with creator", bp.creator
             librarian.db.session.add(bp)
-            librarian.db.session.flush()
 
         books = [BookFactory() for _ in range(1)]
+        book_isbns = [b.isbn for b in books]
 
         for b in books:
             librarian.db.session.add(b)
-            librarian.db.session.flush()
 
+        librarian.db.session.commit()
         library = {}
         # Randomly assign persons to books as roles
         roles = self.ROLE_IDS.keys()
 
         for _ in range(1):
-            rand_book = random.choice(books)
-            rand_person = random.choice(book_persons)
-            print "========================"
-            print "Lucky book is", rand_book
-            print "========================"
+            rand_isbn = random.choice(book_isbns)
+            rand_book = librarian.db.session.query(Book).filter(Book.isbn == rand_isbn).first()
+            rand_person_id = random.choice(person_ids)
+            print "Query for person with id", rand_person_id
+            rand_person = librarian.db.session.query(BookPerson).filter(BookPerson.firstname == rand_person_id).first()
+            print "That person is", rand_person
             rand_role = random.choice(roles)
 
-            if library.get(rand_book.isbn):
-                if library[rand_book.isbn].get(rand_role):
+            if library.get(rand_isbn):
+                if library[rand_isbn].get(rand_role.lower()):
                     pass
                 else:
-                    library[rand_book.isbn][rand_role] = {"lastname": rand_person. lastname,
+                    library[rand_isbn][rand_role.lower()] = {"lastname": rand_person. lastname,
                       "firstname": rand_person.firstname}
 
                     bp = BookParticipant(book_id=rand_book.id,
@@ -312,9 +315,9 @@ class ApiTests(AppTestCase):
                     librarian.db.session.add(bp)
                     librarian.db.session.flush()
             else:
-                library[rand_book.isbn] = {}
-                library[rand_book.isbn]["title"] = rand_book.title
-                library[rand_book.isbn][rand_role] = {"lastname": rand_person.lastname,
+                library[rand_isbn] = {}
+                library[rand_isbn]["title"] = rand_book.title
+                library[rand_isbn][rand_role.lower()] = {"lastname": rand_person.lastname,
                   "firstname": rand_person.firstname}
 
                 book = librarian.db.session.query(Book).filter(Book.id == rand_book.id).first()
@@ -329,4 +332,7 @@ class ApiTests(AppTestCase):
 
         get_books = self.client.get("/api/get/books")
         self.assertEquals(200, get_books._status_code)
-        self.assertEquals(library, get_books.data)
+        ret_data = json.loads(get_books.data)
+        print "library is", library
+        print "data is", ret_data
+        self.assertEquals(library, ret_data)

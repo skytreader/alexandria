@@ -173,7 +173,6 @@ class BookPerson(UserTaggedBase):
         self.firstname = kwargs["firstname"]
         self.creator = kwargs["creator"]
         self.last_modifier = kwargs["creator"]
-        self.id = kwargs.get("id")
 
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
