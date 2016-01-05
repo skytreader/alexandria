@@ -167,7 +167,6 @@ class BookPerson(UserTaggedBase):
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
     def __init__(self, **kwargs):
-        print "kwargs is", kwargs
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
         self.creator = kwargs["creator"]
