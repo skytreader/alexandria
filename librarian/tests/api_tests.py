@@ -324,8 +324,6 @@ class ApiTests(AppTestCase):
                 librarian.db.session.add(bp)
                 librarian.db.session.flush()
 
-        librarian.db.session.flush()
-
         get_books = self.client.get("/api/get/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)
