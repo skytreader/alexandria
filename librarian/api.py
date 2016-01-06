@@ -150,12 +150,18 @@ def get_books():
     
     for book in books:
         record_exists = structured_catalog.get(book[0])
+        role = book[4].lower()
 
         if record_exists:
-            structured_catalog[book[0]][book[4].lower()] = {"lastname": book[2], "firstname": book[3]}
+            if structured_catalog[book[0]].get(role):
+                structured_catalog[book[0]][role].append({"lastname": book[2],
+                  "firstname": book[3]})
+            else:
+                structured_catalog[book[0]][role] = [{"lastname": book[2],
+                  "firstname": book[3]}]
         else:
             fmt = {"title": book[1],
-              book[4].lower(): {"lastname": book[2], "firstname": book[3]}}
+              role: [{"lastname": book[2], "firstname": book[3]}]}
 
             structured_catalog[book[0]] = fmt
 
