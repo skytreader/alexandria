@@ -4,7 +4,21 @@
 <div class="panel panel-default">
     <div class="panel-heading">{{ book.title }}</div>
     <div class="panel-body">
-        {{ book.isbn }}
+        {% if book.author %}
+            <p><strong>Authors:</strong>
+            {% for author in book.author %}
+                {{ author.lastname }}, {{ author.firstname }}.
+            {% endfor %}
+            </p>
+        {% endif %}
+        {% if book.illustrator %}
+            <p><strong>Illustrators:</strong>
+            {% for illustrator in book.illustrator %}
+                {{ illustrator.lastname }}, {{ illustrator.firstname }}.
+            {% endfor %}
+            </p>
+        {% endif %}
+        <p>ISBN: {{ book.isbn }}</p>
     </div>
 </div>
 {% endmacro %}
@@ -12,7 +26,6 @@
 {% block title %}Browse Books{% endblock %}
 {% block content %}
     <h1>Browse the library's collection</h1>
-    {{ books }}
 
     {% for book in books %}
         {{ render_card_catalog(book) }}
