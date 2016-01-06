@@ -1,5 +1,20 @@
 {% extends "main.jinja" %}
+
+{% macro render_card_catalog(book) %}
+<div class="panel">
+    <div class="panel-heading">{{ book.title }}</div>
+    <div class="panel-body">
+        {{ book.isbn }}
+    </div>
+</div>
+{% endmacro %}
+
 {% block title %}Browse Books{% endblock %}
 {% block content %}
     <h1>Browse the library's collection</h1>
+    {{ books }}
+
+    {% for book in books %}
+        {{ render_card_catalog(book) }}
+    {% endfor %}
 {% endblock %}

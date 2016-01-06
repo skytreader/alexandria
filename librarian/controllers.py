@@ -5,6 +5,7 @@ from utils import route_exists
 
 import config
 import flask
+import json
 import librarian
 
 librarian_bp = Blueprint('librarian', __name__)
@@ -63,6 +64,10 @@ def add_books():
 def show_books():
     from librarian.api import get_books
 
-    books = get_books()
+    books = json.loads(get_books().data)
+    book_list = []
+
+    for isbn in books.keys():
+        book_list.append(books[isbn])
     scripts = ("show-books/main.js",)
-    return render_template("books.jinja", scripts=scripts)
+    return render_template("books.jinja", scripts=scripts, books=book_list)
