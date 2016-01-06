@@ -68,6 +68,7 @@ def show_books():
     book_list = []
 
     for isbn in books.keys():
+        books[isbn]["isbn"] = isbn
         book_list.append(books[isbn])
     scripts = ("show-books/main.js",)
     return render_template("books.jinja", scripts=scripts, books=book_list)

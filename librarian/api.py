@@ -168,7 +168,7 @@ def __get_first(x):
 def list_genres():
     genres = db.session.query(Genre.name).all()
     genres = map(__get_first, genres)
-    app.logger.info("Got these genres" + str(genres))
+    app.logger.debug("Got these genres" + str(genres))
     return flask.jsonify({"data": genres})
 
 @librarian_api.route("/api/list/companies")
