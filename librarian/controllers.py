@@ -21,9 +21,6 @@ def login():
     from models import Librarian
     form = LoginForm()
 
-    if current_user:
-        redirect(url_for("librarian.dash"))
-
     if form.validate_on_submit():
         user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
 
@@ -38,6 +35,8 @@ def login():
             return redirect(next_url or url_for("librarian.dash"), code=302)
         else:
             flash("Wrong user credentials")
+    elif not current_user.is_anonymous():
+        return redirect(url_for("librarian.dash", code=302))
 
     return render_template("login.jinja", form=form)
 
