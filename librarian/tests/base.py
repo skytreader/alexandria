@@ -8,6 +8,8 @@ librarian.app.config["TESTING"] = True
 librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 librarian.init_blueprints()
 
+logging.getLogger("factory").setLevel(logging.WARN)
+
 class AppTestCase(TestCase):
     
     def create_app(self):

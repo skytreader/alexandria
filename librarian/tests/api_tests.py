@@ -298,24 +298,26 @@ class ApiTests(AppTestCase):
             rand_person_id = random.choice(person_ids)
             rand_person = librarian.db.session.query(BookPerson).filter(BookPerson.firstname == rand_person_id).first()
             rand_role = random.choice(roles)
+            _role = rand_role.lower()
 
             if library.get(rand_isbn):
-                if library[rand_isbn].get(rand_role.lower()):
-                    pass
+                if library[rand_isbn].get(_role):
+                    library[rand_isbn][_role].append({"lastname": rand_person.lastname,
+                      "firstname": rand_person.firstname})
                 else:
-                    library[rand_isbn][rand_role.lower()] = {"lastname": rand_person. lastname,
-                      "firstname": rand_person.firstname}
+                    library[rand_isbn][_role] = [{"lastname": rand_person. lastname,
+                      "firstname": rand_person.firstname},]
 
-                    bp = BookParticipant(book_id=rand_book.id,
-                      person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
-                      creator=self.admin_user.id)
-                    librarian.db.session.add(bp)
-                    librarian.db.session.flush()
+                bp = BookParticipant(book_id=rand_book.id,
+                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
+                  creator=self.admin_user.id)
+                librarian.db.session.add(bp)
+                librarian.db.session.flush()
             else:
                 library[rand_isbn] = {}
                 library[rand_isbn]["title"] = rand_book.title
-                library[rand_isbn][rand_role.lower()] = {"lastname": rand_person.lastname,
-                  "firstname": rand_person.firstname}
+                library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
+                  "firstname": rand_person.firstname}]
 
                 book = librarian.db.session.query(Book).filter(Book.id == rand_book.id).first()
                 bp = BookParticipant(book_id=rand_book.id,
