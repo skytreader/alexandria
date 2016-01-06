@@ -17,14 +17,19 @@ def index():
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
+    from flask.ext.login import current_user
+    from models import Librarian
     form = LoginForm()
 
+    if current_user:
+        redirect(url_for("librarian.dash"))
+
     if form.validate_on_submit():
-        from models import Librarian
         user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
 
         if user and user.password == form.librarian_password.data:
             login_user(user)
+            # Should not matter becuase redirect is coming up but, oh well
             next_url = flask.request.args.get("next")
 
             if next_url and not route_exists(next_url):
