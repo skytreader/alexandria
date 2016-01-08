@@ -49,4 +49,4 @@ class AddBooksForm(Form):
             except AttributeError:
                 pass # it wasn't a form field os meh
 
-        return "/".join(validations)
+        return "/".join(validations) + "/.validate_on_submit():" + str(self.validate_on_submit())
