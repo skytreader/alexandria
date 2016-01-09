@@ -1,5 +1,5 @@
 from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TEST_DATABASE_URI
-from fabric.api import run
+from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -61,16 +61,16 @@ def manual_test_cleanup():
     session.commit()
 
 def dbdump():
-    run("mysqldump -u root -p alexandria > alexandria.sql")
+    local("mysqldump -u root alexandria > alexandria.sql")
 
 def destroy_database(is_test=False):
     if is_test:
-        run('mysql -u root -e "DROP DATABASE alexandria_test"')
+        local('mysql -u root -e "DROP DATABASE alexandria_test"')
     else:
-        run('mysql -u root -e "DROP DATABASE alexandria"')
+        local('mysql -u root -e "DROP DATABASE alexandria"')
 
 def create_database(is_test=False):
     if is_test: 
-        run('mysql -u root -e "CREATE DATABASE alexandria_test DEFAULT CHARACTER SET = utf8"')
+        local('mysql -u root -e "CREATE DATABASE alexandria_test DEFAULT CHARACTER SET = utf8"')
     else:
-        run('mysql -u root -e "CREATE DATABASE alexandria DEFAULT CHARACTER SET = utf8"')
+        local('mysql -u root -e "CREATE DATABASE alexandria DEFAULT CHARACTER SET = utf8"')
