@@ -8,10 +8,10 @@ before_install:
     - sudo apt-get install -y mysql-server
     - sudo /etc/init.d/mysql start
     - sudo apt-get install -y mysql-client
-    - mysql -uroot -e "CREATE DATABASE alexandria_test;"
 install: "pip install -r requirements.txt"
 before_script:
     - pip install -r test-requirements.txt
+    - fab create_database:is_test=True
 script: "./runtests --with-xcoverage && ./run_js_tests"
 after_success: "COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
 after_failure: "COVERALS_REPO_TOKEN=$coveralls_token coveralls"
