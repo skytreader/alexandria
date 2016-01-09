@@ -1,8 +1,8 @@
 from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TEST_DATABASE_URI
+from fabric.api import run
+from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from fixtures import insert_fixtures
 
 def reset_db_data():
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
@@ -59,3 +59,6 @@ def manual_test_cleanup():
     engine.execute("DELETE FROM pseudonyms;")
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
+
+def dbdump():
+    run("mysqldump -u root -p alexandria > alexandria.sql")
