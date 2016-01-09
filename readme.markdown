@@ -7,10 +7,12 @@ Citing related repos compels me to mention [this one](https://github.com/skytrea
 
 # Dev Set-up
 
-Assuming you have a local mysql database `alexandria` accessbile by passwordless
+Assuming you have a local mysql server accessbile by passwordless account
 account `root`, create the relevant virtualenv and then,
 
     pip install -r requirements.txt
+    fab create_database
+    fab create_database:is_test=True
     python run.py
 
 To load the fixture data,
