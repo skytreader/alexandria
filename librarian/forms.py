@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask.ext.wtf import Form
 from librarian.custom.forms import JsonField
 from wtforms import HiddenField, PasswordField, TextField
@@ -32,12 +33,12 @@ class AddBooksForm(Form):
     # TODO Clarify this in models!!!
     year = HiddenField("Year", [Required(message="Edition Year")])
 
-    def __str__(self):
-        return "/".join((str(self.isbn.data), str(self.title.data),
-          str(self.genre.data), str(self.authors.data),
-          str(self.illustrators.data), str(self.editors.data),
-          str(self.translators.data), str(self.publisher.data),
-          str(self.printer.data), str(self.year.data)))
+    def encode(self):
+        return u"/".join((self.isbn.data.encode("ascii", "ignore").decode("ascii"), self.title.data.encode("ascii", "ignore").decode("ascii"),
+          self.genre.data.encode("ascii", "ignore").decode("ascii"), self.authors.data.encode("ascii", "ignore").decode("ascii"),
+          self.illustrators.data.encode("ascii", "ignore").decode("ascii"), self.editors.data.encode("ascii", "ignore").decode("ascii"),
+          self.translators.data.encode("ascii", "ignore").decode("ascii"), self.publisher.data.encode("ascii", "ignore").decode("ascii"),
+          self.printer.data.encode("ascii", "ignore").decode("ascii"), self.year.data.encode("ascii", "ignore").decode("ascii")))
 
     def debug_validate(self):
         fields = self.__dict__
