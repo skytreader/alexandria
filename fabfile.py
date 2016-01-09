@@ -62,3 +62,15 @@ def manual_test_cleanup():
 
 def dbdump():
     run("mysqldump -u root -p alexandria > alexandria.sql")
+
+def destroy_database(is_test=False):
+    if is_test:
+        run('mysql -u root -e "DROP DATABASE alexandria_test"')
+    else:
+        run('mysql -u root -e "DROP DATABASE alexandria"')
+
+def create_database(is_test=False):
+    if is_test: 
+        run('mysql -u root -e "CREATE DATABASE alexandria_test DEFAULT CHARACTER SET = utf8"')
+    else:
+        run('mysql -u root -e "CREATE DATABASE alexandria DEFAULT CHARACTER SET = utf8"')
