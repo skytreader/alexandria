@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import flask
 import json
 import pytz
@@ -64,7 +65,7 @@ def book_adder():
         500 - Standard server error. Client may retry after some wait period.
     """
     form = AddBooksForm(request.form)
-    app.logger.info(form.encode())
+    app.logger.info(str(form))
     app.logger.debug(form.debug_validate())
 
     if form.validate_on_submit():

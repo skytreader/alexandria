@@ -33,7 +33,7 @@ class AddBooksForm(Form):
     # TODO Clarify this in models!!!
     year = HiddenField("Year", [Required(message="Edition Year")])
 
-    def encode(self):
+    def __str__(self):
         return u"/".join((self.isbn.data.encode("ascii", "ignore").decode("ascii"), self.title.data.encode("ascii", "ignore").decode("ascii"),
           self.genre.data.encode("ascii", "ignore").decode("ascii"), self.authors.data.encode("ascii", "ignore").decode("ascii"),
           self.illustrators.data.encode("ascii", "ignore").decode("ascii"), self.editors.data.encode("ascii", "ignore").decode("ascii"),
