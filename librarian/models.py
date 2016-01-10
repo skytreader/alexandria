@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask.ext.login import current_user, UserMixin
 from librarian import db, app
 from librarian.errors import ConstraintError
