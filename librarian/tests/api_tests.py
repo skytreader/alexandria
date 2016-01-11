@@ -79,6 +79,51 @@ class ApiTests(AppTestCase):
             self.verify_inserted(BookParticipant, person_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
+    def test_book_adder_utf8(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        isbn = fake.isbn()
+
+        # Check that the relevant records do not exist yet
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="English 12")
+        self.verify_does_not_exist(BookPerson, lastname="Pérez-Reverte",
+          firstname="Arturo")
+        self.verify_does_not_exist(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="UP Press")
+
+        single_author = {
+            "isbn": isbn,
+            "title": "The Club Dumas",
+            "genre": "English 12",
+            "authors": """[
+                {
+                    "lastname": "Pérez-Reverte",
+                    "firstname": "Arturo"
+                }
+            ]""",
+            "illustrators": "[]",
+            "editors": "[]",
+            "translators": "[]",
+            "publisher": "Scholastic",
+            "printer": "UP Press",
+            "year": "2013"
+        }
+
+        single_rv = self.client.post("/api/book_adder", data=single_author)
+
+        self.assertEquals(single_rv._status_code, 200)
+
+        self.verify_inserted(Book, isbn=isbn)
+        self.verify_inserted(Genre, name="English 12")
+        self.verify_inserted(BookPerson, lastname="Pérez-Reverte",
+          firstname="Arturo")
+        self.verify_inserted(BookCompany, name="Scholastic")
+        self.verify_inserted(BookCompany, name="UP Press")
+
     def test_multiple_book_people(self):
         """
         Test adding multiple people for the fields where person names are
