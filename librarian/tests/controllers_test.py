@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from base import AppTestCase
 
 class ControllersTest(AppTestCase):

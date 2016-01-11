@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user

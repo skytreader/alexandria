@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
 from faker import Faker
 from librarian import models
