@@ -124,6 +124,56 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
+    def test_book_adder_duplicate_records(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        isbn = fake.isbn()
+
+        # Check that the relevant records do not exist yet
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="io9")
+        self.verify_does_not_exist(BookPerson, lastname="Eschenbach",
+          firstname="Andreas")
+        self.verify_does_not_exist(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="UP Press")
+
+        single_author = {
+            "isbn": isbn,
+            "title": "The Carpet Makers",
+            "genre": "io9",
+            "authors": """[
+                {
+                    "lastname": "Eschenbach",
+                    "firstname": "Andreas"
+                }
+            ]""",
+            "illustrators": "[]",
+            "editors": "[]",
+            "translators": "[]",
+            "publisher": "Scholastic",
+            "printer": "UP Press",
+            "year": "2013"
+        }
+
+        single_rv = self.client.post("/api/book_adder", data=single_author)
+
+        self.assertEquals(single_rv._status_code, 200)
+
+        self.verify_inserted(Book, isbn=isbn)
+        self.verify_inserted(Genre, name="io9")
+        self.verify_inserted(BookPerson, lastname="Eschenbach",
+          firstname="Andreas")
+        self.verify_inserted(BookCompany, name="Scholastic")
+        self.verify_inserted(BookCompany, name="UP Press")
+
+        duplicate = self.client.post("/api/book_adder", data=single_author)
+
+        self.assertEquals(duplicate._status_code, 409)
+        
+
     def test_multiple_book_people(self):
         """
         Test adding multiple people for the fields where person names are
