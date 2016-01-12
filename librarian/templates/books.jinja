@@ -11,6 +11,12 @@
             {% endfor %}
             </p>
         {% endif %}
+        {% if book.translator %}
+            <p><strong>Translators:</strong>
+            {% for translator in book.translator %}
+                {{ translator.lastname }}, {{ translator.firstname }}
+            {% endfor %}
+        {% endif %}
         {% if book.illustrator %}
             <p><strong>Illustrators:</strong>
             {% for illustrator in book.illustrator %}
