@@ -59,3 +59,7 @@ Render the queue to the defaultLocation specified in the constructor.
 VisualQueue.prototype.render = function(){
     $(this.superContainer).append(this.domContainer);
 }
+
+VisualQueue.prototype.getLength = function(){
+    return this.queueCounter;
+}

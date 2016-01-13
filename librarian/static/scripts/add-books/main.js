@@ -20,15 +20,6 @@ is mapped to the Flask form. These are the fields to be included in the request.
 var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
   "editors", "translators", "year", "publisher", "printer"];
 
-/**
-Problem: We don't have a way to determine if we should display the "Ooops..."
-message from script status quickly. So, we add a visualQueue count.
-
-Each time we add to the visual book queue, increment this. Each time we remove
-(clear), decrement.
-*/
-var visualQueueCount = 0;
-
 var visualQueue;
 
 var booksSaved = 0;
@@ -41,7 +32,7 @@ var COMPANIES = [];
 var GENRES = [];
 
 function updateStatCounts(){
-    $("#unsaved-count").text("" + visualQueueCount);
+    $("#unsaved-count").text("" + visualQueue.getLength());
     $("#saved-count").text("" + booksSaved);
     $("#error-count").text("" + booksErrorNoRetry);
     $("#reprocessed-count").text("" + booksReprocessable);
@@ -431,8 +422,6 @@ $(document).ready(function(){
         }
     });
 
-    updateStatCounts();
-
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
@@ -446,8 +435,9 @@ $(document).ready(function(){
     var defs = {"defaultDisplay":defItem,
       "defaultLocation": document.getElementById("qContainer")};
     window.visualQueue = new VisualQueue(qContainer, defs);
-    //document.getElementById("qContainer").appendChild(window.visualQueue.domContainer);
     window.visualQueue.render();
+    updateStatCounts();
+
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
@@ -456,7 +446,6 @@ $(document).ready(function(){
             var spine = renderSpine();
             internalizeBook(spine);
             window.visualQueue.enqueue(spine);
-            window.visualQueueCount++;
             updateStatCounts();
             clearProxyForm();
         }
