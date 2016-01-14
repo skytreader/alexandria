@@ -445,7 +445,7 @@ $(document).ready(function(){
         if($("#proxy-form").valid()){
             var spine = renderSpine();
             internalizeBook(spine);
-            window.visualQueue.enqueue(spine);
+            window.visualQueue.prepend(spine);
             updateStatCounts();
             clearProxyForm();
         }

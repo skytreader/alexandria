@@ -43,6 +43,17 @@ VisualQueue.prototype.enqueue = function(domElement){
 }
 
 /**
+The name "VisualQueue" just became inappropriate.
+*/
+VisualQueue.prototype.prepend = function(domElement){
+    if(this.queueCounter == 0){
+        $(this.domContainer).empty();
+    }
+    $(this.domContainer).prepend(domElement);
+    this.queueCounter++;
+}
+
+/**
 Remove the specified element from the queue.
 
 @param elementId
