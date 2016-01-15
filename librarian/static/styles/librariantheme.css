@@ -7,22 +7,26 @@
 
 body {
 	background-color: #4c4039;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Droid Serif', serif;
 	position: absolute;
 	height: 100%;
 	width: 100%;
 }
 
 h1 {
-	font-size: 25px;
+	font-size: 28px;
 }
 
 h2 {
-	font-size: 23px;
+	font-size: 26px;
 }
 
 h3 {
-    font-size: 21px;
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 22px;
 }
 
 hr {
@@ -35,8 +39,8 @@ hr {
 }
 
 p, .text {
-	font-size: 15px;
-	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-family: 'Droid Serif', serif;
 	text-align: justify;
 	padding-bottom: 8px;
 	padding-right: 10px;
@@ -76,8 +80,8 @@ div.content_box {
 div.navbox{
 	background-color: #4c4039;
 	color: #ffffff;
-	font-family: Arial, sans-serif;
-	font-size: 12px;
+	font-family: 'Droid Serif', serif;
+	font-size: 14px;
 	word-spacing: 20px;
 	margin-top: 10px;
     padding: 5px 12px;

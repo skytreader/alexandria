@@ -2,7 +2,7 @@
 
 {% macro render_card_catalog(book) %}
 <div class="panel panel-default">
-    <div class="panel-heading">{{ book.title }}</div>
+    <div class="panel-heading book-title">{{ book.title }}</div>
     <div class="panel-body">
         {% if book.author %}
             <p><strong>Authors:</strong>
