@@ -14,7 +14,8 @@ librarian_bp = Blueprint('librarian', __name__)
 @librarian_bp.route("/")
 def index():
     form = SearchForm(request.form)
-    return render_template("home.jinja", form=form)
+    styles = ("index.css",)
+    return render_template("home.jinja", form=form, stylesheets=styles)
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
