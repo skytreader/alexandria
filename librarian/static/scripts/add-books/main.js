@@ -46,6 +46,9 @@ function fillGenres(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             window.GENRES = data["data"];
+            $("#genre-proxy").autocomplete({
+                source: window.GENRES
+            });
         },
         "error": function(jqXHR, textStatus, error){
             setTimeout(window.fillGenres, 8000);
@@ -422,6 +425,8 @@ $(document).ready(function(){
         }
     });
 
+    fillGenres();
+
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
@@ -437,7 +442,6 @@ $(document).ready(function(){
     window.visualQueue = new VisualQueue(qContainer, defs);
     window.visualQueue.render();
     updateStatCounts();
-
 
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
