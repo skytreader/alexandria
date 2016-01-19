@@ -11,6 +11,7 @@ test("isbn13Test", function(assert){
 test("isbn10Test", function(assert){
     ok(verifyISBN10("0156453800"));
     ok(verifyISBN10("1553650808"));
+    ok(verifyISBN10("156389016X"), "Positive test, with X checksum");
     ok(!verifyISBN10("9780981467306"), "Negative test, wrong length");
     ok(!verifyISBN10("3141592653"), "Negative test, ok length");
 });
