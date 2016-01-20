@@ -53,7 +53,7 @@ you need to set it up and tear it down in each test.
         assertTrue(msg ? msg : '', !!actual);
     };
     
-    window.equals = function(a, b, msg) {
+    window.equal = function(a, b, msg) {
         assertEquals(msg ? msg : '', b, a);
     };
     

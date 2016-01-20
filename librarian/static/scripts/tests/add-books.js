@@ -1,9 +1,9 @@
 test("content creator render test", function(assert){
     var renderedNameField = renderNameInput("developer", "lastname");
-    equals(renderedNameField.className, "form-control");
-    equals(renderedNameField.type, "text");
-    equals(renderedNameField.name, "developer-proxy-lastname");
-    equals(renderedNameField.placeholder, "Lastname");
+    equal(renderedNameField.className, "form-control");
+    equal(renderedNameField.type, "text");
+    equal(renderedNameField.name, "developer-proxy-lastname");
+    equal(renderedNameField.placeholder, "Lastname");
 
     var developerInput = renderContentCreatorInput("developer");
     var nameInputs = $(developerInput).find(".form-control");
@@ -15,5 +15,6 @@ test("content creator render test", function(assert){
 });
 
 test("realFormIds is populated", function(assert){
+    console.log("B");
     ok(window.realFormIds.length > 0);
 });

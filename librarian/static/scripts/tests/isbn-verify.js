@@ -1,5 +1,5 @@
 test("stripExtraneousTest", function(assert){
-    equals(stripExtraneous("3.1  4 1 5 92-653"), "3141592653", "test");
+    equal(stripExtraneous("3.1  4 1 5 92-653"), "3141592653", "test");
 });
 
 test("isbn13Test", function(assert){

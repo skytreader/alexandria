@@ -19,6 +19,7 @@ is mapped to the Flask form. These are the fields to be included in the request.
 */
 var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
   "editors", "translators", "year", "publisher", "printer"];
+console.log("A");
 
 var visualQueue;
 
