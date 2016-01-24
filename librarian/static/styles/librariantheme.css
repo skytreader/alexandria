@@ -119,9 +119,13 @@ div.reprocess_book{
     color: #000;
 }
 
-div.empty_set, div.unsaved_book, div.grouped_input{
+div.empty_set, div.unsaved_book, div.grouped-input{
     padding: 10px;
     background-color: #dadada;
+}
+
+div.grouped-input, div.input-group{
+    width: 100%;
 }
 
 a.navbox{
@@ -181,6 +185,13 @@ input.special_label{
 input.infrequent{
 	background-color: #896f62;
 	color: #000;
+}
+
+/*
+Make important because to override bootstrap
+*/
+input.single-liner-halves{
+    width: 50% !important;
 }
 
 /*Images*/
