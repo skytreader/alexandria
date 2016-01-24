@@ -169,6 +169,9 @@ function renderDeleteButton(){
     return container;
 }
 
+/**
+Creates the DOM element that displays the name of the added person.
+*/
 function renderNameInput(creatorType, namePart){
     var placeholder = namePart.capitalize();
     var textbox = document.createElement("input");
