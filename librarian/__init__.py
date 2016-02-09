@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-`
 from flask import Flask
+from flask.ext.cache import Cache
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 
+import config
+
 app = Flask(__name__)
+cache = Cache(app, config=config.CACHE_CONFIG)
 app.config.from_object("config")
 
 db = SQLAlchemy(app)

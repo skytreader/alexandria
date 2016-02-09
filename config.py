@@ -19,6 +19,12 @@ SQLALCHEMY_TEST_DATABASE_URI = 'mysql://root@127.0.0.1:3306/alexandria_test'
 SQLALCHEMY_ECHO = DEVEL
 DATABASE_CONNECT_OPTIONS = {"user":"root"}
 
+# Caching, see: https://pythonhosted.org/Flask-Cache/
+# a dictionary containing all the config for Flask-Cache.
+CACHE_CONFIG = {
+    "CACHE_TYPE": "simple"
+}
+
 # Application threads. A common general assumption is
 # using 2 per available processor cores - to handle
 # incoming requests using one and performing background
