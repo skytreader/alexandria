@@ -97,10 +97,10 @@ def book_adder():
 
             #FIXME This part is shaky
             #FIXME I think we should cache.
-            author_role = Role.get_preset_role_id("Author")
-            illus_role = Role.get_preset_role_id("Illustrator")
-            editor_role = Role.get_preset_role_id("Editor")
-            trans_role = Role.get_preset_role_id("Translator")
+            author_role = Role.get_preset_role("Author")
+            illus_role = Role.get_preset_role("Illustrator")
+            editor_role = Role.get_preset_role("Editor")
+            trans_role = Role.get_preset_role("Translator")
 
             # Assign participation
             for author in authors:

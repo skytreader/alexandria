@@ -57,7 +57,6 @@ class AppTestCase(TestCase):
         (Or it _might_ work but we will have to call `create_all` on setUp which
         is going to be a waste of time.)
         """
-        pass
         librarian.db.session.rollback()
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
         librarian.db.engine.execute("DELETE FROM librarians;")
@@ -72,3 +71,6 @@ class AppTestCase(TestCase):
         librarian.db.engine.execute("DELETE FROM pseudonyms;")
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
         librarian.db.session.commit()
+
+        with librarian.app.app_context():
+            librarian.cache.clear()
