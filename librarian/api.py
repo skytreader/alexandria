@@ -12,6 +12,7 @@ from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 from sqlalchemy.exc import IntegrityError
 
+import config
 import re
 import traceback
 
@@ -96,10 +97,10 @@ def book_adder():
 
             #FIXME This part is shaky
             #FIXME I think we should cache.
-            author_role = Role.query.filter_by(name="Author").first()
-            illus_role = Role.query.filter_by(name="Illustrator").first()
-            editor_role = Role.query.filter_by(name="Editor").first()
-            trans_role = Role.query.filter_by(name="Translator").first()
+            author_role = Role.get_preset_role_id("Author")
+            illus_role = Role.get_preset_role_id("Illustrator")
+            editor_role = Role.get_preset_role_id("Editor")
+            trans_role = Role.get_preset_role_id("Translator")
 
             # Assign participation
             for author in authors:

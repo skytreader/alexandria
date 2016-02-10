@@ -25,6 +25,8 @@ CACHE_CONFIG = {
     "CACHE_TYPE": "simple"
 }
 
+CACHE_TIMEOUT = 88
+
 # Application threads. A common general assumption is
 # using 2 per available processor cores - to handle
 # incoming requests using one and performing background

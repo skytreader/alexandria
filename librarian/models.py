@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask.ext.login import current_user, UserMixin
-from librarian import db, app
+from librarian import app, cache, db
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check
 from sqlalchemy.ext.declarative import declared_attr
+
+import config
 
 """
 Year when ISBN was formalized.
@@ -193,6 +195,13 @@ class Role(UserTaggedBase):
         self.display_text = kwargs["display_text"]
         self.creator = kwargs["creator"]
         self.last_modifier = kwargs["creator"]
+
+    @staticmethod
+    @cache.memoize(config.CACHE_TIMEOUT)
+    def get_preset_role_id(role_name):
+        role = Role.query.filter_by(name=role_name).first()
+        return role.id
+        
 
 class BookParticipant(UserTaggedBase):
     """
