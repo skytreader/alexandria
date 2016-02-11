@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-import flask
-import json
-import pytz
-
 from datetime import datetime
 
 from librarian import app, db
 from librarian.forms import AddBooksForm
+from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
 from sqlalchemy.exc import IntegrityError
 
 import config
+import flask
+import json
+import pytz
 import re
 import traceback
 
@@ -146,24 +146,34 @@ def get_books():
     """
     Get a listing of books in the database.
 
-    The request may have optional parameters `offset` and `limit` for pagination
-    purposes. Having only one of the the two will result in an error.
+    Specifying any one of the paramets `offset`, `limit`, or `order` will
+    automatically trigger defaults for the other parameters if they are not
+    specified. The defaults are as follows:
+
+    offset = 0
+    limit = 8
+
+    NOTE: If none of them is present, this will query ALL records.
+
+    Request parameters:
+        offset - Integer. The "page number" used for pagination.
+        limit - Integer. The number of records to return.
 
     Possible responses:
-        200 - Will have accomapnying JSON data of the books.
+        200 - Will have accompanying JSON data of the books.
         400 - Parameters not as expected.
         500 - Standard server error.
     """
-    offset = request.args.get("offset")
-    limit = request.args.get("limit")
+    offset = request.args.get("offset", "0")
+    limit = request.args.get("limit", "8")
     bookq = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
       BookPerson.firstname, Role.name).filter(Book.id == BookParticipant.book_id)
       .filter(BookParticipant.person_id == BookPerson.id)
       .filter(BookParticipant.role_id == Role.id))
 
-    if offset and limit:
-        bookq = bookq.slice(offset, limit)
-    elif bool(offset) ^ bool(limit):
+    if NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
+        bookq = bookq.limit(limit).offset(offset)
+    else:
         return "Error", 400
         
     books = bookq.all()

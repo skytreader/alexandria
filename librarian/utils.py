@@ -3,6 +3,7 @@ import librarian
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
+NUMERIC_REGEX = re.compile("\d+")
 
 def isbn_check(isbn):
     """
