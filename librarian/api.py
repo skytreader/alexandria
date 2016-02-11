@@ -164,16 +164,22 @@ def get_books():
         400 - Parameters not as expected.
         500 - Standard server error.
     """
-    offset = request.args.get("offset", "0")
-    limit = request.args.get("limit", "8")
+    offset = request.args.get("offset")
+    limit = request.args.get("limit")
+
+    if offset and not limit:
+        limit = "8"
+    elif limit and not offset:
+        offset = "0"
+
     bookq = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
       BookPerson.firstname, Role.name).filter(Book.id == BookParticipant.book_id)
       .filter(BookParticipant.person_id == BookPerson.id)
       .filter(BookParticipant.role_id == Role.id))
 
-    if NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
+    if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
         bookq = bookq.limit(limit).offset(offset)
-    else:
+    elif offset and limit:
         return "Error", 400
         
     books = bookq.all()
