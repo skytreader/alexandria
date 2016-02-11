@@ -143,10 +143,30 @@ def servertime():
 
 @librarian_api.route("/api/get/books")
 def get_books():
-    books = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
-      BookPerson.firstname, Role.name).filter(Book.id==BookParticipant.book_id)
-      .filter(BookParticipant.person_id==BookPerson.id)
-      .filter(BookParticipant.role_id == Role.id).all())
+    """
+    Get a listing of books in the database.
+
+    The request may have optional parameters `offset` and `limit` for pagination
+    purposes. Having only one of the the two will result in an error.
+
+    Possible responses:
+        200 - Will have accomapnying JSON data of the books.
+        400 - Parameters not as expected.
+        500 - Standard server error.
+    """
+    offset = request.args.get("offset")
+    limit = request.args.get("limit")
+    bookq = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
+      BookPerson.firstname, Role.name).filter(Book.id == BookParticipant.book_id)
+      .filter(BookParticipant.person_id == BookPerson.id)
+      .filter(BookParticipant.role_id == Role.id))
+
+    if offset and limit:
+        bookq = bookq.slice(offset, limit)
+    elif bool(offset) ^ bool(limit):
+        return "Error", 400
+        
+    books = bookq.all()
     app.logger.debug("Got these books" + str(books))
     structured_catalog = {}
     
