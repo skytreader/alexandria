@@ -1,7 +1,7 @@
 """add cache table
 
 Revision ID: 39ccc5d35a4d
-Revises: 1748bdf1a3b2
+Revises: 1ac819f296cc
 Create Date: 2016-02-14 04:35:39.345094
 
 The purpose of the cache table is to have a single table aggregating all the
@@ -13,7 +13,7 @@ This also adds the 'is_preset' column to the roles table.
 
 # revision identifiers, used by Alembic.
 revision = '39ccc5d35a4d'
-down_revision = '1748bdf1a3b2'
+down_revision = '1ac819f296cc'
 branch_labels = None
 depends_on = None
 
