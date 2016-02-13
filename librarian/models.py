@@ -54,8 +54,10 @@ def get_or_create(model, will_commit=False, **kwargs):
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp(),
       onupdate=db.func.current_timestamp())
 
 class Librarian(Base, UserMixin):
