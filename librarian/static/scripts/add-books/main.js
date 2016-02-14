@@ -188,15 +188,14 @@ Create a list element for displaying a creator's name. The name displayed is
 dependent on what is currently entered in the procy fields for this creator.
 */
 function renderContentCreatorListing(creatorType){
-    console.info("render for", creatorType);
-    console.info($("#" + creatorType + "-proxy-lastname")[0]);
     var lastName = $("#" + creatorType + "-proxy-lastname")[0].value;
     var firstName = $("#" + creatorType + "-proxy-firstname")[0].value;
     var nameElement = document.createElement("span");
     nameElement.innerHTML = lastName + ", " + firstName;
 
     var deleteButton = document.createElement("i");
-    $(deleteButton).addClass("fa fa-times-circle");
+    $(deleteButton).addClass("fa fa-times-circle")
+      .click(recordDeleterFactory(creatorType));
 
     var listing = document.createElement("li");
     listing.appendChild(nameElement);
@@ -207,15 +206,7 @@ function renderContentCreatorListing(creatorType){
 
 function recordDeleterFactory(creatorType){
     return function() {
-        if(document.getElementById(creatorType + "-list").children.length != 1){
-            $(this.parentNode.parentNode).remove();
-        }
-
-        // Check if after removing a row, we should disable deletions for
-        // the time being.
-        if(document.getElementById(creatorType + "-list").children.length == 1){
-            $("#" + creatorType + "-list .fa-minus-circle").addClass("disabled");
-        }
+        $(this.parentNode).remove();
     }
 };
 
@@ -476,6 +467,5 @@ $(document).ready(function(){
 
     CREATORS.forEach(function(creatorTitle){
         $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
-        $("#" + creatorTitle + "-list .fa-minus-circle").click(recordDeleterFactory(creatorTitle));
     });
 });
