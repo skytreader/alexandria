@@ -184,38 +184,25 @@ function renderNameInput(creatorType, namePart){
 }
 
 /**
-Create an "input line" for content creators.
+Create a list element for displaying a creator's name. The name displayed is
+dependent on what is currently entered in the procy fields for this creator.
 */
-function renderContentCreatorInput(creatorType){
-    var rowContainer = document.createElement("div");
-    $(rowContainer).addClass("row");
-    
-    var lastnameCol = document.createElement("div");
-    $(lastnameCol).addClass("col-md-5");
-    
-    var lastnameInput = renderNameInput(creatorType, "lastname");
-    lastnameCol.appendChild(lastnameInput);
-
-    var firstnameCol = document.createElement("div");
-    $(firstnameCol).addClass("col-md-5");
-
-    var firstnameInput = renderNameInput(creatorType, "firstname");
-    firstnameCol.appendChild(firstnameInput);
-
-    var deleteCol = document.createElement("div");
-    $(deleteCol).addClass("col-md-2");
+function renderContentCreatorListing(creatorType){
+    console.info("render for", creatorType);
+    console.info($("#" + creatorType + "-proxy-lastname")[0]);
+    var lastName = $("#" + creatorType + "-proxy-lastname")[0].value;
+    var firstName = $("#" + creatorType + "-proxy-firstname")[0].value;
+    var nameElement = document.createElement("span");
+    nameElement.innerHTML = lastName + ", " + firstName;
 
     var deleteButton = document.createElement("i");
-    $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
-    $(deleteButton).click(recordDeleterFactory(creatorType));
-    
-    deleteCol.appendChild(deleteButton);
+    $(deleteButton).addClass("fa fa-times-circle");
 
-    rowContainer.appendChild(lastnameCol);
-    rowContainer.appendChild(firstnameCol);
-    rowContainer.appendChild(deleteCol);
+    var listing = document.createElement("li");
+    listing.appendChild(nameElement);
+    listing.appendChild(deleteButton);
 
-    return rowContainer;
+    return listing;
 }
 
 function recordDeleterFactory(creatorType){
@@ -318,13 +305,15 @@ function sendSaveForm(domElement){
 TODO I thought of this method to automate my testing but I realized this could
 also be useful for a "reprocess" feature. If saving a book fails, you can reload
 the book's record into the form and redo what you think failed.
+
+FIXME
 */
 function loadToForm(reqData){
     
     function insertAllCreators(all, type){
         for(var i = 0; i < all.length; i++){
             if(i != 0){
-                var creatorInput = renderContentCreatorInput(type);
+                var creatorInput = renderContentCreatorListing(type);
                 $(creatorInput).find("[name='" + type + "-proxy-lastname']")
                   .val(all[i].lastname);
                 $(creatorInput).find("[name='" + type + "-proxy-firstname']")
@@ -368,7 +357,8 @@ $(document).ready(function(){
     */
     function rendererFactory(creatorType){
         return function(){
-            var inputLine = renderContentCreatorInput(creatorType);
+            var name = document.createElement("li");
+            var inputLine = renderContentCreatorListing(creatorType);
     
             // Since we are adding something, we are sure that the list should now
             // have deletable rows.
