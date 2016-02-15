@@ -64,10 +64,14 @@ class Librarian(Base, UserMixin):
     __tablename__ = "librarians"
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    can_read = db.Column(db.Boolean, nullable=False, default=False)
-    can_write = db.Column(db.Boolean, nullable=False, default=False)
-    can_exec = db.Column(db.Boolean, nullable=False, default=False)
-    is_user_active = db.Column(db.Boolean, nullable=False, default=True)
+    can_read = db.Column(db.Boolean, nullable=False, default=False,
+      server_default=False)
+    can_write = db.Column(db.Boolean, nullable=False, default=False,
+      server_default=False)
+    can_exec = db.Column(db.Boolean, nullable=False, default=False,
+      server_default=False)
+    is_user_active = db.Column(db.Boolean, nullable=False, default=True,
+      server_default=False)
 
     def __init__(self, **kwargs):
         self.username = kwargs["username"]

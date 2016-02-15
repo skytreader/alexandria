@@ -17,10 +17,12 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.alter_column("librarians", "date_created",
-      server_default=None)
-    op.alter_column("librarians", "date_modified",
-      server_default=None)
+    op.alter_column("librarians", "date_created", server_default=None)
+    op.alter_column("librarians", "date_modified", server_default=None)
+    op.alter_column("librarians", "can_read", server_default=False)
+    op.alter_column("librarians", "can_write", server_default=False)
+    op.alter_column("librarians", "can_exec", server_default=False)
+    op.alter_column("librarians", "is_user_active", server_default=False)
 
     op.alter_column("genres", "date_created",
       server_default=None)
