@@ -22,10 +22,10 @@ def upgrade():
       server_default=sa.func.current_timestamp())
     op.alter_column("librarians", "date_modified",
       server_default=sa.func.current_timestamp())
-    op.alter_column("librarians", "can_read", server_default=False)
-    op.alter_column("librarians", "can_write", server_default=False)
-    op.alter_column("librarians", "can_exec", server_default=False)
-    op.alter_column("librarians", "is_user_active", server_default=False)
+    op.alter_column("librarians", "can_read", server_default=db.false())
+    op.alter_column("librarians", "can_write", server_default=db.false())
+    op.alter_column("librarians", "can_exec", server_default=db.false())
+    op.alter_column("librarians", "is_user_active", server_default=db.false())
 
     op.alter_column("genres", "date_created",
       server_default=sa.func.current_timestamp())
@@ -77,10 +77,10 @@ def upgrade():
 def downgrade():
     op.alter_column("librarians", "date_created", server_default=None)
     op.alter_column("librarians", "date_modified", server_default=None)
-    op.alter_column("librarians", "can_read", server_default=False)
-    op.alter_column("librarians", "can_write", server_default=False)
-    op.alter_column("librarians", "can_exec", server_default=False)
-    op.alter_column("librarians", "is_user_active", server_default=False)
+    op.alter_column("librarians", "can_read", server_default=None)
+    op.alter_column("librarians", "can_write", server_default=None)
+    op.alter_column("librarians", "can_exec", server_default=None)
+    op.alter_column("librarians", "is_user_active", server_default=None)
 
     op.alter_column("genres", "date_created", server_default=None)
     op.alter_column("genres", "date_modified", server_default=None)
