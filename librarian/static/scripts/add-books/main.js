@@ -188,8 +188,9 @@ function renderContentCreatorListing(creatorType){
     divRow.appendChild(delCol);
     divRow.appendChild(nameCol);
 
-    var lastName = $("#" + creatorType + "-proxy-lastname")[0].value;
-    var firstName = $("#" + creatorType + "-proxy-firstname")[0].value;
+    var lastName = $("#" + creatorType + "-proxy-lastname").val().trim();
+    var firstName = $("#" + creatorType + "-proxy-firstname").val().trim();
+    clearCreatorInput(creatorType);
     var nameElement = document.createElement("span");
     nameElement.innerHTML = lastName + ", " + firstName;
 
@@ -205,6 +206,11 @@ function renderContentCreatorListing(creatorType){
     listing.appendChild(divRow);
 
     return listing;
+}
+
+function clearCreatorInput(creatorType){
+    $("#" + creatorType + "-proxy-lastname").val("");
+    $("#" + creatorType + "-proxy-firstname").val("");
 }
 
 function recordDeleterFactory(creatorType){
