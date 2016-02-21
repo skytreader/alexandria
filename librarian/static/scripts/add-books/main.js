@@ -215,7 +215,7 @@ function clearCreatorInput(creatorType){
 
 function recordDeleterFactory(creatorType){
     return function() {
-        $(this.parentNode).remove();
+        $(this.parentNode.parentNode).remove();
     }
 };
 
