@@ -170,22 +170,10 @@ function renderDeleteButton(){
 }
 
 /**
-Creates the DOM element that displays the name of the added person.
-*/
-function renderNameInput(creatorType, namePart){
-    var placeholder = namePart.capitalize();
-    var textbox = document.createElement("input");
-    textbox.type = "text";
-    textbox.placeholder = placeholder;
-    $(textbox).addClass("form-control");
-    textbox.name = creatorType + "-proxy-" + namePart;
-
-    return textbox;
-}
-
-/**
 Create a list element for displaying a creator's name. The name displayed is
 dependent on what is currently entered in the procy fields for this creator.
+
+TODO Test me
 */
 function renderContentCreatorListing(creatorType){
     var divRow = document.createElement("div");
