@@ -2,3 +2,16 @@ div.legend{
     padding: 0.3em;
     display: inline-block;
 }
+
+.creator-name-list{
+    margin-top: 1em;
+    font-size: 18px;
+}
+
+.creator-name-list li{
+    list-style: none;
+}
+
+.creator-name-list li .del-col{
+    text-align: center;
+}

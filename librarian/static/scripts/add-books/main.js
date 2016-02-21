@@ -188,18 +188,33 @@ Create a list element for displaying a creator's name. The name displayed is
 dependent on what is currently entered in the procy fields for this creator.
 */
 function renderContentCreatorListing(creatorType){
+    var divRow = document.createElement("div");
+    $(divRow).addClass("row");
+
+    var delCol = document.createElement("div");
+    $(delCol).addClass("col-xs-1 del-col");
+
+    var nameCol = document.createElement("div");
+    $(nameCol).addClass("col-xs-11");
+
+    divRow.appendChild(delCol);
+    divRow.appendChild(nameCol);
+
     var lastName = $("#" + creatorType + "-proxy-lastname")[0].value;
     var firstName = $("#" + creatorType + "-proxy-firstname")[0].value;
     var nameElement = document.createElement("span");
     nameElement.innerHTML = lastName + ", " + firstName;
 
+    nameCol.appendChild(nameElement);
+
     var deleteButton = document.createElement("i");
     $(deleteButton).addClass("fa fa-times-circle")
       .click(recordDeleterFactory(creatorType));
 
+    delCol.appendChild(deleteButton);
+
     var listing = document.createElement("li");
-    listing.appendChild(nameElement);
-    listing.appendChild(deleteButton);
+    listing.appendChild(divRow);
 
     return listing;
 }
