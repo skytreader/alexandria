@@ -121,7 +121,7 @@ class Book(UserTaggedBase):
     publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="book_book_company_fk1"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
-      server_default=ISBN_START)
+      server_default=str(ISBN_START))
 
     def __init__(self, **kwargs):
         publish_year = int(kwargs["publish_year"])
