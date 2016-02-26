@@ -22,9 +22,14 @@ import sqlalchemy as sa
 
 
 def upgrade():
+    conn = op.get_bind()
+    meta = MetaData(bind=conn)
+
     op.add_column("roles",
       sa.Column("is_preset", sa.Boolean(), server_default=False)
     )
+
+    roles_table = Table("roles", meta, autoload=True)
 
 
 def downgrade():
