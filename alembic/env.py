@@ -3,9 +3,11 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 
+import os
 import sys
 
-sys.path.append("../librarian")
+sys.path.append(os.path.join(os.getcwd(), "librarian"))
+print sys.path
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

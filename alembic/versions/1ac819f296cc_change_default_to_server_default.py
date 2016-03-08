@@ -12,6 +12,12 @@ down_revision = '1748bdf1a3b2'
 branch_labels = None
 depends_on = None
 
+import os
+import sys
+
+sys.path.append(os.path.join(os.getcwd(), "librarian"))
+print sys.path
+
 from alembic import op
 from librarian.models import ISBN_START
 import sqlalchemy as sa
