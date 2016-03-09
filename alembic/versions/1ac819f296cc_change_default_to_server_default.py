@@ -15,7 +15,7 @@ depends_on = None
 import os
 import sys
 
-sys.path.append(os.path.join(os.getcwd()))
+sys.path.append(os.getcwd())
 
 from alembic import op
 from librarian.models import ISBN_START
