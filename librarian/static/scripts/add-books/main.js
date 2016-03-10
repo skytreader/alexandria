@@ -19,7 +19,6 @@ is mapped to the Flask form. These are the fields to be included in the request.
 */
 var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
   "editors", "translators", "year", "publisher", "printer"];
-console.log("A");
 
 var visualQueue;
 
@@ -31,6 +30,12 @@ var BOOK_PERSONS_LASTNAME = [];
 var BOOK_PERSONS_FIRSTNAME = [];
 var COMPANIES = [];
 var GENRES = [];
+/**
+This is needed by the loadToForm method.
+
+Maps the creator type to the event handler used to add an entry to the creator list.
+*/
+var CREATOR_ADD_HANDLERS = {};
 
 function updateStatCounts(){
     $("#unsaved-count").text("" + visualQueue.getLength());
@@ -176,6 +181,14 @@ dependent on what is currently entered in the procy fields for this creator.
 TODO Test me
 */
 function renderContentCreatorListing(creatorType){
+    var hiddenLastnameProxy = document.createElement("input");
+    hiddenLastnameProxy.type = "hidden";
+    hiddenLastnameProxy.name = creatorType + "-lastname-proxy";
+
+    var hiddenFirstnameProxy = document.createElement("input");
+    hiddenFirstnameProxy.type = "hidden";
+    hiddenFirstnameProxy.name = creatorType + "-lastname-proxy";
+
     var divRow = document.createElement("div");
     $(divRow).addClass("row");
 
@@ -190,6 +203,8 @@ function renderContentCreatorListing(creatorType){
 
     var lastName = $("#" + creatorType + "-proxy-lastname").val().trim();
     var firstName = $("#" + creatorType + "-proxy-firstname").val().trim();
+    hiddenLastnameProxy.value = lastName;
+    hiddenFirstnameProxy.value = firstName;
     clearCreatorInput(creatorType);
     var nameElement = document.createElement("span");
     nameElement.innerHTML = lastName + ", " + firstName;
@@ -305,24 +320,14 @@ function sendSaveForm(domElement){
 TODO I thought of this method to automate my testing but I realized this could
 also be useful for a "reprocess" feature. If saving a book fails, you can reload
 the book's record into the form and redo what you think failed.
-
-FIXME
 */
 function loadToForm(reqData){
     
     function insertAllCreators(all, type){
         for(var i = 0; i < all.length; i++){
-            if(i != 0){
-                var creatorInput = renderContentCreatorListing(type);
-                $(creatorInput).find("[name='" + type + "-proxy-lastname']")
-                  .val(all[i].lastname);
-                $(creatorInput).find("[name='" + type + "-proxy-firstname']")
-                  .val(all[i].firstname);
-                document.getElementById(type + "-list").appendChild(creatorInput);
-            } else{
-                $("[name='" + type + "-proxy-lastname']").val(all[i].lastname);
-                $("[name='" + type + "-proxy-firstname']").val(all[i].firstname);
-            }
+            $("#" + type + "-proxy-firstname").val(all[i].firstname);
+            $("#" + type + "-proxy-lastname").val(all[i].lastname);
+            CREATOR_ADD_HANDLERS[type]();
         }
     }
 
@@ -359,10 +364,6 @@ $(document).ready(function(){
         return function(){
             var name = document.createElement("li");
             var inputLine = renderContentCreatorListing(creatorType);
-    
-            // Since we are adding something, we are sure that the list should now
-            // have deletable rows.
-            $("#" + creatorType + "-list .fa-minus-circle").removeClass("disabled");
     
             document.getElementById(creatorType + "-list").appendChild(inputLine);
         }
@@ -475,6 +476,6 @@ $(document).ready(function(){
     }, REPROCESS_INTERVAL);
 
     CREATORS.forEach(function(creatorTitle){
-        $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
-    });
-});
+        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
+        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+    }); });
