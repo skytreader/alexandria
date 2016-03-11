@@ -76,7 +76,6 @@ function renderSpine(){
     var isbn = $(allInputs).filter("#isbn-proxy");
     spine.id = isbn.val();
     var title = $(allInputs).filter("#title-proxy");
-    var authors = $(allInputs).filter("#authors-proxy");
 
     var isbnText = document.createElement("h3");
     isbnText.innerHTML = isbn.val();
@@ -110,12 +109,13 @@ function listNames(nameList){
 Get all the names entered for the given creator.
 
 This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
-it must be uuaranteed that the order of lastnames and firstnames returned is the
+it must be guaranteed that the order of lastnames and firstnames returned is the
 same.
 
 Returns a list of Person objects.
 */
 function getCreatorNames(creator){
+    console.info("looking for", creator);
     var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
     var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
     var persons = [];
@@ -183,11 +183,13 @@ TODO Test me
 function renderContentCreatorListing(creatorType){
     var hiddenLastnameProxy = document.createElement("input");
     hiddenLastnameProxy.type = "hidden";
-    hiddenLastnameProxy.name = creatorType + "-lastname-proxy";
+    hiddenLastnameProxy.name = creatorType + "-proxy-lastname";
+    console.info("created hidden field with name", hiddenLastnameProxy.name);
 
     var hiddenFirstnameProxy = document.createElement("input");
     hiddenFirstnameProxy.type = "hidden";
-    hiddenFirstnameProxy.name = creatorType + "-lastname-proxy";
+    hiddenFirstnameProxy.name = creatorType + "-proxy-firstname";
+    console.info("created hidden field with name", hiddenFirstnameProxy.name);
 
     var divRow = document.createElement("div");
     $(divRow).addClass("row");
@@ -219,6 +221,8 @@ function renderContentCreatorListing(creatorType){
 
     var listing = document.createElement("li");
     listing.appendChild(divRow);
+    listing.appendChild(hiddenLastnameProxy);
+    listing.appendChild(hiddenFirstnameProxy);
 
     return listing;
 }
