@@ -184,12 +184,10 @@ function renderContentCreatorListing(creatorType){
     var hiddenLastnameProxy = document.createElement("input");
     hiddenLastnameProxy.type = "hidden";
     hiddenLastnameProxy.name = creatorType + "-proxy-lastname";
-    console.info("created hidden field with name", hiddenLastnameProxy.name);
 
     var hiddenFirstnameProxy = document.createElement("input");
     hiddenFirstnameProxy.type = "hidden";
     hiddenFirstnameProxy.name = creatorType + "-proxy-firstname";
-    console.info("created hidden field with name", hiddenFirstnameProxy.name);
 
     var divRow = document.createElement("div");
     $(divRow).addClass("row");
@@ -347,6 +345,15 @@ function loadToForm(reqData){
     insertAllCreators(reqData.translators, "translator");
 }
 
+/**
+Clear all the user listings of their children li elements.
+*/
+function clearLists(){
+    for(var i = 0; i < CREATORS.length; i++){
+        $("#" + CREATORS[i] + "-list").empty();
+    }
+}
+
 $.validator.addMethod("isbnVal", function(value, element, param){
     var stripped = stripExtraneous(value);
     return verifyISBN10(stripped) || verifyISBN13(stripped);
@@ -451,6 +458,7 @@ $(document).ready(function(){
             window.visualQueue.prepend(spine);
             updateStatCounts();
             clearProxyForm();
+            clearLists();
         }
     });
 
