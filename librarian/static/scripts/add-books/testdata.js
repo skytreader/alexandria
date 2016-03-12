@@ -14,19 +14,23 @@ var FORM_DATA = {
 }
 
 var SANDMAN = {
-    "isbn": "1401231233",
-    "title": "Fables and Reflections",
+    "isbn": "1563891387",
+    "title": "The Sandman: Brief Lives",
     "genre": "Graphic Novel",
     "authors": [
         {"lastname": "Gaiman", "firstname": "Neil"}
     ],
     "illustrators": [
-        {"lastname": "Russell", "firstname": "P. Craig"},
+        {"lastname": "Locke", "firstname": "Vince"},
+        {"lastname": "McKean", "firstname": "Dave"},
         {"lastname": "Thompson", "firstname": "Jill"}
     ],
-    "editors": [],
+    "editors": [
+        {"lastname": "Berger", "firstname": "Karen"},
+        {"lastname": "Kahan", "firstname": "Bob"}
+    ],
     "translators": [],
     "publisher": "Vertigo",
     "printer": "Vertigo",
-    "year": "2011"
+    "year": "1994"
 }

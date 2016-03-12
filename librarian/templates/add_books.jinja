@@ -2,28 +2,29 @@
 
 {% macro render_creator_listing(creator_title) %}
 {% set listing_label = "".join((creator_title.capitalize(), "(s):")) %}
-<div class="grouped_input" id="{{ creator_title }}-block">
+<div class="grouped-input" id="{{ creator_title }}-block">
     <div class="row">
         <div class="col-md-11">
             <h3>{{ listing_label }}</h3>
         </div>
-        <div class="col-md-1 content-creator-buttons">
+    </div>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="input-group">
+                <input type="text" class="form-control single-liner-halves" placeholder="Last name" id="{{creator_title}}-proxy-lastname">
+                <input type="text" class="form-control single-liner-halves" placeholder="First name" id="{{creator_title}}-proxy-firstname">
+            </div>
+        </div>
+        <div class="col-md-1">
             <i class="fa fa-plus-circle fa-2x clickable" id="{{ creator_title }}-add"></i>
         </div>
     </div>
-    <span id="{{ creator_title }}-list">
-        <div class="row">
-            <div class="col-md-5">
-                <input type="text" name="{{ creator_title }}-proxy-lastname" placeholder="Lastname" class="form-control">
-            </div>
-            <div class="col-md-5">
-                <input type="text" name="{{ creator_title }}-proxy-firstname" placeholder="First name" class="form-control">
-            </div>
-            <div class="col-md-2">
-                <i class="fa fa-minus-circle fa-2x clickable disabled"></i>
-            </div>
+    <div class="row">
+        <div class="col-md-11">
+            <ul id="{{ creator_title }}-list" class="creator-name-list">
+            </ul>
         </div>
-    </span>
+    </div>
 </div>
 {% endmacro %}
 

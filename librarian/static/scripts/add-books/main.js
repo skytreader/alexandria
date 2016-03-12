@@ -19,7 +19,6 @@ is mapped to the Flask form. These are the fields to be included in the request.
 */
 var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
   "editors", "translators", "year", "publisher", "printer"];
-console.log("A");
 
 var visualQueue;
 
@@ -31,6 +30,12 @@ var BOOK_PERSONS_LASTNAME = [];
 var BOOK_PERSONS_FIRSTNAME = [];
 var COMPANIES = [];
 var GENRES = [];
+/**
+This is needed by the loadToForm method.
+
+Maps the creator type to the event handler used to add an entry to the creator list.
+*/
+var CREATOR_ADD_HANDLERS = {};
 
 function updateStatCounts(){
     $("#unsaved-count").text("" + visualQueue.getLength());
@@ -71,7 +76,6 @@ function renderSpine(){
     var isbn = $(allInputs).filter("#isbn-proxy");
     spine.id = isbn.val();
     var title = $(allInputs).filter("#title-proxy");
-    var authors = $(allInputs).filter("#authors-proxy");
 
     var isbnText = document.createElement("h3");
     isbnText.innerHTML = isbn.val();
@@ -105,12 +109,13 @@ function listNames(nameList){
 Get all the names entered for the given creator.
 
 This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
-it must be uuaranteed that the order of lastnames and firstnames returned is the
+it must be guaranteed that the order of lastnames and firstnames returned is the
 same.
 
 Returns a list of Person objects.
 */
 function getCreatorNames(creator){
+    console.info("looking for", creator);
     var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
     var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
     var persons = [];
@@ -169,63 +174,65 @@ function renderDeleteButton(){
     return container;
 }
 
-function renderNameInput(creatorType, namePart){
-    var placeholder = namePart.capitalize();
-    var textbox = document.createElement("input");
-    textbox.type = "text";
-    textbox.placeholder = placeholder;
-    $(textbox).addClass("form-control");
-    textbox.name = creatorType + "-proxy-" + namePart;
-
-    return textbox;
-}
-
 /**
-Create an "input line" for content creators.
+Create a list element for displaying a creator's name. The name displayed is
+dependent on what is currently entered in the procy fields for this creator.
+
+TODO Test me
 */
-function renderContentCreatorInput(creatorType){
-    var rowContainer = document.createElement("div");
-    $(rowContainer).addClass("row");
-    
-    var lastnameCol = document.createElement("div");
-    $(lastnameCol).addClass("col-md-5");
-    
-    var lastnameInput = renderNameInput(creatorType, "lastname");
-    lastnameCol.appendChild(lastnameInput);
+function renderContentCreatorListing(creatorType){
+    var hiddenLastnameProxy = document.createElement("input");
+    hiddenLastnameProxy.type = "hidden";
+    hiddenLastnameProxy.name = creatorType + "-proxy-lastname";
 
-    var firstnameCol = document.createElement("div");
-    $(firstnameCol).addClass("col-md-5");
+    var hiddenFirstnameProxy = document.createElement("input");
+    hiddenFirstnameProxy.type = "hidden";
+    hiddenFirstnameProxy.name = creatorType + "-proxy-firstname";
 
-    var firstnameInput = renderNameInput(creatorType, "firstname");
-    firstnameCol.appendChild(firstnameInput);
+    var divRow = document.createElement("div");
+    $(divRow).addClass("row");
 
-    var deleteCol = document.createElement("div");
-    $(deleteCol).addClass("col-md-2");
+    var delCol = document.createElement("div");
+    $(delCol).addClass("col-xs-1 del-col");
+
+    var nameCol = document.createElement("div");
+    $(nameCol).addClass("col-xs-11");
+
+    divRow.appendChild(delCol);
+    divRow.appendChild(nameCol);
+
+    var lastName = $("#" + creatorType + "-proxy-lastname").val().trim();
+    var firstName = $("#" + creatorType + "-proxy-firstname").val().trim();
+    hiddenLastnameProxy.value = lastName;
+    hiddenFirstnameProxy.value = firstName;
+    clearCreatorInput(creatorType);
+    var nameElement = document.createElement("span");
+    nameElement.innerHTML = lastName + ", " + firstName;
+
+    nameCol.appendChild(nameElement);
 
     var deleteButton = document.createElement("i");
-    $(deleteButton).addClass("fa fa-minus-circle fa-2x clickable");
-    $(deleteButton).click(recordDeleterFactory(creatorType));
-    
-    deleteCol.appendChild(deleteButton);
+    $(deleteButton).addClass("fa fa-times-circle")
+      .click(recordDeleterFactory(creatorType));
 
-    rowContainer.appendChild(lastnameCol);
-    rowContainer.appendChild(firstnameCol);
-    rowContainer.appendChild(deleteCol);
+    delCol.appendChild(deleteButton);
 
-    return rowContainer;
+    var listing = document.createElement("li");
+    listing.appendChild(divRow);
+    listing.appendChild(hiddenLastnameProxy);
+    listing.appendChild(hiddenFirstnameProxy);
+
+    return listing;
+}
+
+function clearCreatorInput(creatorType){
+    $("#" + creatorType + "-proxy-lastname").val("");
+    $("#" + creatorType + "-proxy-firstname").val("");
 }
 
 function recordDeleterFactory(creatorType){
     return function() {
-        if(document.getElementById(creatorType + "-list").children.length != 1){
-            $(this.parentNode.parentNode).remove();
-        }
-
-        // Check if after removing a row, we should disable deletions for
-        // the time being.
-        if(document.getElementById(creatorType + "-list").children.length == 1){
-            $("#" + creatorType + "-list .fa-minus-circle").addClass("disabled");
-        }
+        $(this.parentNode.parentNode).remove();
     }
 };
 
@@ -320,17 +327,9 @@ function loadToForm(reqData){
     
     function insertAllCreators(all, type){
         for(var i = 0; i < all.length; i++){
-            if(i != 0){
-                var creatorInput = renderContentCreatorInput(type);
-                $(creatorInput).find("[name='" + type + "-proxy-lastname']")
-                  .val(all[i].lastname);
-                $(creatorInput).find("[name='" + type + "-proxy-firstname']")
-                  .val(all[i].firstname);
-                document.getElementById(type + "-list").appendChild(creatorInput);
-            } else{
-                $("[name='" + type + "-proxy-lastname']").val(all[i].lastname);
-                $("[name='" + type + "-proxy-firstname']").val(all[i].firstname);
-            }
+            $("#" + type + "-proxy-firstname").val(all[i].firstname);
+            $("#" + type + "-proxy-lastname").val(all[i].lastname);
+            CREATOR_ADD_HANDLERS[type]();
         }
     }
 
@@ -344,6 +343,15 @@ function loadToForm(reqData){
     insertAllCreators(reqData.illustrators, "illustrator");
     insertAllCreators(reqData.editors, "editor");
     insertAllCreators(reqData.translators, "translator");
+}
+
+/**
+Clear all the user listings of their children li elements.
+*/
+function clearLists(){
+    for(var i = 0; i < CREATORS.length; i++){
+        $("#" + CREATORS[i] + "-list").empty();
+    }
 }
 
 $.validator.addMethod("isbnVal", function(value, element, param){
@@ -365,11 +373,8 @@ $(document).ready(function(){
     */
     function rendererFactory(creatorType){
         return function(){
-            var inputLine = renderContentCreatorInput(creatorType);
-    
-            // Since we are adding something, we are sure that the list should now
-            // have deletable rows.
-            $("#" + creatorType + "-list .fa-minus-circle").removeClass("disabled");
+            var name = document.createElement("li");
+            var inputLine = renderContentCreatorListing(creatorType);
     
             document.getElementById(creatorType + "-list").appendChild(inputLine);
         }
@@ -453,6 +458,7 @@ $(document).ready(function(){
             window.visualQueue.prepend(spine);
             updateStatCounts();
             clearProxyForm();
+            clearLists();
         }
     });
 
@@ -482,7 +488,6 @@ $(document).ready(function(){
     }, REPROCESS_INTERVAL);
 
     CREATORS.forEach(function(creatorTitle){
-        $("#" + creatorTitle + "-add").click(rendererFactory(creatorTitle));
-        $("#" + creatorTitle + "-list .fa-minus-circle").click(recordDeleterFactory(creatorTitle));
-    });
-});
+        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
+        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+    }); });
