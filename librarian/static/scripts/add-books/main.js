@@ -490,4 +490,11 @@ $(document).ready(function(){
     CREATORS.forEach(function(creatorTitle){
         CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
         $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+        $("#" + creatorTitle + "-proxy-firstname")
+          .keypress(function(e){
+              if(e.keyCode == 13){
+                  CREATOR_ADD_HANDLERS[creatorTitle]();
+                  $("#" + creatorTitle + "-proxy-lastname").focus();
+              }
+          });
     }); });
