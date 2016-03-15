@@ -211,14 +211,14 @@ def __get_first(x):
 @librarian_api.route("/api/list/genres")
 def list_genres():
     genres = db.session.query(Genre.name).all()
-    genres = map(__get_first, genres)
+    genres = [g for g, in genres]
     app.logger.debug("Got these genres" + str(genres))
     return flask.jsonify({"data": genres})
 
 @librarian_api.route("/api/list/companies")
 def list_companies():
     companies = db.session.query(BookCompany.name).all()
-    companies = map(__get_first, companies)
+    companies = [c for c, in companies]
     return flask.jsonify({"data": companies})
 
 @librarian_api.route("/api/list/persons")
