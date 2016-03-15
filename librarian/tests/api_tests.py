@@ -308,6 +308,10 @@ class ApiTests(AppTestCase):
         self.assertTrue(dateutil.parser.parse(data["now"]))
 
     def test_list_genres(self):
+        empty_genres = self.client.get("/api/list/genres")
+        data = json.loads(empty_genres.data)
+        self.assertEqual(set(), set(data["data"]))
+
         genres = [GenreFactory() for _ in range(8)]
 
         for g in genres:
@@ -323,6 +327,10 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_genre_set, genre_set)
 
     def test_list_companies(self):
+        empty_companies = self.client.get("/api/list/companies")
+        data = json.loads(empty_companies.data)
+        self.assertEqual(set(), set(data["data"]))
+
         companies = [BookCompanyFactory() for _ in range(8)]
 
         for c in companies:
