@@ -2,30 +2,38 @@
 
 {% macro render_card_catalog(book) %}
 <div class="panel panel-default">
-    <div class="panel-heading book-title">{{ book.title }}</div>
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-6 book-title">
+                <i class="fa fa-book"></i> {{ book.title }}
+            </div>
+            <div class="col-md-6 isbn">
+                ISBN: {{ book.isbn }}
+            </div>
+        </div>
+    </div>
     <div class="panel-body">
         {% if book.author %}
-            <p><strong>Authors:</strong>
+            <p><i class="fa fa-pencil-square-o"></i> <strong>Authors:</strong>
             {% for author in book.author %}
                 {{ author.lastname }}, {{ author.firstname }}.
             {% endfor %}
             </p>
         {% endif %}
         {% if book.translator %}
-            <p><strong>Translators:</strong>
+            <p><i class="fa fa-globe"></i> <strong>Translators:</strong>
             {% for translator in book.translator %}
                 {{ translator.lastname }}, {{ translator.firstname }}
             {% endfor %}
         {% endif %}
         {% if book.illustrator %}
-            <p><strong>Illustrators:</strong>
+            <p><i class="fa fa-picture-o"></i> <strong>Illustrators:</strong>
             {% for illustrator in book.illustrator %}
                 {{ illustrator.lastname }}, {{ illustrator.firstname }}.
             {% endfor %}
             </p>
         {% endif %}
         {{ book.publisher }}
-        <p>ISBN: {{ book.isbn }}</p>
     </div>
 </div>
 {% endmacro %}
