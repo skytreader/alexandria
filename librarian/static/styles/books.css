@@ -1,6 +1,14 @@
+.book-info{
+    font-size: 18px;
+}
+
 .book-title{
     font-size: 18px;
     font-weight: bold;
+}
+
+.creator-label{
+    text-align: right;
 }
 
 .isbn{

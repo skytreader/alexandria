@@ -12,26 +12,42 @@
             </div>
         </div>
     </div>
-    <div class="panel-body">
+    <div class="panel-body book-info">
         {% if book.author %}
-            <p><i class="fa fa-pencil-square-o"></i> <strong>Authors:</strong>
-            {% for author in book.author %}
-                {{ author.lastname }}, {{ author.firstname }}.
-            {% endfor %}
-            </p>
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-pencil-square-o"></i> <strong>Authors:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for author in book.author %}
+                        {{ author.lastname }}, {{ author.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
         {% if book.translator %}
-            <p><i class="fa fa-globe"></i> <strong>Translators:</strong>
-            {% for translator in book.translator %}
-                {{ translator.lastname }}, {{ translator.firstname }}
-            {% endfor %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-globe"></i> <strong>Translators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for translator in book.translator %}
+                        {{ translator.lastname }}, {{ translator.firstname }}
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
         {% if book.illustrator %}
-            <p><i class="fa fa-picture-o"></i> <strong>Illustrators:</strong>
-            {% for illustrator in book.illustrator %}
-                {{ illustrator.lastname }}, {{ illustrator.firstname }}.
-            {% endfor %}
-            </p>
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-picture-o"></i> <strong>Illustrators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for illustrator in book.illustrator %}
+                        {{ illustrator.lastname }}, {{ illustrator.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
         {{ book.publisher }}
     </div>
