@@ -62,6 +62,48 @@ function fillGenres(){
     });
 }
 
+function fillCompanies(){
+    $.ajax("/api/list/companies", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            window.COMPANIES = data["data"]
+            $("#publisher-proxy").autocomplete({
+                source: window.COMPANIES
+            });
+            $("#printer-proxy").autocomplete({
+                source: window.COMPANIES
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillCompanies, 8000)
+        }
+    });
+}
+
+function fillNames(){
+    $.ajax("/api/list/persons", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            var allNames = data["data"];
+            window.BOOK_PERSONS_LASTNAME = _.map(function(x){return x["lastname"]},
+              allNames);
+            window.BOOK_PERSONS_FIRSTNAME = _.map(function(x){return x["firstname"]},
+              allNames);
+
+            $(".auto-lastname").autocomplete({
+                source: window.BOOK_PERSONS_LASTNAME
+            });
+
+            $(".auto-firstname").autocomplete({
+                source: window.BOOK_PERSONS_FIRSTNAME
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillNames, 8000);
+        }
+    });
+}
+
 /**
 Renders the "spine" display of the book list. Takes data from the proxy form
 directly.
@@ -432,6 +474,8 @@ $(document).ready(function(){
     });
 
     fillGenres();
+    fillCompanies();
+    fillNames();
 
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
