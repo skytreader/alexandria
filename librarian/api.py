@@ -95,8 +95,6 @@ def book_adder():
             editors = __create_bookperson(form.editors.data)
             translators = __create_bookperson(form.translators.data)
 
-            #FIXME This part is shaky
-            #FIXME I think we should cache.
             author_role = Role.get_preset_role("Author")
             illus_role = Role.get_preset_role("Illustrator")
             editor_role = Role.get_preset_role("Editor")
