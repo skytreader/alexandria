@@ -85,10 +85,10 @@ function fillNames(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
-            window.BOOK_PERSONS_LASTNAME = _.map(function(x){return x["lastname"]},
-              allNames);
-            window.BOOK_PERSONS_FIRSTNAME = _.map(function(x){return x["firstname"]},
-              allNames);
+            window.BOOK_PERSONS_LASTNAME = _.map(allNames,
+              function(x){return x["lastname"]});
+            window.BOOK_PERSONS_FIRSTNAME = _.map(allNames,
+              function(x){return x["firstname"]});
 
             $(".auto-lastname").autocomplete({
                 source: window.BOOK_PERSONS_LASTNAME
