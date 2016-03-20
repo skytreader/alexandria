@@ -15,3 +15,7 @@ div.legend{
 .creator-name-list li .del-col{
     text-align: center;
 }
+
+.del-col .fa-times-circle{
+    cursor: pointer;
+}
