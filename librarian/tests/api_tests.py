@@ -301,6 +301,43 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(single_rv._status_code, 200)
 
+    def test_multiple_same_names(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        single_author = {
+            "isbn": "9780062330260",
+            "title": "Trigger Warning",
+            "genre": "Short Story Collection",
+            "authors": """[
+                {
+                    "lastname": "Gaiman",
+                    "firstname": "Neil"
+                },
+                {
+                    "lastname": "Gaiman",
+                    "firstname": "Neil"
+                }
+            ]""",
+            "illustrators": "[]",
+            "editors": "[]",
+            "translators": "[]",
+            "publisher": "Wiliam Morrow",
+            "printer": "",
+            "year": "2015"
+        }
+
+        single_rv = self.client.post("/api/book_adder", data=single_author)
+        self.assertEquals(200, single_rv.status_code)
+        
+        gaimen = (librarian.db.session.query(BookPerson)
+          .filter(BookPerson.firstname == 'Neil')
+          .filter(BookPerson.lastname == 'Gaiman').all())
+
+        self.assertEquals(1, len(gaimen))
+
     def test_servertime(self):
         servertime = self.client.get("/api/util/servertime")
         self.assertEquals(servertime._status_code, 200)
