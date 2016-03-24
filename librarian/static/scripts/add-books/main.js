@@ -434,6 +434,7 @@ $(document).ready(function(){
         True if a book record was loaded successfuly into the actual form.
     */
     function loadFromQueueToForm(queue){
+        clearActualForm();
         var fromQ = queue.dequeue();
     
         if(fromQ){
