@@ -308,9 +308,23 @@ saved.
     The book spine representing the book to be sent, as a DOM element.
 */
 function sendSaveForm(domElement){
+    var authors = JSON.parse(document.getElementById("authors").value);
+    var illustrators = JSON.parse(document.getElementById("illustrators").value);
+    var editors = JSON.parse(document.getElementById("editors").value);
+    var translators = JSON.parse(document.getElementById("translators").value);
+    var possibleNewNames = [authors, illustrators, editors, translators];
 
     function success(){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
+        _.forEach(possibleNewNames, function(newNames){
+            _.forEach(newNames, function(person){
+                if(!BOOK_PERSONS_SET.has(person)){
+                    BOOK_PERSONS_SET.add(person);
+                    BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
+                    BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                }
+            });
+        });
         window.booksSaved++;
     }
 

@@ -92,6 +92,8 @@ class ApiTests(AppTestCase):
         self.verify_does_not_exist(Genre, name="English 12")
         self.verify_does_not_exist(BookPerson, lastname="Pérez-Reverte",
           firstname="Arturo")
+        self.verify_does_not_exist(BookPerson, lastname="de Onís",
+          firstname="Harriet")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
 
@@ -107,7 +109,12 @@ class ApiTests(AppTestCase):
             ]""",
             "illustrators": "[]",
             "editors": "[]",
-            "translators": "[]",
+            "translators": """[
+                {
+                    "lastname": "de Onís",
+                    "firstname": "Harriet"
+                }
+            ]""",
             "publisher": "Scholastic",
             "printer": "UP Press",
             "year": "2013"
