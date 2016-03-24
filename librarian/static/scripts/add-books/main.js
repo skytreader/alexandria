@@ -28,6 +28,7 @@ var booksReprocessable = 0;
 
 var BOOK_PERSONS_LASTNAME = [];
 var BOOK_PERSONS_FIRSTNAME = [];
+var BOOK_PERSONS_SET = new Set();
 var COMPANIES = [];
 var GENRES = [];
 /**
@@ -85,6 +86,7 @@ function fillNames(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
+            BOOK_PERSONS_SET.addAll(allNames);
             window.BOOK_PERSONS_LASTNAME = _.map(allNames,
               function(x){return x["lastname"]});
             window.BOOK_PERSONS_FIRSTNAME = _.map(allNames,
@@ -181,7 +183,7 @@ map the Book object to its visual representation.
 
 @param spineDom
     The DOM element representing the book spine. This is just necessary for
-    mapping.
+    mapping, which in turn is necessary for the reprocess function.
 */
 function internalizeBook(spineDom){
     var allInputs = $("#proxy-form input");
@@ -299,17 +301,6 @@ function removeBlock(e){
 }
 
 /**
-Clear the actual form.
-
-It is important to clear the actual form after every send to server. Else,
-we might get mixed data! (Consider the scenario where a record with an illustrator
-follows a record with no illustrator.)
-*/
-function clearActualForm(){
-    $("#main-form input").not("csrf_token").val("");
-}
-
-/**
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
 
@@ -420,6 +411,17 @@ $(document).ready(function(){
     
             document.getElementById(creatorType + "-list").appendChild(inputLine);
         }
+    }
+
+    /**
+    Clear the actual form.
+    
+    It is important to clear the actual form after every send to server. Else,
+    we might get mixed data! (Consider the scenario where a record with an
+    illustrator follows a record with no illustrator.)
+    */
+    function clearActualForm(){
+        $("#main-form input").not("csrf_token").val("");
     }
 
     /**
