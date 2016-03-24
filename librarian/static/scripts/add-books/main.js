@@ -435,7 +435,7 @@ $(document).ready(function(){
     illustrator follows a record with no illustrator.)
     */
     function clearActualForm(){
-        $("#main-form input").not("csrf_token").val("");
+        $("#main-form input").not("#csrf_token").val("");
     }
 
     /**
