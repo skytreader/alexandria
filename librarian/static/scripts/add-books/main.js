@@ -87,10 +87,14 @@ function fillNames(){
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
             BOOK_PERSONS_SET.addAll(allNames);
-            window.BOOK_PERSONS_LASTNAME = _.map(allNames,
-              function(x){return x["lastname"]});
-            window.BOOK_PERSONS_FIRSTNAME = _.map(allNames,
-              function(x){return x["firstname"]});
+            var allLastnames = _.map(allNames, function(x){return x["lastname"]});
+            var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
+
+            var lastnameSet = new Set(allLastNames);
+            var firstnameSet = new Set(allFirstNames);
+
+            BOOK_PERSONS_LASTNAME = [...lastnameSet];
+            BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
 
             $(".auto-lastname").autocomplete({
                 source: window.BOOK_PERSONS_LASTNAME
@@ -320,8 +324,12 @@ function sendSaveForm(domElement){
             _.forEach(newNames, function(person){
                 if(!BOOK_PERSONS_SET.has(person)){
                     BOOK_PERSONS_SET.add(person);
-                    BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
-                    BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                    if(BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
+                        BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
+                    }
+                    if(BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
+                        BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                    }
                 }
             });
         });
