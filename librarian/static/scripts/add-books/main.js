@@ -340,8 +340,8 @@ function sendSaveForm(domElement){
         });
 
         _.forEach(possibleNewCompanies, function(company){
-            if(!COMPANIES.has(company)){
-                COMPANIES.add(company);
+            if(COMPANIES.indexOf(company) < 0){
+                COMPANIES.push(company);
             }
         });
         window.booksSaved++;
