@@ -90,8 +90,8 @@ function fillNames(){
             var allLastnames = _.map(allNames, function(x){return x["lastname"]});
             var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
 
-            var lastnameSet = new Set(allLastNames);
-            var firstnameSet = new Set(allFirstNames);
+            var lastnameSet = new Set(allLastnames);
+            var firstnameSet = new Set(allFirstnames);
 
             BOOK_PERSONS_LASTNAME = [...lastnameSet];
             BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
@@ -349,7 +349,7 @@ function sendSaveForm(domElement){
 
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
-        "isbn": stripExtraneous(document.getElementById("isbn").value),
+        "isbn": document.getElementById("isbn").value,
         "title": document.getElementById("title").value,
         "genre": document.getElementById("genre").value,
         "authors": document.getElementById("authors").value,
@@ -410,7 +410,7 @@ function clearLists(){
 }
 
 $.validator.addMethod("isbnVal", function(value, element, param){
-    var stripped = stripExtraneous(value);
+    var stripped = value.trim();
     return verifyISBN10(stripped) || verifyISBN13(stripped);
 }, "Invalid ISBN input.");
 

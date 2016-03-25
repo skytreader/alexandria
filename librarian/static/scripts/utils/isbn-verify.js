@@ -8,13 +8,6 @@ All inputs assume that it has been stripped of any extraneous
 characters like dashes or whitespace.
 */
 
-/**
-Leave only digits.
-*/
-function stripExtraneous(isbnInput){
-    return isbnInput.replace(/[\D]/g, "")
-}
-
 //TODO: Abstract ISBN verification.
 
 /**
