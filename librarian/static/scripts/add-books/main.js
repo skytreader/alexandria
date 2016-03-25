@@ -318,8 +318,13 @@ function sendSaveForm(domElement){
     var translators = JSON.parse(document.getElementById("translators").value);
     var possibleNewNames = [authors, illustrators, editors, translators];
 
+    var publisher = document.getElementById("publisher").value;
+    var printer = document.getElementById("printer").value;
+    var possibleNewCompanies = [publisher, printer];
+
     function success(){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
+
         _.forEach(possibleNewNames, function(newNames){
             _.forEach(newNames, function(person){
                 if(!BOOK_PERSONS_SET.has(person)){
@@ -332,6 +337,12 @@ function sendSaveForm(domElement){
                     }
                 }
             });
+        });
+
+        _.forEach(possibleNewCompanies, function(company){
+            if(!COMPANIES.has(company)){
+                COMPANIES.add(company);
+            }
         });
         window.booksSaved++;
     }
