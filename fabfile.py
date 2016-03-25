@@ -5,6 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 def reset_db_data():
+    """
+    Truncate all database tables.
+    """
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
@@ -25,6 +28,9 @@ def reset_db_data():
     insert_fixtures(engine, session)
 
 def destroy_db_tables():
+    """
+    Drop all database tables.
+    """
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
@@ -43,6 +49,9 @@ def destroy_db_tables():
     session.commit()
 
 def manual_test_cleanup():
+    """
+    Delete all tables in test database.
+    """
     engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
@@ -61,15 +70,29 @@ def manual_test_cleanup():
     session.commit()
 
 def dbdump():
+    """
+    Dump out local database to file. Assumes access to local mysql db via
+    passwordless root.
+    """
     local("mysqldump -u root alexandria > alexandria.sql")
 
 def destroy_database(is_test=False):
+    """
+    Drop the database. Pass `:is_test=True` to drop the test database instead.
+
+    Assumes access to local mysql db via passwordless root.
+    """
     if is_test:
         local('mysql -u root -e "DROP DATABASE alexandria_test"')
     else:
         local('mysql -u root -e "DROP DATABASE alexandria"')
 
 def create_database(is_test=False):
+    """
+    Create the database. Pass `:is_test=True` to create the test database.
+
+    Assumes access to local mysql db via passwordless root.
+    """
     if is_test: 
         local('mysql -u root -e "CREATE DATABASE alexandria_test DEFAULT CHARACTER SET = utf8"')
     else:
