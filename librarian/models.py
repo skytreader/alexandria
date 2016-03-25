@@ -124,7 +124,10 @@ class Book(UserTaggedBase):
       server_default=str(ISBN_START))
 
     def __init__(self, **kwargs):
-        publish_year = int(kwargs["publish_year"])
+        if not isbn_check(kwargs["isbn"]):
+            raise ConstraintError("Invalid ISBN" , self.isbn)
+
+        self.publish_year = int(kwargs["publish_year"])
         self.isbn = kwargs["isbn"]
         self.title = kwargs["title"]
         self.genre = kwargs["genre"]
@@ -132,18 +135,6 @@ class Book(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.printer = kwargs["printer"]
         self.publisher = kwargs["publisher"]
-        
-        # Check the publish year on ORM since not all SQL engines (mySQL, for
-        # one), check constraints. Support the Long Now Foundation!!!
-        pulish_year = int(kwargs["publish_year"])
-        if ISBN_START <= publish_year and publish_year <= LONG_NOW_WORLD_END:
-            self.publish_year = publish_year
-        else:
-            raise ConstraintError("bet. %d and %d" % (ISBN_START, LONG_NOW_WORLD_END),
-              publish_year)
-
-        if not isbn_check(self.isbn):
-            raise ConstraintError("Invalid ISBN" , self.isbn)
 
 class BookCompany(UserTaggedBase):
     """
