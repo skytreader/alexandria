@@ -1,24 +1,24 @@
 /*Global style definitions*/
 
 * {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 body {
-	background-color: #4c4039;
-	font-family: 'Droid Serif', serif;
-	position: absolute;
-	height: 100%;
-	width: 100%;
+    background-color: #4c4039;
+    font-family: 'Droid Serif', serif;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 h1 {
-	font-size: 28px;
+    font-size: 28px;
 }
 
 h2 {
-	font-size: 26px;
+    font-size: 26px;
 }
 
 h3 {
@@ -30,21 +30,21 @@ h4 {
 }
 
 hr {
-	color: #4c4039;
-	background-color: #4c4039;
-	width: 98.8%;
-	height: 3px;
-	border: 0px;
-	margin-bottom: 3px;
+    color: #4c4039;
+    background-color: #4c4039;
+    width: 98.8%;
+    height: 3px;
+    border: 0px;
+    margin-bottom: 3px;
 }
 
 p, .text {
-	font-size: 18px;
-	font-family: 'Droid Serif', serif;
-	text-align: justify;
-	padding-bottom: 8px;
-	padding-right: 10px;
-	color: #000000;
+    font-size: 18px;
+    font-family: 'Droid Serif', serif;
+    text-align: justify;
+    padding-bottom: 8px;
+    padding-right: 10px;
+    color: #000000;
 }
 
 label{
@@ -62,35 +62,35 @@ label{
 /*Boxes*/
 
 div.main_box {
-	background-color: #ffffff;
-	color: #000000;
-	width: 70%;
-	margin-left: 15%;
-	margin-right: 15%;
-	min-height: 100%;
-	float: left;
+    background-color: #ffffff;
+    color: #000000;
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    min-height: 100%;
+    float: left;
 }
 
 div.content_box {
-	margin: 5px;
-	float: left;
+    margin: 5px;
+    float: left;
     width: 99%;
 }
 
 div.navbox{
-	background-color: #4c4039;
-	color: #ffffff;
-	font-family: 'Droid Serif', serif;
-	font-size: 14px;
-	word-spacing: 20px;
-	margin-top: 10px;
+    background-color: #4c4039;
+    color: #ffffff;
+    font-family: 'Droid Serif', serif;
+    font-size: 14px;
+    word-spacing: 20px;
+    margin-top: 10px;
     padding: 5px 12px;
 }
 
 div.block{
-	float: none;
-	padding: 5px;
-	margin: 3px;
+    float: none;
+    padding: 5px;
+    margin: 3px;
 }
 
 div.queued_block{
@@ -129,8 +129,8 @@ div.grouped-input, div.input-group{
 }
 
 a.navbox{
-	color: #ffffff;
-	word-spacing: normal;
+    color: #ffffff;
+    word-spacing: normal;
 }
 
 label.input-holder{
@@ -139,7 +139,7 @@ label.input-holder{
 
 /*Forms*/
 input.search, select.search, option.search {
-	font-size: 16px;
+    font-size: 16px;
     padding: 10px;
 }
 
@@ -148,16 +148,16 @@ input.search, select.search, option.search {
 }
 
 /*input.btn {
-	padding: 5px;
-	border: solid 1px #2b2b2b;
+    padding: 5px;
+    border: solid 1px #2b2b2b;
 }*/
 
 input.btn:hover {
-	border-color: #d2c136;
+    border-color: #d2c136;
 }
 
 input.btn:active {
-	color: #fff;
+    color: #fff;
 }
 
 /*
@@ -172,10 +172,10 @@ input.special_label{
 }
 
 .btn-primary{
-	background-color: #2b2b2b;
+    background-color: #2b2b2b;
     background-image: none;
     text-shadow: none;
-	color: #d2c136;
+    color: #d2c136;
 }
 
 .btn-primary:hover{
@@ -183,8 +183,8 @@ input.special_label{
 }
 
 input.infrequent{
-	background-color: #896f62;
-	color: #000;
+    background-color: #896f62;
+    color: #000;
 }
 
 /*
