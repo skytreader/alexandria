@@ -542,28 +542,20 @@ $(document).ready(function(){
         }
     });
 
-    $("#autosave_label").click(function(){
-        document.getElementById("auto-save-toggle").checked = !document.getElementById("auto-save-toggle").checked;
-    });
-
     // Start the polling interval timers.
     setInterval(function(){
         console.debug("Polling main")
-        if(document.getElementById("auto-save-toggle").checked){
-            var foo = loadFromQueueToForm(window.bookQueue);
-            if(foo){
-                sendSaveForm(foo.domElement);
-            }
+        var foo = loadFromQueueToForm(window.bookQueue);
+        if(foo){
+            sendSaveForm(foo.domElement);
         }
     }, PROCESS_INTERVAL);
     
     setInterval(function(){
         console.debug("Polling reprocess");
-        if(document.getElementById("auto-save-toggle").checked){
-            var foo = loadFromQueueToForm(window.reprocessQueue);
-            if(foo){
-                sendSaveForm(foo.domElement);
-            }
+        var foo = loadFromQueueToForm(window.reprocessQueue);
+        if(foo){
+            sendSaveForm(foo.domElement);
         }
     }, REPROCESS_INTERVAL);
 
