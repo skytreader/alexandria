@@ -322,6 +322,8 @@ function sendSaveForm(domElement){
     var printer = document.getElementById("printer").value;
     var possibleNewCompanies = [publisher, printer];
 
+    var possibleNewGenre = document.getElementById("genre").value;
+
     function success(){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
 
@@ -342,6 +344,12 @@ function sendSaveForm(domElement){
         _.forEach(possibleNewCompanies, function(company){
             if(COMPANIES.indexOf(company) < 0){
                 COMPANIES.push(company);
+            }
+        });
+
+        _.forEach(possibleNewGenre, function(genre){
+            if(GENRES.indexOf(genre) < 0){
+                GENRES.push(genre);
             }
         });
         window.booksSaved++;
