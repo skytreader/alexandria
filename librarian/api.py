@@ -171,7 +171,7 @@ def get_books():
         offset = "0"
 
     bookq = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
-      BookPerson.firstname, Role.name).filter(Book.id == BookParticipant.book_id)
+      BookPerson.firstname, Role.name, Book.publisher.name).filter(Book.id == BookParticipant.book_id)
       .filter(BookParticipant.person_id == BookPerson.id)
       .filter(BookParticipant.role_id == Role.id))
 
@@ -197,7 +197,8 @@ def get_books():
                   "firstname": book[3]}]
         else:
             fmt = {"title": book[1],
-              role: [{"lastname": book[2], "firstname": book[3]}]}
+              role: [{"lastname": book[2], "firstname": book[3]}],
+              "publisher": book[5]}
 
             structured_catalog[book[0]] = fmt
 
