@@ -423,11 +423,15 @@ class ApiTests(AppTestCase):
 
     def test_get_books(self):
         book_persons = [BookPersonFactory() for _ in range(12)]
+        printers = [BookCompanyFactory() for _ in range(8)]
         person_ids = [bp.firstname for bp in book_persons]
 
         for bp in book_persons:
             bp.creator = self.admin_user.id
             librarian.db.session.add(bp)
+
+        for co in printers:
+            librarian.db.session.add(co)
 
         books = [BookFactory() for _ in range(12)]
         book_isbns = [b.isbn for b in books]
@@ -466,6 +470,7 @@ class ApiTests(AppTestCase):
                 library[rand_isbn]["title"] = rand_book.title
                 library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
                   "firstname": rand_person.firstname}]
+                library[rand_isbn]["publisher"] = rand_book.publisher
 
                 book = librarian.db.session.query(Book).filter(Book.id == rand_book.id).first()
                 bp = BookParticipant(book_id=rand_book.id,

@@ -10,7 +10,7 @@ fake = Faker()
 class BookFieldsProvider(BaseProvider):
     ADJECTIVES = ("beautiful", "wonderful", "abstruse", "astute", "bad", "good",
       "austere", "sinister", "jolly", "helpful", "ersatz", "slippery", "penultimate",
-      "unyielding", "intimidating", "wistful", "vile", "carmivorous", "miserable")
+      "unyielding", "intimidating", "wistful", "vile", "carnivorous", "miserable")
     NOUNS = ("computer", "formula", "equation", "waters", "rain", "fight",
       "hope", "dream", "love", "library", "book", "elevator", "hospital",
       "village", "academy", "goblet", "chamber", "carnival", "hero")
