@@ -33,7 +33,7 @@
     <h1>Add Books</h1>
     <p></p>
     <!-- This is the hidden "buffer" form, the actual form mapped from back-end. -->
-    <form method="POST" action="/book_adder" role="form" id="main-form">
+    <form method="POST" action="/add/books" role="form" id="main-form">
         {{ form.csrf_token }}
         {{ form.isbn() }}
         {{ form.title() }}

@@ -61,7 +61,7 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        single_rv = self.client.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author)
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -120,7 +120,7 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        single_rv = self.client.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author)
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -165,7 +165,7 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        single_rv = self.client.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author)
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -176,7 +176,7 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
-        duplicate = self.client.post("/api/book_adder", data=single_author)
+        duplicate = self.client.post("/api/add/books", data=single_author)
 
         self.assertEquals(duplicate._status_code, 409)
         
@@ -212,7 +212,7 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        req_val = self.client.post("/api/book_adder", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data)
         self.assertEqual(200, req_val.status_code)
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
@@ -277,7 +277,7 @@ class ApiTests(AppTestCase):
             "year": "2013"
         }
 
-        req_val = self.client.post("/api/book_adder", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data)
         self.assertEqual(200, req_val.status_code)
 
     def test_no_printer(self):
@@ -304,7 +304,7 @@ class ApiTests(AppTestCase):
             "year": "2015"
         }
 
-        single_rv = self.client.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author)
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -336,7 +336,7 @@ class ApiTests(AppTestCase):
             "year": "2015"
         }
 
-        single_rv = self.client.post("/api/book_adder", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author)
         self.assertEquals(200, single_rv.status_code)
         
         gaimen = (librarian.db.session.query(BookPerson)

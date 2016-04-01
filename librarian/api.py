@@ -18,8 +18,7 @@ import traceback
 
 """
 Convention:
-/api/* - large methods, might take some time, usually database transactions (with
-lots of writes)
+/api/add/* - add some records to the database
 /api/read/* - get data from backend
 /api/util/* - for utility functions. These functions are usually generic and can
 find use in any project.
@@ -51,7 +50,7 @@ def __create_bookperson(form_data):
         return None
 
 
-@librarian_api.route("/api/book_adder", methods=["POST"])
+@librarian_api.route("/api/add/books", methods=["POST"])
 @login_required
 def book_adder():
     """

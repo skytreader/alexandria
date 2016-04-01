@@ -379,7 +379,7 @@ function sendSaveForm(domElement){
         "printer": document.getElementById("printer").value,
         "year": document.getElementById("year").value
     }
-    $.ajax("/api/book_adder", {
+    $.ajax("/api/add/books", {
         "type": "POST",
         "data": data,
         "success": success,
