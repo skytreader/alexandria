@@ -49,7 +49,7 @@ function updateStatCounts(){
 I am not sure if this is a good idea.
 */
 function fillGenres(){
-    $.ajax("/api/list/genres", {
+    $.ajax("/api/read/genres", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             window.GENRES = data["data"];
@@ -64,7 +64,7 @@ function fillGenres(){
 }
 
 function fillCompanies(){
-    $.ajax("/api/list/companies", {
+    $.ajax("/api/read/companies", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             window.COMPANIES = data["data"]
@@ -82,7 +82,7 @@ function fillCompanies(){
 }
 
 function fillNames(){
-    $.ajax("/api/list/persons", {
+    $.ajax("/api/read/persons", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];

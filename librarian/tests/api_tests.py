@@ -352,7 +352,7 @@ class ApiTests(AppTestCase):
         self.assertTrue(dateutil.parser.parse(data["now"]))
 
     def test_list_genres(self):
-        empty_genres = self.client.get("/api/list/genres")
+        empty_genres = self.client.get("/api/read/genres")
         data = json.loads(empty_genres.data)
         self.assertEqual(set(), set(data["data"]))
 
@@ -364,14 +364,14 @@ class ApiTests(AppTestCase):
         librarian.db.session.flush()
         expected_genre_set = set([g.name for g in genres])
 
-        list_genres = self.client.get("/api/list/genres")
+        list_genres = self.client.get("/api/read/genres")
         data = json.loads(list_genres.data)
         genre_set = set(data["data"])
 
         self.assertEqual(expected_genre_set, genre_set)
 
     def test_list_companies(self):
-        empty_companies = self.client.get("/api/list/companies")
+        empty_companies = self.client.get("/api/read/companies")
         data = json.loads(empty_companies.data)
         self.assertEqual(set(), set(data["data"]))
 
@@ -383,7 +383,7 @@ class ApiTests(AppTestCase):
         librarian.db.session.flush()
         expected_company_set = set([c.name for c in companies])
 
-        list_companies = self.client.get("/api/list/companies")
+        list_companies = self.client.get("/api/read/companies")
         data = json.loads(list_companies.data)
         company_set = set(data["data"])
 
@@ -404,7 +404,7 @@ class ApiTests(AppTestCase):
             def __str__(self):
                 return self.lastname + ", " + self.firstname
 
-        empty = json.loads(self.client.get("/api/list/persons").data)
+        empty = json.loads(self.client.get("/api/read/persons").data)
         self.assertEqual(len(empty["data"]), 0)
 
         persons = [BookPersonFactory() for _ in range(8)]
@@ -415,7 +415,7 @@ class ApiTests(AppTestCase):
         librarian.db.session.flush()
         expected_person_set = set([Person(p.lastname, p.firstname) for p in persons])
 
-        list_persons = self.client.get("/api/list/persons")
+        list_persons = self.client.get("/api/read/persons")
         data = json.loads(list_persons.data)
         person_set = set([Person(p["lastname"], p["firstname"]) for p in data["data"]])
 
@@ -479,7 +479,7 @@ class ApiTests(AppTestCase):
                 librarian.db.session.add(bp)
                 librarian.db.session.flush()
 
-        get_books = self.client.get("/api/get/books")
+        get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)
         self.assertEquals(library, ret_data)

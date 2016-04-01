@@ -20,9 +20,8 @@ import traceback
 Convention:
 /api/* - large methods, might take some time, usually database transactions (with
 lots of writes)
-/api/get/* - get a list of objects that are composite of DB tables
-/api/list/* - get a list of objects from a single table in the DB.
-/api/util/* - for utility functions. These functions are usually generi and can
+/api/read/* - get data from backend
+/api/util/* - for utility functions. These functions are usually generic and can
 find use in any project.
 """
 
@@ -139,7 +138,7 @@ def book_adder():
 def servertime():
     return flask.jsonify({"now": str(datetime.now(tz=pytz.utc).isoformat())})
 
-@librarian_api.route("/api/get/books")
+@librarian_api.route("/api/read/books")
 def get_books():
     """
     Get a listing of books in the database.
@@ -169,6 +168,7 @@ def get_books():
           .filter(Role.name == role)
           .filter(Book.id == BookParticipant.book_id)
           .subqery())
+
     offset = request.args.get("offset")
     limit = request.args.get("limit")
 
@@ -214,20 +214,20 @@ def get_books():
 def __get_first(x):
     return x[0]
 
-@librarian_api.route("/api/list/genres")
+@librarian_api.route("/api/read/genres")
 def list_genres():
     genres = db.session.query(Genre.name).all()
     genres = [g for g, in genres]
     app.logger.debug("Got these genres" + str(genres))
     return flask.jsonify({"data": genres})
 
-@librarian_api.route("/api/list/companies")
+@librarian_api.route("/api/read/companies")
 def list_companies():
     companies = db.session.query(BookCompany.name).all()
     companies = [c for c, in companies]
     return flask.jsonify({"data": companies})
 
-@librarian_api.route("/api/list/persons")
+@librarian_api.route("/api/read/persons")
 def list_persons():
     persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
     persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
