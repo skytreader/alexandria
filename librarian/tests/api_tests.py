@@ -7,7 +7,7 @@ from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import make_name_object
+from librarian.tests.utils import make_name_object, create_library
 
 import dateutil.parser
 import factory
@@ -422,63 +422,8 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
-        book_persons = [BookPersonFactory() for _ in range(12)]
-        printers = [BookCompanyFactory() for _ in range(8)]
-        person_ids = [bp.firstname for bp in book_persons]
-
-        for bp in book_persons:
-            bp.creator = self.admin_user.id
-            librarian.db.session.add(bp)
-
-        for co in printers:
-            librarian.db.session.add(co)
-
-        books = [BookFactory() for _ in range(12)]
-        book_isbns = [b.isbn for b in books]
-
-        for b in books:
-            librarian.db.session.add(b)
-
-        librarian.db.session.commit()
-        library = {}
-        # Randomly assign persons to books as roles
-        roles = self.ROLE_IDS.keys()
-
-        for _ in range(32):
-            rand_isbn = random.choice(book_isbns)
-            rand_book = librarian.db.session.query(Book).filter(Book.isbn == rand_isbn).first()
-            rand_person_id = random.choice(person_ids)
-            rand_person = librarian.db.session.query(BookPerson).filter(BookPerson.firstname == rand_person_id).first()
-            rand_role = random.choice(roles)
-            _role = rand_role.lower()
-
-            if library.get(rand_isbn):
-                if library[rand_isbn].get(_role):
-                    library[rand_isbn][_role].append({"lastname": rand_person.lastname,
-                      "firstname": rand_person.firstname})
-                else:
-                    library[rand_isbn][_role] = [{"lastname": rand_person. lastname,
-                      "firstname": rand_person.firstname},]
-
-                bp = BookParticipant(book_id=rand_book.id,
-                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
-                  creator=self.admin_user.id)
-                librarian.db.session.add(bp)
-                librarian.db.session.flush()
-            else:
-                library[rand_isbn] = {}
-                library[rand_isbn]["title"] = rand_book.title
-                library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
-                  "firstname": rand_person.firstname}]
-                library[rand_isbn]["publisher"] = rand_book.publisher
-
-                book = librarian.db.session.query(Book).filter(Book.id == rand_book.id).first()
-                bp = BookParticipant(book_id=rand_book.id,
-                  person_id=rand_person.id, role_id=self.ROLE_IDS[rand_role],
-                  creator=self.admin_user.id)
-                librarian.db.session.add(bp)
-                librarian.db.session.flush()
-
+        create_library(librarian.db.session, self.admin_user, self.ROLE_IDS, book_person_c=12,
+          company_c=8, book_c=12, participant_c=32)
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)
