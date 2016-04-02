@@ -19,6 +19,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
   participant_c=8):
     """
     Create a library in the database with the given counts.
+
+    Returns a map representing the structure of the library.
     """
     book_persons = [BookPersonFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
@@ -59,8 +61,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
                   "firstname": rand_person.firstname},]
 
             bp = BookParticipant(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_maps[rand_role],
-              creator=self.admin_user.id)
+              person_id=rand_person.id, role_id=role_map[rand_role],
+              creator=admin.id)
             session.add(bp)
             session.flush()
         else:
@@ -72,7 +74,9 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
             bp = BookParticipant(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_maps[rand_role],
-              creator=self.admin_user.id)
+              person_id=rand_person.id, role_id=role_map[rand_role],
+              creator=admin.id)
             session.add(bp)
             session.flush()
+
+    return library
