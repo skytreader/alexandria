@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user
@@ -428,3 +430,23 @@ class ApiTests(AppTestCase):
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)
         self.assertEquals(library, ret_data)
+
+    def test_stats(self):
+        person_count = 44
+        company_count = 9
+        book_count = 28
+        participant_count = 33
+        library = create_library(librarian.db.session, self.admin_user,
+          self.ROLE_IDS, book_person_c=person_count, company_c=company_count,
+          book_c=book_count, participant_c=participant_count)
+
+        get_stats = self.client.get("/api/util/stats")
+        stats = json.loads(get_stats.data)
+        
+        self.assertEquals(200, get_stats._status_code)
+        
+        persons_per_book = person_count / book_count
+        self.assertEquals(persons_per_book, stats.get("persons_per_book"))
+        
+        participants_per_book = participant_count / book_count
+        self.assertEquals(participants_per_book, stats.get("participants_per_book"))

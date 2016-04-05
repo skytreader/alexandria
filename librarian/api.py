@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 from datetime import datetime
 
 from librarian import app, db
@@ -20,8 +22,9 @@ import traceback
 Convention:
 /api/add/* - add some records to the database
 /api/read/* - get data from backend
-/api/util/* - for utility functions. These functions are usually generic and can
-find use in any project.
+/api/util/* - for utility functions. Functions that are usually and can find use
+in any project may go here but this namespace can also house project-specific
+utilities.
 """
 
 librarian_api = Blueprint("librarian_api", __name__)
@@ -231,3 +234,7 @@ def list_persons():
     persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
     persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
     return flask.jsonify({"data": persons})
+
+@librarian_api.route("/api/util/stats")
+def quick_stats():
+    return flask.jsonify({})
