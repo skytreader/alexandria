@@ -445,8 +445,5 @@ class ApiTests(AppTestCase):
         
         self.assertEquals(200, get_stats._status_code)
         
-        persons_per_book = person_count / book_count
-        self.assertEquals(persons_per_book, stats.get("persons_per_book"))
-        
         participants_per_book = participant_count / book_count
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))

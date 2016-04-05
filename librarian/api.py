@@ -237,4 +237,6 @@ def list_persons():
 
 @librarian_api.route("/api/util/stats")
 def quick_stats():
-    return flask.jsonify({})
+    books = len(db.session.query(Book).all())
+    contributors = len(db.session.query(BookParticipant).all())
+    return flask.jsonify({"participants_per_book": (contributors / books)})
