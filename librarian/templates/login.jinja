@@ -8,7 +8,7 @@
                 {{ message }}
             {% endfor %}
             <form method="POST" action="/login/" role="form">
-                <div class="input-group input-group-lg" style="width: 100%;">
+                <div class="form-group-lg" style="width: 100%;">
                     {{ form.csrf_token }}
                     Username:<br>
                     {{ form.librarian_username(autofocus="", placeholder="Username", class="form-control") }}<br>
