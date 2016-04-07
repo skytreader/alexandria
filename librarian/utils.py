@@ -39,3 +39,11 @@ def isbn_check(isbn):
 
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())
+
+def stats_adjective(val):
+    if 1 <= val < 2:
+        return "focused"
+    elif 2 <= val < 3:
+        return "collaborative"
+    else:
+        return "diverse"
