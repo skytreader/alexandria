@@ -428,8 +428,8 @@ class ApiTests(AppTestCase):
           self.ROLE_IDS, book_person_c=12, company_c=8, book_c=12, participant_c=32)
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
-        ret_data = json.loads(get_books.data)
-        self.assertEquals(library, ret_data)
+        ret_data = json.loads(get_books.data)["data"]
+        self.assertEquals(set(library), set(ret_data))
 
     def test_stats(self):
         person_count = 44

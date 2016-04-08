@@ -20,7 +20,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     """
     Create a library in the database with the given counts.
 
-    Returns a map representing the structure of the library.
+    Returns a map representing the structure of the library as a list of
+    dictionaries where the dictionary will have the following fields:
     """
     book_persons = [BookPersonFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
@@ -78,5 +79,12 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
               creator=admin.id)
             session.add(bp)
             session.flush()
+
+    library_list = []
+
+    for isbn in library.keys():
+        book = library[isbn]
+        book["isbn"] = isbn
+        library_list.insert(0, book)
 
     return library

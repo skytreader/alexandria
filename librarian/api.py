@@ -211,8 +211,15 @@ def get_books():
 
             structured_catalog[book[0]] = fmt
 
-    return flask.jsonify(structured_catalog)
+    book_listing = []
 
+    for isbn in structured_catalog.keys():
+        book = structured_catalog[isbn]
+        book["isbn"] = isbn
+        book_listing.insert(0, book)
+
+    return flask.jsonify({"data": book_listing})
+1
 def __get_first(x):
     return x[0]
 

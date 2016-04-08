@@ -77,13 +77,8 @@ def add_books():
 def show_books():
     from librarian.api import get_books
 
-    books = json.loads(get_books().data)
-    book_list = []
-
-    for isbn in books.keys():
-        books[isbn]["isbn"] = isbn
-        book_list.append(books[isbn])
+    books = json.loads(get_books().data)["data"]
     scripts = ("show-books/main.js",)
     styles = ("books.css",)
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
-      books=book_list)
+      books=books)
