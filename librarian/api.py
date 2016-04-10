@@ -9,6 +9,7 @@ from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 import config
@@ -241,6 +242,28 @@ def list_persons():
     persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
     persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
     return flask.jsonify({"data": persons})
+
+def get_top_contributors(contrib_type, limit=4):
+    top = (db.session.query(BookPerson.id, BookPerson.lastname,
+      BookPerson.firstname,
+      func.count(BookParticipant.book_id).label("contrib_count"))
+      .filter(BookPerson.id==BookParticipant.person_id)
+      .filter(BookParticipant.role_id==Role.id)
+      .filter(Role.name==contrib_type)
+      .group_by(BookPerson.id).order_by("contrib_count").limit(limit)
+      .all())
+
+    return top
+
+def get_recent_contributors(contrib_type, limit=4):
+    top = (db.session.query(BookPerson.id, BookPerson.lastname,
+      BookPerson.firstname, BookParticipant.created_at)
+      .filter(BookPerson.id==BookParticipant.person_id)
+      .filter(BookParticipant.role_id==Role.id)
+      .filter(Role.name==contrib_type)
+      .order_by(BookParticipant.created_at).limit(limit).all())
+    
+    return top
 
 @librarian_api.route("/api/util/stats")
 def quick_stats():
