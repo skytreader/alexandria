@@ -9,7 +9,7 @@ from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import make_name_object, create_library
+from librarian.tests.utils import LibraryEntry, make_name_object, create_library
 
 import dateutil.parser
 import factory
@@ -429,7 +429,12 @@ class ApiTests(AppTestCase):
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]
-        self.assertEquals(set(library), set(ret_data))
+        return_set = set()
+        
+        for book in ret_data:
+            return_set.add(LibraryEntry(**book))
+
+        self.assertEquals(set(library), return_set)
 
     def test_stats(self):
         person_count = 44

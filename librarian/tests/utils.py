@@ -12,6 +12,35 @@ import string
 PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
 fuzzy_text = FuzzyText()
 
+class LibraryEntry(object):
+    """
+    Object with the following fields:
+
+      - isbn
+      - title
+      - author*: list of dictionaries with `lastname` and `firstname` fields.
+      - illustrator*: list of dictionaries with `lastname` and `firstname` fields.
+      - editor*: list of dictionaries with `lastname` and `firstname` fields.
+      - translator*: list of dictionaries with `lastname` and `firstname` fields.
+      - publisher
+
+    * May contain `None` if applicable.
+    """
+    
+    def __init__(self, isbn=None, title=None, author=None, illustrator=None,
+      editor=None, translator=None, publisher=None):
+        self.isbn = isbn
+        self.title = title
+        self.author = author
+        self.illustrator = illustrator
+        self.translator = translator
+        self.publisher = publisher
+
+    def __eq__(self, le):
+        return (self.isbn == le.isbn and self.title == le.title and
+          self.author == le.author and self.illustrator == le.illustrator and
+          self.translator == le.translator and self.publisher == le.publisher)
+
 def make_name_object():
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
 
@@ -20,8 +49,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     """
     Create a library in the database with the given counts.
 
-    Returns a map representing the structure of the library as a list of
-    dictionaries where the dictionary will have the following fields:
+    Returns a list of `LibraryEntry` objects.
     """
     book_persons = [BookPersonFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
@@ -85,6 +113,6 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
-        library_list.insert(0, book)
+        library_list.insert(0, LibraryEntry(**book))
 
-    return library
+    return library_list
