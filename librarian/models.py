@@ -96,11 +96,11 @@ class UserTaggedBase(Base):
     __abstract__ = True
 
     @declared_attr
-    def creator(self):
+    def creator_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
     @declared_attr
-    def last_modifier(self):
+    def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
 class Genre(UserTaggedBase):
@@ -116,9 +116,9 @@ class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
-    genre = db.Column(db.Integer, db.ForeignKey("genres.id",
+    genre_id = db.Column(db.Integer, db.ForeignKey("genres.id",
       name="book_genre_fk"))
-    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    publisher_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="book_book_company_fk1"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
       server_default=str(ISBN_START))
@@ -150,9 +150,9 @@ class BookCompany(UserTaggedBase):
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
-    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk1"))
-    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    imprint_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk2"))
 
     def __init__(self, **kwargs):
