@@ -5,11 +5,12 @@ from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user
 from librarian.models import Book, BookCompany, BookParticipant, BookPerson, Genre
+from librarian.tests.dummies import LibraryEntry, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import LibraryEntry, make_name_object, create_library
+from librarian.tests.utils import make_name_object, create_library
 
 import dateutil.parser
 import factory
@@ -392,20 +393,6 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_company_set, company_set)
 
     def test_list_persons(self):
-        class Person:
-            def __init__(self, lastname, firstname):
-                self.lastname = lastname
-                self.firstname = firstname
-
-            def __eq__(self, p):
-                return p.lastname == self.lastname and p.firstname == self.firstname
-
-            def __hash__(self):
-                return hash((self.lastname, self.firstname))
-            
-            def __str__(self):
-                return self.lastname + ", " + self.firstname
-
         empty = json.loads(self.client.get("/api/read/persons").data)
         self.assertEqual(len(empty["data"]), 0)
 

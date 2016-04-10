@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
 from librarian.models import Book, BookPerson, BookParticipant
+from librarian.tests.dummies import LibraryEntry
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, BookPersonFactory,
 )
@@ -11,35 +12,6 @@ import string
 
 PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
 fuzzy_text = FuzzyText()
-
-class LibraryEntry(object):
-    """
-    Object with the following fields:
-
-      - isbn
-      - title
-      - author*: list of dictionaries with `lastname` and `firstname` fields.
-      - illustrator*: list of dictionaries with `lastname` and `firstname` fields.
-      - editor*: list of dictionaries with `lastname` and `firstname` fields.
-      - translator*: list of dictionaries with `lastname` and `firstname` fields.
-      - publisher
-
-    * May contain `None` if applicable.
-    """
-    
-    def __init__(self, isbn=None, title=None, author=None, illustrator=None,
-      editor=None, translator=None, publisher=None):
-        self.isbn = isbn
-        self.title = title
-        self.author = author
-        self.illustrator = illustrator
-        self.translator = translator
-        self.publisher = publisher
-
-    def __eq__(self, le):
-        return (self.isbn == le.isbn and self.title == le.title and
-          self.author == le.author and self.illustrator == le.illustrator and
-          self.translator == le.translator and self.publisher == le.publisher)
 
 def make_name_object():
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
