@@ -35,7 +35,13 @@ load the URL helper.
     <body>
         {% block body %}
             <div class="main_box">
-                <img src="/static/images/librarian.png" class="logo" />
+                {% if current_user.is_authenticated() %}
+                    <a href="/dashboard">
+                        <img src="/static/images/librarian.png" class="logo">
+                    </a>
+                {% else %}
+                    <img src="/static/images/librarian.png" class="logo">
+                {% endif %}
                 <div class="navbox">
                     <a class="navbox" href="/">Search</a>
                     <a class="navbox" href="/about">About</a>
