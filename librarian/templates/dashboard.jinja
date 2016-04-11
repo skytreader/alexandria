@@ -2,10 +2,29 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
     <h1>Welcome logged-in user</h1>
+    <hr>
     <h2>
-        <i class="fa fa-pie-chart"></i> Some quick stats
+        <i class="fa fa-bar-chart"></i> Some quick stats
     </h2>
-    <ul>
-        <li>{{ contrib_stat }}</li>
-    </ul>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p><i class="fa fa-pie-chart"></i> {{ contrib_stat }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>Newest books:</p>
+                    <ol class="text">
+                        {% for title in recent_books %}
+                            <li>{{ title }} </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

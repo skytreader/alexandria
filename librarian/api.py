@@ -261,12 +261,23 @@ def get_recent_contributors(contrib_type, limit=4):
       .filter(BookPerson.id==BookParticipant.person_id)
       .filter(BookParticipant.role_id==Role.id)
       .filter(Role.name==contrib_type)
-      .order_by(BookParticipant.created_at).limit(limit).all())
+      .order_by(BookParticipant.date_created).limit(limit).all())
     
     return top
 
+def get_recent_books(limit=4):
+    """
+    Returns a list of size `limit` containing the most recently added books.
+    """
+    top = db.session.query(Book.title).order_by(Book.date_created).limit(limit).all()
+
+    return [title for title, in top]
+
 @librarian_api.route("/api/util/stats")
 def quick_stats():
+    stats = {}
     books = len(db.session.query(Book).all())
     contributors = len(db.session.query(BookParticipant).all())
-    return flask.jsonify({"participants_per_book": (contributors / books)})
+    stats["participants_per_book"] = (contributors / books)
+    stats["recent_books"] = get_recent_books()
+    return flask.jsonify(stats)

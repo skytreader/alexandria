@@ -50,7 +50,10 @@ def dash():
     cpb_stat = ("%.2f. Your library features %.2f contributors per book. %s." %
       (stats["participants_per_book"], stats["participants_per_book"],
       contribs_per_book.title()))
-    return render_template("dashboard.jinja", contrib_stat=cpb_stat)
+    
+    recent_books = stats["recent_books"]
+
+    return render_template("dashboard.jinja", contrib_stat=cpb_stat, recent_books=recent_books)
 
 @librarian_bp.route("/logout")
 @login_required
