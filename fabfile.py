@@ -1,4 +1,7 @@
-from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TEST_DATABASE_URI
+from config import (
+  SQL_DB_NAME, SQL_TEST_DB_NAME, SQLALCHEMY_DATABASE_URI,
+  SQLALCHEMY_TEST_DATABASE_URI
+)
 from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
@@ -75,6 +78,28 @@ def dbdump():
     passwordless root.
     """
     local("mysqldump -u root alexandria > alexandria.sql")
+
+def clone_database():
+    """
+    Clone the database specified in config.py. Use when working with migrations.
+
+    The new database will be prefixed by the hash of the latest alembic revision.
+    """
+    from sqlalchemy import Table, MetaData
+    from sqlalchemy.sql import select
+
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    meta = MetaData(bind=engine)
+
+    alembic_version_table = Table("alembic_version", meta, autoload=True)
+    alembic_version = engine.execute(select([alembic_version_table])
+      .select_from(alembic_version_table)).first()[0]
+
+    new_db_name = '_'.join((SQL_DB_NAME, alembic_version))
+
+    local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
+    local("mysqldump -u root %s | mysql -u root %s" % (SQL_DB_NAME, new_db_name))
+    print "NOTE: Must reconfigure this branch to use %s instead" % new_db_name
 
 def destroy_database(is_test=False):
     """
