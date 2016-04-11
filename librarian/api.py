@@ -9,7 +9,7 @@ from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
-from sqlalchemy import func
+from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
 
 import config
@@ -261,7 +261,7 @@ def get_recent_contributors(contrib_type, limit=4):
       .filter(BookPerson.id==BookParticipant.person_id)
       .filter(BookParticipant.role_id==Role.id)
       .filter(Role.name==contrib_type)
-      .order_by(BookParticipant.date_created).limit(limit).all())
+      .order_by(desc(BookParticipant.date_created)).limit(limit).all())
     
     return top
 
@@ -269,7 +269,7 @@ def get_recent_books(limit=4):
     """
     Returns a list of size `limit` containing the most recently added books.
     """
-    top = db.session.query(Book.title).order_by(Book.date_created).limit(limit).all()
+    top = db.session.query(Book.title).order_by(desc(Book.date_created)).limit(limit).all()
 
     return [title for title, in top]
 

@@ -10,19 +10,19 @@
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <p><i class="fa fa-pie-chart"></i> {{ contrib_stat }}</p>
+                    <p><i class="fa fa-book"></i> Newest books:</p>
+                    <ol class="text">
+                        {% for title in recent_books %}
+                            <li>{{ title }} </li>
+                        {% endfor %}
+                    </ol>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <p>Newest books:</p>
-                    <ol class="text">
-                        {% for title in recent_books %}
-                            <li>{{ title }} </li>
-                        {% endfor %}
-                    </ol>
+                    <p><i class="fa fa-pie-chart"></i> {{ contrib_stat }}</p>
                 </div>
             </div>
         </div>
