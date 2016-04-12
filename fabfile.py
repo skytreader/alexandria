@@ -72,12 +72,12 @@ def manual_test_cleanup():
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
 
-def dbdump():
+def dbdump(dump_name="alexandria.sql"):
     """
     Dump out local database to file. Assumes access to local mysql db via
     passwordless root.
     """
-    local("mysqldump -u root alexandria > alexandria.sql")
+    local("mysqldump -u root alexandria > %s" % dump_name)
 
 def clone_database():
     """
@@ -85,6 +85,8 @@ def clone_database():
 
     The new database will be prefixed by the hash of the latest alembic revision.
     """
+    dbdump("alexandria_preclone.sql")
+    print "For accidents, the back-up `alexandria_preclone.sql` was created."
     from sqlalchemy import Table, MetaData
     from sqlalchemy.sql import select
 
