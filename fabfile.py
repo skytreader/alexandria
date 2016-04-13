@@ -123,6 +123,6 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root -e "CREATE DATABASE alexandria_test DEFAULT CHARACTER SET = utf8"')
+        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQLALCHEMY_TEST_DATABASE_URI)
     else:
-        local('mysql -u root -e "CREATE DATABASE alexandria DEFAULT CHARACTER SET = utf8"')
+        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQLALCHEMY_DATABASE_URI)
