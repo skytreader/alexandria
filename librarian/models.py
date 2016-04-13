@@ -208,7 +208,7 @@ class BookContribution(UserTaggedBase):
     __tablename__ = "book_contributions"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="book_participant_book_fk1"))
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+    contributor_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
       name="book_participant_book_person_fk1"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
       name="book_pariticipant_role_fk1"))

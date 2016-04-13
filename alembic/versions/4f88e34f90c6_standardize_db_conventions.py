@@ -54,6 +54,12 @@ def upgrade():
     op.alter_column("imprint", "mother_company", new_column_name="mother_company_id")
     op.alter_column("imprint", "imprint_company", new_column_name="imprint_company_id")
 
+    # Rename awkwardly-named tables
+    op.rename_table("book_persons", "contributors")
+    op.rename_table("book_participants", "book_contributions")
+
+    op.alter_column("book_contributions", "person_id", "contributor_id")
+
 
 def downgrade():
     # General creator_id -> creator
@@ -87,3 +93,9 @@ def downgrade():
     # Modifications for Imprint table
     op.alter_column("imprint", "mother_company_id", new_column_name="mother_company")
     op.alter_column("imprint", "imprint_company_id", new_column_name="imprint_company")
+
+    # Rename awkwardly-named tables
+    op.rename_table("contributors", "book_persons")
+    op.rename_table("book_contributions", "book_participants")
+
+    op.alter_column("book_participants", "contributor_id", "person_id")
