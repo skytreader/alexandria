@@ -4,7 +4,7 @@ from __future__ import division
 from datetime import datetime
 
 from librarian import app, db
-from librarian.forms import AddBooksForm
+from librarian.forms import AddBooksForm, EditBookForm
 from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
@@ -23,6 +23,7 @@ import traceback
 Convention:
 /api/add/* - add some records to the database
 /api/read/* - get data from backend
+/api/edit/* - edit data in the database
 /api/util/* - for utility functions. Functions that are usually and can find use
 in any project may go here but this namespace can also house project-specific
 utilities.
@@ -136,6 +137,30 @@ def book_adder():
             return "IntegrityError", 409
     
     return "Error", 400
+
+@librarian_api.route("/api/edit/books", methods=["POST"])
+@login_required
+def edit_book():
+    from flask.ext.login import current_user
+
+    form = EditBookForm(request.form)
+    app.logger.infp(str(form))
+    app.logger.debug(form.debug_validate())
+
+    # TODO Testme especially integrating foreign keys with db-standardization branch
+    if form.validate_on_submit():
+        book_id = int(form.book_id)
+        try:
+            # Update records in books table
+            publisher = get_or_create(BookCompany, will_commit=True, 
+              name=form.publisher.data, creator=current_user.get_id())
+            book = Book.query.get(book_id)
+            book.isbn = form.isbn.data
+            book.title = form.title.data
+            book.publish_year = form.year.data
+
+            # Delete the book_participants involved
+            BookParticipant.query.filter(BookParticipant.book_id == book_id).delete()
 
 @librarian_api.route("/api/util/servertime")
 def servertime():

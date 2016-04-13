@@ -51,3 +51,6 @@ class AddBooksForm(Form):
                 pass # it wasn't a form field os meh
 
         return "/".join(validations) + "/.validate_on_submit():" + str(self.validate_on_submit())
+
+class EditBookForm(AddBooksForm):
+    book_id = HiddenField("bookid", [Required(message="book id")])
