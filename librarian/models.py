@@ -161,8 +161,8 @@ class Imprint(UserTaggedBase):
         self.creator = kwargs["creator"]
         self.last_modifier = kwargs["creator"]
 
-class BookPerson(UserTaggedBase):
-    __tablename__ = "book_persons"
+class Contributor(UserTaggedBase):
+    __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
@@ -201,11 +201,11 @@ class Role(UserTaggedBase):
         return role
         
 
-class BookParticipant(UserTaggedBase):
+class BookContribution(UserTaggedBase):
     """
     Consider that 99% of books will need the same roles over and over. 
     """
-    __tablename__ = "book_participants"
+    __tablename__ = "book_contributions"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="book_participant_book_fk1"))
     person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",

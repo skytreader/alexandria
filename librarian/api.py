@@ -8,7 +8,7 @@ from librarian.forms import AddBooksForm
 from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
-from models import get_or_create, Book, BookCompany, BookParticipant, BookPerson, Genre, Role
+from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Role
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
@@ -44,7 +44,7 @@ def __create_bookperson(form_data):
         persons_created = []
 
         for parson in parse:
-            persons_created.insert(0, get_or_create(BookPerson, will_commit=True,
+            persons_created.insert(0, get_or_create(Contributor, will_commit=True,
               firstname=parson["firstname"], lastname=parson["lastname"],
               creator=current_user.get_id()))
 
@@ -91,7 +91,7 @@ def book_adder():
               publish_year=int(form.year.data))
             db.session.add(book)
 
-            # Create the BookPersons
+            # Create the Contributors
             authors = __create_bookperson(form.authors.data)
             illustrators = __create_bookperson(form.illustrators.data)
             editors = __create_bookperson(form.editors.data)
@@ -104,26 +104,26 @@ def book_adder():
 
             # Assign participation
             for author in authors:
-                author_part = BookParticipant(book_id=book.id,
+                author_part = BookContribution(book_id=book.id,
                   person_id=author.id, role_id=author_role.id,
                   creator=current_user.get_id())
                 db.session.add(author)
                 db.session.add(author_part)
 
             for illustrator in illustrators:
-                illus_part = BookParticipant(book_id=book.id,
+                illus_part = BookContribution(book_id=book.id,
                   person_id=illustrator.id, role_id=illus_role.id,
                   creator=current_user.get_id())
                 db.session.add(illus_part)
 
             for editor in editors:
-                editor_part = BookParticipant(book_id=book.id,
+                editor_part = BookContribution(book_id=book.id,
                   person_id=editor.id, role_id=editor_role.id,
                   creator=current_user.get_id())
                 db.session.add(editor_part)
 
             for translator in translators:
-                translator_part = BookParticipant(book_id=book.id,
+                translator_part = BookContribution(book_id=book.id,
                   person_id=translator.id, role_id=trans_role.id,
                   creator=current_user.get_id())
                 db.session.add(translator_part)
@@ -165,11 +165,11 @@ def get_books():
         500 - Standard server error.
     """
     def subq_generator(role):
-        return (db.session.query(Book.id, BookPerson.lastname, BookPerson.firstname)
-          .filter(BookPerson.id == BookParticipant.person_id)
-          .filter(BookParticipant.role_id == Role.id)
+        return (db.session.query(Book.id, Contributor.lastname, Contributor.firstname)
+          .filter(Contributor.id == BookContribution.person_id)
+          .filter(BookContribution.role_id == Role.id)
           .filter(Role.name == role)
-          .filter(Book.id == BookParticipant.book_id)
+          .filter(Book.id == BookContribution.book_id)
           .subqery())
 
     offset = request.args.get("offset")
@@ -180,10 +180,10 @@ def get_books():
     elif limit and not offset:
         offset = "0"
 
-    bookq = (db.session.query(Book.isbn, Book.title, BookPerson.lastname,
-      BookPerson.firstname, Role.name, Book.publisher.name).filter(Book.id == BookParticipant.book_id)
-      .filter(BookParticipant.person_id == BookPerson.id)
-      .filter(BookParticipant.role_id == Role.id))
+    bookq = (db.session.query(Book.isbn, Book.title, Contributor.lastname,
+      Contributor.firstname, Role.name, Book.publisher.name).filter(Book.id == BookContribution.book_id)
+      .filter(BookContribution.person_id == Contributor.id)
+      .filter(BookContribution.role_id == Role.id))
 
     if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
         bookq = bookq.limit(limit).offset(offset)
@@ -239,34 +239,34 @@ def list_companies():
 
 @librarian_api.route("/api/read/persons")
 def list_persons():
-    persons = db.session.query(BookPerson.lastname, BookPerson.firstname).all()
+    persons = db.session.query(Contributor.lastname, Contributor.firstname).all()
     persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
     return flask.jsonify({"data": persons})
 
 def get_top_contributors(contrib_type, limit=4):
-    top = (db.session.query(BookPerson.id, BookPerson.lastname,
-      BookPerson.firstname,
-      func.count(BookParticipant.book_id).label("contrib_count"))
-      .filter(BookPerson.id==BookParticipant.person_id)
-      .filter(BookParticipant.role_id==Role.id)
+    top = (db.session.query(Contributor.id, Contributor.lastname,
+      Contributor.firstname,
+      func.count(BookContribution.book_id).label("contrib_count"))
+      .filter(Contributor.id==BookContribution.person_id)
+      .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
-      .group_by(BookPerson.id).order_by("contrib_count").limit(limit)
+      .group_by(Contributor.id).order_by("contrib_count").limit(limit)
       .all())
 
     return top
 
 def get_recent_contributors(contrib_type, limit=4):
-    top = (db.session.query(BookPerson.id, BookPerson.lastname,
-      BookPerson.firstname, BookParticipant.created_at)
-      .filter(BookPerson.id==BookParticipant.person_id)
-      .filter(BookParticipant.role_id==Role.id)
+    top = (db.session.query(Contributor.id, Contributor.lastname,
+      Contributor.firstname, BookContribution.created_at)
+      .filter(Contributor.id==BookContribution.person_id)
+      .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
-      .order_by(BookParticipant.created_at).limit(limit).all())
+      .order_by(BookContribution.created_at).limit(limit).all())
     
     return top
 
 @librarian_api.route("/api/util/stats")
 def quick_stats():
     books = len(db.session.query(Book).all())
-    contributors = len(db.session.query(BookParticipant).all())
+    contributors = len(db.session.query(BookContribution).all())
     return flask.jsonify({"participants_per_book": (contributors / books)})

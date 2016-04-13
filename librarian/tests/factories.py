@@ -61,9 +61,9 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     printer = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
 
 
-class BookPersonFactory(factory.alchemy.SQLAlchemyModelFactory):
+class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
-        model = models.BookPerson
+        model = models.Contributor
         sqlalchemy_session = librarian.db.session
 
     id = factory.Sequence(lambda x: x)
