@@ -133,7 +133,7 @@ def book_adder():
 
             return "Accepted", 200
         except IntegrityError, ierr:
-            print traceback.format_exc()
+            app.logger.error(traceback.format_exc())
             return "IntegrityError", 409
     
     return "Error", 400
@@ -161,6 +161,9 @@ def edit_book():
 
             # Delete the book_participants involved
             BookParticipant.query.filter(BookParticipant.book_id == book_id).delete()
+        except IntegrityError, ierr:
+            app.logger.error(traceback.format_exc())
+            return "IntegrityError", 409
 
 @librarian_api.route("/api/util/servertime")
 def servertime():
