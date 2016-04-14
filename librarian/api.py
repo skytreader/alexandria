@@ -248,9 +248,6 @@ def get_books():
         book_listing.insert(0, book)
 
     return flask.jsonify({"data": book_listing})
-1
-def __get_first(x):
-    return x[0]
 
 @librarian_api.route("/api/read/genres")
 def list_genres():
