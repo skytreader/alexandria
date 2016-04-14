@@ -244,7 +244,7 @@ class Pseudonym(UserTaggedBase):
     Is this table ever going into any use?
     """
     __tablename__ = "pseudonyms"
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+    person_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
       name="pseudonym_book_person_fk1"))
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="pseudonym_book_fk1"))
