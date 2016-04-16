@@ -120,35 +120,31 @@ This function expects certain elements from the page. In particular, this needs
 that the elements described by `targetId` and `partnerId` also have the class
 `auto-lastname` xor `auto-firstname`, depending on their actual purpose.
 
-@param {strong} targetId
+@param {string} targetId
 @param {string} partnerId
 @throws If the page where this method is used does not conform to the expected
 stucture.
 */
 function setAutoComplete(targetId, partnerId){
+    function mapAndSet(partner, target){
+        var acSource = _.map(_.filter(BOOK_PERSONS, function(person){
+          return person[partner] == partnerElement.val();
+        }), function(person){
+          return person[target];
+        });
+        
+        $("#" + target).autocomplete({
+            source: acSource
+        });
+    }
+
     var partnerElement = $("#" + partnerId);
     var acSource;
 
     if(partnerElement.hasClass("auto-lastname")){
-        acSource = _.map(_.filter(BOOK_PERSONS, function(person){
-          return person["lastname"] == partnerElement.val()
-        }), function(person){
-          return person["firstname"];
-        });
-
-        $("#" + targetId).autocomplete({
-            source: acSource
-        });
+        mapAndSet("lastname", "firstname");
     } else if(partnerElement.hasClass("auto-firstname")){
-        acSource = _.map(_.filter(BOOK_PERSONS, function(person){
-            return person["firstname"] == partnerElement.val();
-        }), function(person){
-            return person["lastname"];
-        });
-
-        $("#" + targetId).autocomplete({
-            source: acSource
-        });
+        mapAndSet("firstname", "lastname");
     } else{
         throw "Missing expected elements."
     }
