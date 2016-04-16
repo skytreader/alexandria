@@ -126,7 +126,7 @@ that the elements described by `targetId` and `partnerId` also have the class
 stucture.
 */
 function setAutoComplete(targetId, partnerId){
-    var partnerElement = $("#" + partnerElement);
+    var partnerElement = $("#" + partnerId);
     var acSource;
 
     if(partnerElement.hasClass("auto-lastname")){
@@ -136,7 +136,7 @@ function setAutoComplete(targetId, partnerId){
           return person["firstname"];
         });
 
-        $(".auto-firstname").autocomplete({
+        $("#" + targetId).autocomplete({
             source: acSource
         });
     } else if(partnerElement.hasClass("auto-firstname")){
@@ -146,7 +146,7 @@ function setAutoComplete(targetId, partnerId){
             return person["lastname"];
         });
 
-        $(".auto-lastname").autocomplete({
+        $("#" + targetId).autocomplete({
             source: acSource
         });
     } else{
