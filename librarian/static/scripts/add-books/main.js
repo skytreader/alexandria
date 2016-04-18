@@ -126,14 +126,17 @@ that the elements described by `targetId` and `partnerId` also have the class
 stucture.
 */
 function setAutoComplete(targetId, partnerId){
+    console.log("setAutoComplete");
     function mapAndSet(partner, target){
         var acSource = _.map(_.filter(BOOK_PERSONS, function(person){
           return person[partner] == partnerElement.val();
         }), function(person){
           return person[target];
         });
+
+        console.log("set autocomplete of", targetId, "to", acSource);
         
-        $("#" + target).autocomplete({
+        $("#" + targetId).autocomplete({
             source: acSource
         });
     }
@@ -589,6 +592,13 @@ $(document).ready(function(){
             clearProxyForm();
             clearLists();
         }
+    });
+
+    $("#author-proxy-lastname").blur(function(){
+        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+    });
+    $("#author-proxy-firstname").blur(function(){
+        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
     });
 
     // Start the polling interval timers.
