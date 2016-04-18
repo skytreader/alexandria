@@ -126,7 +126,6 @@ that the elements described by `targetId` and `partnerId` also have the class
 stucture.
 */
 function setAutoComplete(targetId, partnerId){
-    console.log("setAutoComplete");
     function mapAndSet(partner, target){
         var acSource = _.map(_.filter(BOOK_PERSONS, function(person){
           return person[partner] == partnerElement.val();
@@ -134,11 +133,11 @@ function setAutoComplete(targetId, partnerId){
           return person[target];
         });
 
-        console.log("set autocomplete of", targetId, "to", acSource);
-        
-        $("#" + targetId).autocomplete({
-            source: acSource
-        });
+        if(acSource.length > 0){
+            $("#" + targetId).autocomplete({
+                source: acSource
+            });
+        }
     }
 
     var partnerElement = $("#" + partnerId);
