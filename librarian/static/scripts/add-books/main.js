@@ -595,10 +595,28 @@ $(document).ready(function(){
     });
 
     $("#author-proxy-lastname").blur(function(){
-        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
     });
     $("#author-proxy-firstname").blur(function(){
-        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+    });
+    $("#illustrator-proxy-lastname").blur(function(){
+        setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+    });
+    $("#illustrator-proxy-firstname").blur(function(){
+        setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+    });
+    $("#editor-proxy-lastname").blur(function(){
+        setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+    });
+    $("#editor-proxy-firstname").blur(function(){
+        setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+    });
+    $("#translator-proxy-lastname").blur(function(){
+        setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+    });
+    $("#translator-proxy-firstname").blur(function(){
+        setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 
     // Start the polling interval timers.
