@@ -18,15 +18,16 @@ import sys
 sys.path.append(os.getcwd())
 
 from alembic import op
+import librarian
 from librarian.models import ISBN_START
 import sqlalchemy as sa
 
 
 def upgrade():
     op.alter_column("librarians", "date_created",
-      server_default=sa.func.current_timestamp())
+      server_default=sa.func.current_timestamp(), type_=librarian.db.DateTime(True))
     op.alter_column("librarians", "date_modified",
-      server_default=sa.func.current_timestamp())
+      server_default=sa.func.current_timestamp(), type_=librarian.db.DateTime(True))
     op.alter_column("librarians", "can_read", server_default=db.false())
     op.alter_column("librarians", "can_write", server_default=db.false())
     op.alter_column("librarians", "can_exec", server_default=db.false())
