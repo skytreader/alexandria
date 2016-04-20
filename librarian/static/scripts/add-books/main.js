@@ -335,6 +335,26 @@ function clearProxyForm(){
 }
 
 /**
+@return {boolean} Returns true if the proxy form is all blank and if there is
+nothing left in both queues.
+*/
+function isWorkDone(){
+    // TODO Check the condition where there is a _pending_ HTTP request. Should
+    // this even handle that?
+    function isProxyFormEmpty(){
+        var proxyInputs = $("#proxy-form input");
+        var isEmpty = true;
+        _.forEach(proxyInputs, function(input){
+            isEmpty = input.value == "";
+            return isEmpty;
+        });
+        return isEmpty;
+    }
+    return bookQueue.getLength() == 0 && reprocessQueue.length == 0 &&
+      isProxyFormEmpty();
+}
+
+/**
 Remove the book spine that triggered the event.
 
 If the block is already saved to DB, delete the pertaining record as well. (UI
