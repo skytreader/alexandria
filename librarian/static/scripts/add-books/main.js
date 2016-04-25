@@ -157,8 +157,8 @@ function setAutoComplete(targetId, partnerId){
 Renders the "spine" display of the book list. Takes data from the proxy form
 directly.
 
-@return A div element which displays like a spine of a book. The div
-element has the isbn for its id.
+@return {HTMLElement} A div element which displays like a spine of a book. The
+div element has the isbn for its id.
 */
 function renderSpine(){
     var spine = document.createElement("div");
@@ -185,7 +185,7 @@ function renderSpine(){
 }
 
 /**
-Get a ;ist of persons and return a string to display them..
+Get a list of persons and return a string to display them..
 */
 function listNames(nameList){
     var names = [];
@@ -228,9 +228,9 @@ Append the book described in #proxy-form to the internal queue.
 The DOM element representing the book is a required parameter since we use it to
 map the Book object to its visual representation.
 
-@param spineDom
-    The DOM element representing the book spine. This is just necessary for
-    mapping, which in turn is necessary for the reprocess function.
+@param {HTMLElement} spineDom - the DOM element representing the book spine.
+  This is just necessary for mapping, which in turn is necessary for the
+  reprocess function.
 */
 function internalizeBook(spineDom){
     var allInputs = $("#proxy-form input");
@@ -252,8 +252,9 @@ function internalizeBook(spineDom){
 }
 
 /**
-Generates the delete button to be added at the end
-of every row record.
+Generates the delete button to be added at the end of every row record.
+
+@return {HTMLElement}
 */
 function renderDeleteButton(){
     var container = document.createElement("input");
@@ -270,6 +271,8 @@ Create a list element for displaying a creator's name. The name displayed is
 dependent on what is currently entered in the procy fields for this creator.
 
 TODO Test me
+
+@param {string} creatorType
 */
 function renderContentCreatorListing(creatorType){
     var hiddenLastnameProxy = document.createElement("input");
@@ -316,11 +319,17 @@ function renderContentCreatorListing(creatorType){
     return listing;
 }
 
+/**
+@param {string} creatorType
+*/
 function clearCreatorInput(creatorType){
     $("#" + creatorType + "-proxy-lastname").val("");
     $("#" + creatorType + "-proxy-firstname").val("");
 }
 
+/**
+@param {string} creatorType
+*/
 function recordDeleterFactory(creatorType){
     return function() {
         $(this.parentNode.parentNode).remove();
@@ -371,8 +380,8 @@ function removeBlock(e){
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
 
-@param domElement
-    The book spine representing the book to be sent, as a DOM element.
+@param {HTMLElement} domElement - the book spine representing the book to be
+  sent, as a DOM element.
 */
 function sendSaveForm(domElement){
     var authors = JSON.parse(document.getElementById("authors").value);
