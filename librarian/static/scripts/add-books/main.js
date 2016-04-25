@@ -565,6 +565,16 @@ $(document).ready(function(){
         return false;
     }
 
+    $(window).on("beforeunload", function(){
+        console.log("unload detected");
+        alert("leaving...");
+        if(!isWorkDone()){
+            alertify.confirm("Leaving...", "You are leaving the page with unsaved work. Continue?",
+              function(){}, function(){});
+        }
+        return "don't leave";
+    });
+
     $("#proxy-form").validate({
         rules:{
             "isbn-rule":{
