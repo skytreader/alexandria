@@ -354,12 +354,15 @@ function isWorkDone(){
         var proxyInputs = $("#proxy-form input");
         var isEmpty = true;
         _.forEach(proxyInputs, function(input){
-            isEmpty = input.value == "";
+            console.log(input);
+            isEmpty = _.isEmpty(input.value);
             return isEmpty;
         });
         return isEmpty;
     }
-    return bookQueue.getLength() == 0 && reprocessQueue.length == 0 &&
+    console.log(bookQueue.getLength());
+    console.log(reprocessQueue.getLength());
+    return bookQueue.getLength() == 0 && reprocessQueue.getLength() == 0 &&
       isProxyFormEmpty();
 }
 
