@@ -354,14 +354,11 @@ function isWorkDone(){
         var proxyInputs = $("#proxy-form input");
         var isEmpty = true;
         _.forEach(proxyInputs, function(input){
-            console.log(input);
             isEmpty = _.isEmpty(input.value);
             return isEmpty;
         });
         return isEmpty;
     }
-    console.log(bookQueue.getLength());
-    console.log(reprocessQueue.getLength());
     return bookQueue.getLength() == 0 && reprocessQueue.getLength() == 0 &&
       isProxyFormEmpty();
 }
@@ -568,14 +565,10 @@ $(document).ready(function(){
         return false;
     }
 
-    $(window).on("beforeunload", function(){
-        console.log("unload detected");
-        alert("leaving...");
+    $(window).bind("beforeunload", function(){
         if(!isWorkDone()){
-            alertify.confirm("Leaving...", "You are leaving the page with unsaved work. Continue?",
-              function(){}, function(){});
+            return "You are leaving the page with unsaved work.";
         }
-        return "don't leave";
     });
 
     $("#proxy-form").validate({
