@@ -171,10 +171,10 @@ class Imprint(UserTaggedBase):
     imprint_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk2"))
     
-    mother_company = relationship("BookCompany", "Imprint.mother_company_id")
+    mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
     #mother_company = relationship("BookCompany")
-    #imprint_company = relationship("BookCompany", "Imprint.imprint_company_id")
-    imprint_company = relationship("BookCompany")
+    imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
+    #imprint_company = relationship("BookCompany")
 
     def __init__(self, **kwargs):
         self.mother_company_id = kwargs["mother_company"]
