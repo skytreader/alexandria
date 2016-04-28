@@ -79,7 +79,7 @@ def upgrade():
     op.rename_table("book_persons", "contributors")
     op.rename_table("book_participants", "book_contributions")
 
-    op.alter_column("book_contributions", "person_id", "contributor_id",
+    op.alter_column("book_contributions", "person_id", new_column_name="contributor_id",
       existing_type=db.Integer)
 
 
@@ -95,9 +95,9 @@ def downgrade():
       existing_type=db.Integer)
     op.alter_column("imprints", "creator_id", new_column_name="creator",
       existing_type=db.Integer)
-    op.alter_column("book_persons", "creator_id", new_column_name="creator",
+    op.alter_column("contributors", "creator_id", new_column_name="creator",
       existing_type=db.Integer)
-    op.alter_column("book_participants", "creator_id", new_column_name="creator",
+    op.alter_column("book_contributions", "creator_id", new_column_name="creator",
       existing_type=db.Integer)
     op.alter_column("printers", "creator_id", new_column_name="creator",
       existing_type=db.Integer)
@@ -115,9 +115,9 @@ def downgrade():
       existing_type=db.Integer)
     op.alter_column("imprints", "last_modifier_id", new_column_name="last_modifier",
       existing_type=db.Integer)
-    op.alter_column("book_persons", "last_modifier_id", new_column_name="last_modifier",
+    op.alter_column("contributors", "last_modifier_id", new_column_name="last_modifier",
       existing_type=db.Integer)
-    op.alter_column("book_pariticipants", "last_modifier_id", new_column_name="last_modifier",
+    op.alter_column("book_contributions", "last_modifier_id", new_column_name="last_modifier",
       existing_type=db.Integer)
     op.alter_column("printers", "last_modifier_id", new_column_name="last_modifier",
       existing_type=db.Integer)
@@ -140,5 +140,5 @@ def downgrade():
     op.rename_table("contributors", "book_persons")
     op.rename_table("book_contributions", "book_participants")
 
-    op.alter_column("book_participants", "contributor_id", "person_id",
+    op.alter_column("book_participants", "contributor_id", new_column_name="person_id",
       existing_type=db.Integer)
