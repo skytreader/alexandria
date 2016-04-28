@@ -70,9 +70,9 @@ def upgrade():
       existing_type=db.Integer)
 
     # Modifications for Imprint table
-    op.alter_column("imprint", "mother_company", new_column_name="mother_company_id",
+    op.alter_column("imprints", "mother_company", new_column_name="mother_company_id",
       existing_type=db.Integer)
-    op.alter_column("imprint", "imprint_company", new_column_name="imprint_company_id",
+    op.alter_column("imprints", "imprint_company", new_column_name="imprint_company_id",
       existing_type=db.Integer)
 
     # Rename awkwardly-named tables
