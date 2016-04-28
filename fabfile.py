@@ -104,6 +104,7 @@ def clone_database():
     local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
     local("mysqldump -u root %s | mysql -u root %s" % (SQL_DB_NAME, new_db_name))
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
+    print "Don't forget to reconfigure alembic.ini as well!"
 
 def destroy_database(is_test=False):
     """
