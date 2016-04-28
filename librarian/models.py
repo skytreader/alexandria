@@ -104,17 +104,21 @@ class UserTaggedBase(Base):
     def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
-    @declared_attr
+    #@declared_attr
     def creator(self):
-        return relationship("Librarian", foreign_keys="UserTaggedBase.creator_id")
+        return relationship("Librarian",
+          foreign_keys=self.__class__.__name__ + ".creator_id")
 
-    @declared_attr
+    #@declared_attr
     def last_modifier(self):
-        return relationship("Librarian", foreign_keys="UserTaggedBase.last_modifier_id")
+        return relationship("Librarian",
+          foreign_keys=self.__class__.__name__ + ".last_modifier_id")
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
     name = db.Column(db.String(40), nullable=False, unique=True)
+    creator = relationship("Librarian", foreign_keys="Genre.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Genre.last_modifier_id")
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
@@ -168,7 +172,9 @@ class Imprint(UserTaggedBase):
       name="imprint_book_company_fk2"))
     
     mother_company = relationship("BookCompany", "Imprint.mother_company_id")
-    imporint_company = relationship("BookCompany", "Imprint.imprint_company_id")
+    #mother_company = relationship("BookCompany")
+    #imprint_company = relationship("BookCompany", "Imprint.imprint_company_id")
+    imprint_company = relationship("BookCompany")
 
     def __init__(self, **kwargs):
         self.mother_company_id = kwargs["mother_company"]
