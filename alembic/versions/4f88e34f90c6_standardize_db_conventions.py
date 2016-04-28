@@ -131,9 +131,9 @@ def downgrade():
       existing_type=db.Integer)
 
     # Modifications for Imprint table
-    op.alter_column("imprint", "mother_company_id", new_column_name="mother_company",
+    op.alter_column("imprints", "mother_company_id", new_column_name="mother_company",
       existing_type=db.Integer)
-    op.alter_column("imprint", "imprint_company_id", new_column_name="imprint_company",
+    op.alter_column("imprints", "imprint_company_id", new_column_name="imprint_company",
       existing_type=db.Integer)
 
     # Rename awkwardly-named tables
