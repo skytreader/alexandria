@@ -76,7 +76,7 @@ def book_adder():
             from flask.ext.login import current_user
             # Genre first
             genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
-              creator=current_user.get_id())
+              creator_id=current_user.get_id())
 
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,

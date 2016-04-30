@@ -33,17 +33,17 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
-    given_creator = kwargs.pop("creator", None)
+    given_creator = kwargs.pop("creator_id", None)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
         if given_creator:
-            kwargs["creator"] = given_creator
+            kwargs["creator_id"] = given_creator
         else:
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
-            kwargs["creator"] = admin
+            kwargs["creator_id"] = admin.id
 
         instance = model(**kwargs)
         if will_commit:
@@ -104,16 +104,6 @@ class UserTaggedBase(Base):
     def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
-    #@declared_attr
-    def creator(self):
-        return relationship("Librarian",
-          foreign_keys=self.__class__.__name__ + ".creator_id")
-
-    #@declared_attr
-    def last_modifier(self):
-        return relationship("Librarian",
-          foreign_keys=self.__class__.__name__ + ".last_modifier_id")
-
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
     name = db.Column(db.String(40), nullable=False, unique=True)
@@ -122,8 +112,8 @@ class Genre(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Book(UserTaggedBase):
     __tablename__ = "books"
@@ -147,8 +137,8 @@ class Book(UserTaggedBase):
         self.isbn = kwargs["isbn"]
         self.title = kwargs["title"]
         self.genre = kwargs["genre"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
         self.printer = kwargs["printer"]
         self.publisher = kwargs["publisher"]
 
@@ -161,8 +151,8 @@ class BookCompany(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
@@ -179,8 +169,8 @@ class Imprint(UserTaggedBase):
     def __init__(self, **kwargs):
         self.mother_company_id = kwargs["mother_company"]
         self.imprint_company_id = kwargs["imprint_company"]
-        self.creator_id = kwargs["creator"]
-        self.last_modifier_id = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Contributor(UserTaggedBase):
     __tablename__ = "contributors"
@@ -191,8 +181,8 @@ class Contributor(UserTaggedBase):
     def __init__(self, **kwargs):
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator"]
-        self.last_modifier_id = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
@@ -212,8 +202,8 @@ class Role(UserTaggedBase):
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
         self.display_text = kwargs["display_text"]
-        self.creator_id = kwargs["creator"]
-        self.last_modifier_id = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
     @staticmethod
     @cache.memoize(config.CACHE_TIMEOUT)
@@ -242,8 +232,8 @@ class BookContribution(UserTaggedBase):
         self.book_id = kwargs["book_id"]
         self.person_id = kwargs["person_id"]
         self.role_id = kwargs["role_id"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
@@ -262,8 +252,8 @@ class Printer(UserTaggedBase):
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
         self.company_id = kwargs["company_id"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Pseudonym(UserTaggedBase):
     """
@@ -288,5 +278,5 @@ class Pseudonym(UserTaggedBase):
         self.book_id = kwargs["book_id"]
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator"]
-        self.last_modifier_id = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
