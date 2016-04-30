@@ -40,7 +40,7 @@ def get_or_create(model, will_commit=False, **kwargs):
     else:
         if given_creator:
             kwargs["creator_id"] = given_creator
-        else:
+        elif not issubclass(model, UserMixin):
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
             kwargs["creator_id"] = admin.id
@@ -198,6 +198,9 @@ class Role(UserTaggedBase):
     __tablename__ = "roles"
     name = db.Column(db.String(255), unique=True, nullable=False)
     display_text = db.Column(db.String(255), nullable=False)
+
+    creator = relationship("Librarian", foreign_keys="Role.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Role.last_modifier_id")
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]

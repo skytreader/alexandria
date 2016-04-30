@@ -20,6 +20,7 @@ class AppTestCase(TestCase):
         self.app = self.create_app()
         self.ROLE_IDS = {}
         self.admin_user = get_or_create(Librarian, will_commit=True, username="admin", password="admin", is_user_active=True, can_read=True, can_write=True, can_exec=True)
+        print "The admin user is", self.admin_user
         roles = ("Author", "Illustrator", "Editor", "Translator")
         
         for r in roles:
