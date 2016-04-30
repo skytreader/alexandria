@@ -625,6 +625,9 @@ $(document).ready(function(){
             updateStatCounts();
             clearProxyForm();
             clearLists();
+        } else{
+            alertify.alert("There is a problem with that book's details. Check the fields for specifics.",
+              function(){alertify.message("OK")});
         }
     });
 
