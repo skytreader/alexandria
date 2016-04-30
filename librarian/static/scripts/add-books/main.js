@@ -513,6 +513,7 @@ $.validator.addMethod("yearVal", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function(){
+    alertify.parent(document.body);
     /**
     Return a function that generates an input row for a given creatorType. The
     generated function was meant to be called for the click event on the add button.
@@ -626,8 +627,7 @@ $(document).ready(function(){
             clearProxyForm();
             clearLists();
         } else{
-            alertify.alert("There is a problem with that book's details. Check the fields for specifics.",
-              function(){alertify.message("OK")});
+            alertify.alert("There is a problem with that book's details. Check the fields for specifics.");
         }
     });
 
