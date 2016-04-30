@@ -73,7 +73,7 @@ def add_books():
         scripts.insert(0, "add-books/testdata.js")
 
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
-      "jquery-ui.theme.min.css", "alertify.css")
+      "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
     return render_template("add_books.jinja", form=form, scripts=scripts, stylesheets=styles)
 
 @librarian_bp.route("/books")
