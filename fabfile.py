@@ -1,12 +1,25 @@
 from config import (
-  SQL_DB_NAME, SQL_TEST_DB_NAME, SQLALCHEMY_DATABASE_URI,
-  SQLALCHEMY_TEST_DATABASE_URI
+  DEVEL, SQL_DB_NAME, SQL_TEST_DB_NAME, SQLALCHEMY_DATABASE_URI,
+  SQLALCHEMY_TEST_DATABASE_URI, TESTING
 )
 from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+def __env_safeguard(fab_method):
+    """
+    This is not a fabric method per se. Useless to call this.
+    """
+    def check(*args, **kwargs):
+        if DEVEL or TESTING:
+            fab_method(*args, **kwargs)
+        else:
+            print "Prevented by env_safeguard"
+
+    return check
+
+@__env_safeguard
 def reset_db_data():
     """
     Truncate all database tables.
@@ -30,6 +43,7 @@ def reset_db_data():
 
     insert_fixtures(engine, session)
 
+@__env_safeguard
 def destroy_db_tables():
     """
     Drop all database tables.
@@ -106,6 +120,7 @@ def clone_database():
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
+@__env_safeguard
 def destroy_database(is_test=False):
     """
     Drop the database. Pass `:is_test=True` to drop the test database instead.
@@ -113,9 +128,9 @@ def destroy_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test:
-        local('mysql -u root -e "DROP DATABASE alexandria_test"')
+        local('mysql -u root -e "DROP DATABASE %s"' % SQL_TEST_DB_NAME)
     else:
-        local('mysql -u root -e "DROP DATABASE alexandria"')
+        local('mysql -u root -e "DROP DATABASE %s"' % SQL_DB_NAME)
 
 def create_database(is_test=False):
     """
@@ -124,6 +139,6 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQLALCHEMY_TEST_DATABASE_URI)
+        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_TEST_DB_NAME)
     else:
-        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQLALCHEMY_DATABASE_URI)
+        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_DB_NAME)
