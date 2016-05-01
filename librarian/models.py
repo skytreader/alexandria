@@ -136,11 +136,10 @@ class Book(UserTaggedBase):
         self.publish_year = int(kwargs["publish_year"])
         self.isbn = kwargs["isbn"]
         self.title = kwargs["title"]
-        self.genre = kwargs["genre"]
+        self.genre_id = kwargs["genre_id"]
         self.creator_id = kwargs["creator_id"]
         self.last_modifier_id = kwargs["creator_id"]
-        self.printer = kwargs["printer"]
-        self.publisher = kwargs["publisher"]
+        self.publisher_id = kwargs["publisher_id"]
 
 class BookCompany(UserTaggedBase):
     """

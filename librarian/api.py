@@ -8,7 +8,7 @@ from librarian.forms import AddBooksForm
 from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
-from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Role
+from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
@@ -46,7 +46,7 @@ def __create_bookperson(form_data):
         for parson in parse:
             persons_created.insert(0, get_or_create(Contributor, will_commit=True,
               firstname=parson["firstname"], lastname=parson["lastname"],
-              creator=current_user.get_id()))
+              creator_id=current_user.get_id()))
 
         return persons_created
     except ValueError:
@@ -80,16 +80,20 @@ def book_adder():
 
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,
-              name=form.publisher.data, creator=current_user.get_id())
+              name=form.publisher.data, creator_id=current_user.get_id())
             printer = get_or_create(BookCompany, will_commit=True,
-              name=form.printer.data, creator=current_user.get_id())
+              name=form.printer.data, creator_id=current_user.get_id())
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
-              genre=genre.id, creator=current_user.get_id(),
-              publisher=publisher.id, printer=printer.id,
-              publish_year=int(form.year.data))
+              genre_id=genre.id, creator_id=current_user.get_id(),
+              publisher_id=publisher.id, publish_year=int(form.year.data))
             db.session.add(book)
+
+            # Create printer entry
+            printer_record = Printer(company_id=printer.id, book_id=book.id,
+              creator_id=current_user.get_id())
+            db.session.add(printer_record)
 
             # Create the Contributors
             authors = __create_bookperson(form.authors.data)
@@ -106,26 +110,26 @@ def book_adder():
             for author in authors:
                 author_part = BookContribution(book_id=book.id,
                   person_id=author.id, role_id=author_role.id,
-                  creator=current_user.get_id())
+                  creator_id=current_user.get_id())
                 db.session.add(author)
                 db.session.add(author_part)
 
             for illustrator in illustrators:
                 illus_part = BookContribution(book_id=book.id,
                   person_id=illustrator.id, role_id=illus_role.id,
-                  creator=current_user.get_id())
+                  creator_id=current_user.get_id())
                 db.session.add(illus_part)
 
             for editor in editors:
                 editor_part = BookContribution(book_id=book.id,
                   person_id=editor.id, role_id=editor_role.id,
-                  creator=current_user.get_id())
+                  creator_id=current_user.get_id())
                 db.session.add(editor_part)
 
             for translator in translators:
                 translator_part = BookContribution(book_id=book.id,
                   person_id=translator.id, role_id=trans_role.id,
-                  creator=current_user.get_id())
+                  creator_id=current_user.get_id())
                 db.session.add(translator_part)
 
             db.session.commit()

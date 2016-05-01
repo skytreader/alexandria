@@ -16,6 +16,11 @@ fake.add_provider(BookFieldsProvider)
 
 fuzzy_text = FuzzyText()
 
+"""
+Note: These factories lack the `last_modifier_id` field because they are creating
+_new_ records so we expect the `last_modifier_id` to be the same as `creator_id`.
+"""
+
 class LibrarianFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.Librarian
@@ -33,7 +38,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: "Genre%s" % n)
-    creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
 
 
 class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -43,7 +48,7 @@ class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.LazyAttribute(lambda x: fake.company())
-    creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
 
 
 class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -58,7 +63,6 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     publisher_id = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     publish_year = factory.LazyAttribute(lambda x: fake.year())
     creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
-    printer_id = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
 
 
 class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -69,7 +73,7 @@ class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda x: x)
     lastname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
     firstname = factory.LazyAttribute(lambda x:fuzzy_text.fuzz())
-    creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
 
 
 class PrinterFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -79,4 +83,4 @@ class PrinterFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     company_id = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
     book_id = factory.LazyAttribute(lambda x: BookFactory().id)
-    creator = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
