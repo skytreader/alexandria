@@ -89,6 +89,7 @@ def book_adder():
               genre_id=genre.id, creator_id=current_user.get_id(),
               publisher_id=publisher.id, publish_year=int(form.year.data))
             db.session.add(book)
+            db.session.flush()
 
             # Create printer entry
             printer_record = Printer(company_id=printer.id, book_id=book.id,
