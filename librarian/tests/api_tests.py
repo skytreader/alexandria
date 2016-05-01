@@ -79,7 +79,7 @@ class ApiTests(AppTestCase):
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
-            self.verify_inserted(BookContribution, person_id=_p.id,
+            self.verify_inserted(BookContribution, contributor_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
     def test_book_adder_utf8(self):
