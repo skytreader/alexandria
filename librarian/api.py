@@ -306,3 +306,12 @@ def quick_stats():
     stats["participants_per_book"] = (contributors / books)
     stats["recent_books"] = get_recent_books()
     return flask.jsonify(stats)
+
+@librarian_api.route("/api/util/search")
+def search():
+    searchq = request.args.get("q")
+    results = (db.session.query(Book)
+      .filter(Book.title.like("".join(("%", searchq, "%"))))
+      .all())
+
+    return flask.jsonify(results)
