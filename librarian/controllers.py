@@ -29,7 +29,7 @@ def login():
         if user and user.password == form.librarian_password.data:
             login_user(user)
             # Should not matter becuase redirect is coming up but, oh well
-            next_url = flask.request.args.get("next")
+            next_url = request.args.get("next")
 
             if next_url and not route_exists(next_url):
                 return flask.abort(400)
@@ -82,6 +82,15 @@ def show_books():
 
     books = json.loads(get_books().data)["data"]
     scripts = ("show-books/main.js",)
+    styles = ("books.css",)
+    return render_template("books.jinja", scripts=scripts, stylesheets=styles,
+      books=books)
+
+@librarian_bp.route("/search")
+def search():
+    from librarian.api import search
+    searchq = request.args.get("q")
+    books = search(searchq)
     styles = ("books.css",)
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
       books=books)
