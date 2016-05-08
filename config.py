@@ -18,7 +18,7 @@ SQL_PORT = 3306
 SQL_USERNAME = "root"
 SQL_PASSWORD = ""
 SQL_ENGINE = "mysql"
-SQL_DB_NAME = "alexandria"#_1748bdf1a3b2"
+SQL_DB_NAME = "alexandria_1748bdf1a3b2"
 SQL_TEST_DB_NAME = "%s_test" % SQL_DB_NAME
 SQLALCHEMY_DATABASE_URI = '%s://%s:%s@%s:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
   SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_DB_NAME)

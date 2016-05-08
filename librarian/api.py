@@ -109,6 +109,7 @@ def book_adder():
 
             # Assign participation
             for author in authors:
+                print "Creating author record for", author, "in book", book.id
                 author_part = BookContribution(book_id=book.id,
                   person_id=author.id, role_id=author_role.id,
                   creator_id=current_user.get_id())

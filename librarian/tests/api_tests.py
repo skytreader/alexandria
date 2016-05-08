@@ -76,9 +76,11 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="UP Press")
 
     def verify_bookperson_inserted(self, persons, role, bookid):
+        print "Verifying role", role
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
+            print "qing for", _p.id, "on book", bookid
             self.verify_inserted(BookContribution, contributor_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 

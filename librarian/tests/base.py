@@ -25,6 +25,7 @@ class AppTestCase(TestCase):
         for r in roles:
             _r = get_or_create(Role, will_commit=True, name=r,
               display_text="%s(s)" % r, creator_id=self.admin_user.id)
+            print "role", _r.id
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
 
@@ -34,6 +35,7 @@ class AppTestCase(TestCase):
         represented by the given model. Returns the inserted record (if the
         assert succeeds.
         """
+        print "kwargs is", kwargs
         record = librarian.db.session.query(model).filter_by(**kwargs).first()
         self.assertTrue(record is not None)
         return record
