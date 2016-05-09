@@ -25,7 +25,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     """
     book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
-    person_ids = [bp.firstname for bp in book_persons]
+    person_fns = [bp.firstname for bp in book_persons]
 
     for bp in book_persons:
         bp.creator_id = admin.id
@@ -50,8 +50,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for _ in range(participant_c):
         rand_isbn = random.choice(book_isbns)
         rand_book = session.query(Book).filter(Book.isbn == rand_isbn).first()
-        rand_person_id = random.choice(person_ids)
-        rand_person = session.query(Contributor).filter(Contributor.firstname == rand_person_id).first()
+        rand_person_fn = random.choice(person_fns)
+        rand_person = session.query(Contributor).filter(Contributor.firstname == rand_person_fn).first()
         rand_role = random.choice(roles)
         _role = rand_role.lower()
 
