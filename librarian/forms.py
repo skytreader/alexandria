@@ -5,7 +5,7 @@ from wtforms import HiddenField, PasswordField, TextField
 from wtforms.validators import Length, Required
 
 class SearchForm(Form):
-    search_term = TextField("Search for", [Required(message="What are you looking for?")])
+    q = TextField("Search for", [Required(message="What are you looking for?")])
 
 class LoginForm(Form):
     librarian_username = TextField("Username",
@@ -51,3 +51,6 @@ class AddBooksForm(Form):
                 pass # it wasn't a form field os meh
 
         return "/".join(validations) + "/.validate_on_submit():" + str(self.validate_on_submit())
+
+class EditBookForm(AddBooksForm):
+    book_id = HiddenField("bookid", [Required(message="book id")])

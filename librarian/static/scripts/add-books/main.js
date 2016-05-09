@@ -26,6 +26,7 @@ var booksSaved = 0;
 var booksErrorNoRetry = 0;
 var booksReprocessable = 0;
 
+var BOOK_PERSONS = [];
 var BOOK_PERSONS_LASTNAME = [];
 var BOOK_PERSONS_FIRSTNAME = [];
 var BOOK_PERSONS_SET = new Set();
@@ -86,6 +87,7 @@ function fillNames(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
+            BOOK_PERSONS = allNames;
             BOOK_PERSONS_SET.addAll(allNames);
             var allLastnames = _.map(allNames, function(x){return x["lastname"]});
             var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
@@ -111,11 +113,52 @@ function fillNames(){
 }
 
 /**
+Sets the autocomplete of the element with identifier `targetId` based on the
+value held by the element with identifier `partnerId`.
+
+This function expects certain elements from the page. In particular, this needs
+that the elements described by `targetId` and `partnerId` also have the class
+`auto-lastname` xor `auto-firstname`, depending on their actual purpose.
+
+@param {string} targetId
+@param {string} partnerId
+@throws If the page where this method is used does not conform to the expected
+stucture.
+*/
+function setAutoComplete(targetId, partnerId){
+    function mapAndSet(partner, target){
+        var acSource = _.map(_.filter(BOOK_PERSONS, function(person){
+          return person[partner] == partnerElement.val();
+        }), function(person){
+          return person[target];
+        });
+
+        if(acSource.length > 0){
+            $("#" + targetId).autocomplete({
+                source: acSource
+            });
+        }
+    }
+
+    var partnerElement = $("#" + partnerId);
+    var acSource;
+
+    if(partnerElement.hasClass("auto-lastname")){
+        mapAndSet("lastname", "firstname");
+    } else if(partnerElement.hasClass("auto-firstname")){
+        mapAndSet("firstname", "lastname");
+    } else{
+        throw "Missing expected elements."
+    }
+
+}
+
+/**
 Renders the "spine" display of the book list. Takes data from the proxy form
 directly.
 
-@return A div element which displays like a spine of a book. The div
-element has the isbn for its id.
+@return {HTMLElement} A div element which displays like a spine of a book. The
+div element has the isbn for its id.
 */
 function renderSpine(){
     var spine = document.createElement("div");
@@ -142,7 +185,7 @@ function renderSpine(){
 }
 
 /**
-Get a ;ist of persons and return a string to display them..
+Get a list of persons and return a string to display them..
 */
 function listNames(nameList){
     var names = [];
@@ -185,9 +228,9 @@ Append the book described in #proxy-form to the internal queue.
 The DOM element representing the book is a required parameter since we use it to
 map the Book object to its visual representation.
 
-@param spineDom
-    The DOM element representing the book spine. This is just necessary for
-    mapping, which in turn is necessary for the reprocess function.
+@param {HTMLElement} spineDom - the DOM element representing the book spine.
+  This is just necessary for mapping, which in turn is necessary for the
+  reprocess function.
 */
 function internalizeBook(spineDom){
     var allInputs = $("#proxy-form input");
@@ -209,8 +252,9 @@ function internalizeBook(spineDom){
 }
 
 /**
-Generates the delete button to be added at the end
-of every row record.
+Generates the delete button to be added at the end of every row record.
+
+@return {HTMLElement}
 */
 function renderDeleteButton(){
     var container = document.createElement("input");
@@ -227,6 +271,8 @@ Create a list element for displaying a creator's name. The name displayed is
 dependent on what is currently entered in the procy fields for this creator.
 
 TODO Test me
+
+@param {string} creatorType
 */
 function renderContentCreatorListing(creatorType){
     var hiddenLastnameProxy = document.createElement("input");
@@ -273,11 +319,17 @@ function renderContentCreatorListing(creatorType){
     return listing;
 }
 
+/**
+@param {string} creatorType
+*/
 function clearCreatorInput(creatorType){
     $("#" + creatorType + "-proxy-lastname").val("");
     $("#" + creatorType + "-proxy-firstname").val("");
 }
 
+/**
+@param {string} creatorType
+*/
 function recordDeleterFactory(creatorType){
     return function() {
         $(this.parentNode.parentNode).remove();
@@ -289,6 +341,26 @@ Clears the proxy form.
 */
 function clearProxyForm(){
     $("#proxy-form input").val("")
+}
+
+/**
+@return {boolean} Returns true if the proxy form is all blank and if there is
+nothing left in both queues.
+*/
+function isWorkDone(){
+    // TODO Check the condition where there is a _pending_ HTTP request. Should
+    // this even handle that?
+    function isProxyFormEmpty(){
+        var proxyInputs = $("#proxy-form input");
+        var isEmpty = true;
+        _.forEach(proxyInputs, function(input){
+            isEmpty = _.isEmpty(input.value);
+            return isEmpty;
+        });
+        return isEmpty;
+    }
+    return bookQueue.getLength() == 0 && reprocessQueue.getLength() == 0 &&
+      isProxyFormEmpty();
 }
 
 /**
@@ -308,8 +380,8 @@ function removeBlock(e){
 Send the actual, hidden form to the server via AJAX so that the data may be
 saved.
 
-@param domElement
-    The book spine representing the book to be sent, as a DOM element.
+@param {HTMLElement} domElement - the book spine representing the book to be
+  sent, as a DOM element.
 */
 function sendSaveForm(domElement){
     var authors = JSON.parse(document.getElementById("authors").value);
@@ -441,6 +513,7 @@ $.validator.addMethod("yearVal", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function(){
+    alertify.parent(document.body);
     /**
     Return a function that generates an input row for a given creatorType. The
     generated function was meant to be called for the click event on the add button.
@@ -492,6 +565,12 @@ $(document).ready(function(){
     
         return false;
     }
+
+    $(window).bind("beforeunload", function(){
+        if(!isWorkDone()){
+            return "You are leaving the page with unsaved work.";
+        }
+    });
 
     $("#proxy-form").validate({
         rules:{
@@ -547,7 +626,34 @@ $(document).ready(function(){
             updateStatCounts();
             clearProxyForm();
             clearLists();
+        } else{
+            alertify.alert("There is a problem with that book's details. Check the fields for specifics.");
         }
+    });
+
+    $("#author-proxy-lastname").blur(function(){
+        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+    });
+    $("#author-proxy-firstname").blur(function(){
+        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+    });
+    $("#illustrator-proxy-lastname").blur(function(){
+        setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+    });
+    $("#illustrator-proxy-firstname").blur(function(){
+        setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+    });
+    $("#editor-proxy-lastname").blur(function(){
+        setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+    });
+    $("#editor-proxy-firstname").blur(function(){
+        setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+    });
+    $("#translator-proxy-lastname").blur(function(){
+        setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+    });
+    $("#translator-proxy-firstname").blur(function(){
+        setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 
     // Start the polling interval timers.

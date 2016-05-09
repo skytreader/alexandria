@@ -4,12 +4,12 @@ from __future__ import division
 from datetime import datetime
 
 from librarian import app, db
-from librarian.forms import AddBooksForm
+from librarian.forms import AddBooksForm, EditBookForm
 from librarian.utils import NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
-from sqlalchemy import func
+from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
 
 import config
@@ -23,6 +23,7 @@ import traceback
 Convention:
 /api/add/* - add some records to the database
 /api/read/* - get data from backend
+/api/edit/* - edit data in the database
 /api/util/* - for utility functions. Functions that are usually and can find use
 in any project may go here but this namespace can also house project-specific
 utilities.
@@ -145,10 +146,37 @@ def book_adder():
 
             return "Accepted", 200
         except IntegrityError, ierr:
-            print traceback.format_exc()
+            app.logger.error(traceback.format_exc())
             return "IntegrityError", 409
     
     return "Error", 400
+
+@librarian_api.route("/api/edit/books", methods=["POST"])
+@login_required
+def edit_book():
+    from flask.ext.login import current_user
+
+    form = EditBookForm(request.form)
+    app.logger.infp(str(form))
+    app.logger.debug(form.debug_validate())
+
+    # TODO Testme especially integrating foreign keys with db-standardization branch
+    if form.validate_on_submit():
+        book_id = int(form.book_id)
+        try:
+            # Update records in books table
+            publisher = get_or_create(BookCompany, will_commit=True, 
+              name=form.publisher.data, creator=current_user.get_id())
+            book = Book.query.get(book_id)
+            book.isbn = form.isbn.data
+            book.title = form.title.data
+            book.publish_year = form.year.data
+
+            # Delete the book_participants involved
+            BookParticipant.query.filter(BookParticipant.book_id == book_id).delete()
+        except IntegrityError, ierr:
+            app.logger.error(traceback.format_exc())
+            return "IntegrityError", 409
 
 @librarian_api.route("/api/util/servertime")
 def servertime():
@@ -235,9 +263,6 @@ def get_books():
         book_listing.insert(0, book)
 
     return flask.jsonify({"data": book_listing})
-1
-def __get_first(x):
-    return x[0]
 
 @librarian_api.route("/api/read/genres")
 def list_genres():
@@ -276,12 +301,30 @@ def get_recent_contributors(contrib_type, limit=4):
       .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
-      .order_by(BookContribution.created_at).limit(limit).all())
+      .order_by(desc(BookParticipant.date_created)).limit(limit).all())
     
     return top
 
+def get_recent_books(limit=4):
+    """
+    Returns a list of size `limit` containing the most recently added books.
+    """
+    top = db.session.query(Book.title).order_by(desc(Book.date_created)).limit(limit).all()
+
+    return [title for title, in top]
+
 @librarian_api.route("/api/util/stats")
 def quick_stats():
+    stats = {}
     books = len(db.session.query(Book).all())
-    contributors = len(db.session.query(BookContribution).all())
-    return flask.jsonify({"participants_per_book": (contributors / books)})
+    contributors = len(db.session.query(Contributor).all())
+    stats["participants_per_book"] = (contributors / books)
+    stats["recent_books"] = get_recent_books()
+    return flask.jsonify(stats)
+
+def search(searchq):
+    results = (db.session.query(Book)
+      .filter(Book.title.like("".join(("%", searchq, "%"))))
+      .all())
+
+    return results

@@ -137,6 +137,14 @@ label.input-holder{
     width: 97%;
 }
 
+.panel-body ol{
+    padding-left: 1em;
+}
+
+.panel-body ul{
+    padding-left: 1em;
+}
+
 /*Forms*/
 input.search, select.search, option.search {
     font-size: 16px;
