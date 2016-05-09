@@ -141,6 +141,9 @@ class Book(UserTaggedBase):
         self.last_modifier_id = kwargs["creator_id"]
         self.publisher_id = kwargs["publisher_id"]
 
+    def __str__(self):
+        return self.title + "/" + self.isbn
+
 class BookCompany(UserTaggedBase):
     """
     List?! List?! This is better off in NoSQL form!
@@ -212,6 +215,9 @@ class Role(UserTaggedBase):
     def get_preset_role(role_name):
         role = Role.query.filter_by(name=role_name).first()
         return role
+
+    def __str__(self):
+        return self.name
         
 
 class BookContribution(UserTaggedBase):
@@ -239,7 +245,7 @@ class BookContribution(UserTaggedBase):
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
-          (str(self.person_id), str(self.book_id), str(self.role_id))
+          (str(self.contributor), str(self.book), str(self.role))
 
 class Printer(UserTaggedBase):
     __tablename__ = "printers"
