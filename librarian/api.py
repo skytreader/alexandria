@@ -222,11 +222,11 @@ def get_books():
         offset = "0"
 
     bookq = (db.session.query(Book.isbn, Book.title, Contributor.lastname,
-      Contributor.firstname, Role.name, BookCompany.name)
+      Contributor.firstname, Role.name, Book.publisher)
       .filter(Book.id == BookContribution.book_id)
       .filter(BookContribution.contributor_id == Contributor.id)
-      .filter(BookContribution.role_id == Role.id)
-      .filter(Book.publisher_id == BookCompany.id))
+      .filter(BookContribution.role_id == Role.id))
+      #.filter(Book.publisher_id == BookCompany.id))
 
     if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
         bookq = bookq.limit(limit).offset(offset)
