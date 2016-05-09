@@ -80,7 +80,6 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
             session.add(bp)
             session.flush()
 
-    session.commit()
     library_list = []
 
     for isbn in library.keys():

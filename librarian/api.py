@@ -317,7 +317,7 @@ def get_recent_books(limit=4):
 def quick_stats():
     stats = {}
     books = len(db.session.query(Book).all())
-    contributors = len(db.session.query(Contributor).all())
+    contributors = len(db.session.query(BookContribution).all())
     stats["participants_per_book"] = (contributors / books)
     stats["recent_books"] = get_recent_books()
     return flask.jsonify(stats)
