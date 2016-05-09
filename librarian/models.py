@@ -156,6 +156,9 @@ class BookCompany(UserTaggedBase):
         self.creator_id = kwargs["creator_id"]
         self.last_modifier_id = kwargs["creator_id"]
 
+    def __str__(self):
+        return self.name
+
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
     mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",

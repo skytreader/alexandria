@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, Contributor, BookContribution
+from librarian.models import Book, BookCompany, Contributor, BookContribution
 from librarian.tests.dummies import LibraryEntry
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory,
@@ -34,6 +34,9 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for co in printers:
         co.creator_id = admin.id
         session.add(co)
+
+    session.commit()
+    printers = session.query(BookCompany).all()
 
     books = [BookFactory(publisher_id=random.choice(printers).id) for _ in range(book_c)]
     book_isbns = [b.isbn for b in books]

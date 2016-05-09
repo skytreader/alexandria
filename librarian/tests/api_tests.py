@@ -440,6 +440,12 @@ class ApiTests(AppTestCase):
         for book in ret_data:
             return_set.add(LibraryEntry(**book))
 
+        #from pprint import pprint
+
+        #print "library"
+        #pprint(list(str(book) for book in library))
+        #print "return_set"
+        #pprint(list(str(book) for book in return_set))
         self.assertEquals(set(library), return_set)
 
     def test_stats(self):
