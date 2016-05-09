@@ -25,19 +25,22 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     """
     book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
+    print "printers created", len(printers)
     person_ids = [bp.firstname for bp in book_persons]
 
     for bp in book_persons:
-        bp.creator = admin.id
+        bp.creator_id = admin.id
         session.add(bp)
 
     for co in printers:
+        co.creator_id = admin.id
         session.add(co)
 
     books = [BookFactory() for _ in range(book_c)]
     book_isbns = [b.isbn for b in books]
 
     for b in books:
+        b.creator_id = admin.id
         session.add(b)
 
     session.commit()

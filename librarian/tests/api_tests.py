@@ -413,6 +413,16 @@ class ApiTests(AppTestCase):
     def test_get_books(self):
         library = create_library(librarian.db.session, self.admin_user,
           self.ROLE_IDS, book_person_c=12, company_c=8, book_c=12, participant_c=32)
+
+        contribs = librarian.db.session.query(Contributor).all()
+        self.assertEquals(12, len(contribs))
+        companies = librarian.db.session.query(BookCompany).all()
+        self.assertEquals(8, len(companies))
+        books = librarian.db.session.query(Book).all()
+        self.assertEquals(12, len(books))
+        a_contribs = librarian.db.session.query(BookContribution).all()
+        self.assertEquals(32, len(a_contribs))
+
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]
