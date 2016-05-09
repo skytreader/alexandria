@@ -92,5 +92,4 @@ def search():
     searchq = request.args.get("q")
     books = search(searchq)
     styles = ("books.css",)
-    return render_template("books.jinja", scripts=scripts, stylesheets=styles,
-      books=books)
+    return render_template("books.jinja", stylesheets=styles, books=books)
