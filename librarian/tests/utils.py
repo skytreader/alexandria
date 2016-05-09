@@ -62,7 +62,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
                   "firstname": rand_person.firstname},]
 
             bp = BookContribution(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_map[rand_role],
+              contributor_id=rand_person.id, role_id=role_map[rand_role],
               creator_id=admin.id)
             session.add(bp)
             session.flush()
@@ -75,7 +75,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
             bp = BookContribution(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_map[rand_role],
+              contributor_id=rand_person.id, role_id=role_map[rand_role],
               creator_id=admin.id)
             session.add(bp)
             session.flush()

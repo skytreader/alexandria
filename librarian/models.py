@@ -238,7 +238,7 @@ class BookContribution(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
-        self.person_id = kwargs["person_id"]
+        self.contributor_id = kwargs["contributor_id"]
         self.role_id = kwargs["role_id"]
         self.creator_id = kwargs["creator_id"]
         self.last_modifier_id = kwargs["creator_id"]

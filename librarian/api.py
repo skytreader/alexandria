@@ -109,29 +109,36 @@ def book_adder():
 
             # Assign participation
             for author in authors:
-                print "Creating author record for", author, "in book", book.id
                 author_part = BookContribution(book_id=book.id,
-                  person_id=author.id, role_id=author_role.id,
+                  contributor_id=author.id, role_id=author_role.id,
                   creator_id=current_user.get_id())
                 db.session.add(author)
                 db.session.add(author_part)
+            db.session.commit()
+
+            a = db.session.query(BookContribution).filter(BookContribution.book_id==book.id).all()
 
             for illustrator in illustrators:
                 illus_part = BookContribution(book_id=book.id,
-                  person_id=illustrator.id, role_id=illus_role.id,
+                  contributor_id=illustrator.id, role_id=illus_role.id,
                   creator_id=current_user.get_id())
+                db.session.add(illustrator)
                 db.session.add(illus_part)
+            db.session.commit()
 
             for editor in editors:
                 editor_part = BookContribution(book_id=book.id,
-                  person_id=editor.id, role_id=editor_role.id,
+                  contributor_id=editor.id, role_id=editor_role.id,
                   creator_id=current_user.get_id())
+                db.session.add(editor)
                 db.session.add(editor_part)
+            db.session.commit()
 
             for translator in translators:
                 translator_part = BookContribution(book_id=book.id,
-                  person_id=translator.id, role_id=trans_role.id,
+                  contributor_id=translator.id, role_id=trans_role.id,
                   creator_id=current_user.get_id())
+                db.session.add(translator)
                 db.session.add(translator_part)
 
             db.session.commit()
@@ -172,7 +179,7 @@ def get_books():
     """
     def subq_generator(role):
         return (db.session.query(Book.id, Contributor.lastname, Contributor.firstname)
-          .filter(Contributor.id == BookContribution.person_id)
+          .filter(Contributor.id == BookContribution.contributor_id)
           .filter(BookContribution.role_id == Role.id)
           .filter(Role.name == role)
           .filter(Book.id == BookContribution.book_id)
@@ -255,7 +262,7 @@ def get_top_contributors(contrib_type, limit=4):
     top = (db.session.query(Contributor.id, Contributor.lastname,
       Contributor.firstname,
       func.count(BookContribution.book_id).label("contrib_count"))
-      .filter(Contributor.id==BookContribution.person_id)
+      .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
       .group_by(Contributor.id).order_by("contrib_count").limit(limit)
@@ -266,7 +273,7 @@ def get_top_contributors(contrib_type, limit=4):
 def get_recent_contributors(contrib_type, limit=4):
     top = (db.session.query(Contributor.id, Contributor.lastname,
       Contributor.firstname, BookContribution.created_at)
-      .filter(Contributor.id==BookContribution.person_id)
+      .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
       .order_by(BookContribution.created_at).limit(limit).all())
