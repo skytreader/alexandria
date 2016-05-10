@@ -24,7 +24,7 @@ class AppTestCase(TestCase):
         
         for r in roles:
             _r = get_or_create(Role, will_commit=True, name=r,
-              display_text="%s(s)" % r, creator=self.admin_user.id)
+              display_text="%s(s)" % r, creator_id=self.admin_user.id)
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
 
@@ -65,8 +65,8 @@ class AppTestCase(TestCase):
         librarian.db.engine.execute("DELETE FROM books;")
         librarian.db.engine.execute("DELETE FROM book_companies;")
         librarian.db.engine.execute("DELETE FROM imprints;")
-        librarian.db.engine.execute("DELETE FROM book_persons;")
-        librarian.db.engine.execute("DELETE FROM book_participants;")
+        librarian.db.engine.execute("DELETE FROM contributors;")
+        librarian.db.engine.execute("DELETE FROM book_contributions;")
         librarian.db.engine.execute("DELETE FROM printers;")
         librarian.db.engine.execute("DELETE FROM pseudonyms;")
         librarian.db.engine.execute("SET FOREIGN_KEY_CHECKS = 1;")

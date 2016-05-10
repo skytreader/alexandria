@@ -1,6 +1,5 @@
 import os
 
-# Statement for development and test environments
 """
 DEVEL environment is understood as running a local instance of the app.
 
@@ -14,9 +13,18 @@ TESTING = bool(os.environ.get("TESTING"))
 import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
-SQLALCHEMY_DATABASE_URI = 'mysql://root@127.0.0.1/alexandria'
-SQLALCHEMY_TEST_DATABASE_URI = 'mysql://root@127.0.0.1:3306/alexandria_test'
-SQLALCHEMY_ECHO = DEVEL
+SQL_HOST = "127.0.0.1"
+SQL_PORT = 3306
+SQL_USERNAME = "root"
+SQL_PASSWORD = ""
+SQL_ENGINE = "mysql"
+SQL_DB_NAME = "alexandria"
+SQL_TEST_DB_NAME = "%s_test" % SQL_DB_NAME
+SQLALCHEMY_DATABASE_URI = '%s://%s:%s@%s:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
+  SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_DB_NAME)
+SQLALCHEMY_TEST_DATABASE_URI = '%s://%s:%s@%s:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
+  SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_TEST_DB_NAME)
+SQLALCHEMY_ECHO = not DEVEL
 DATABASE_CONNECT_OPTIONS = {"user":"root"}
 
 # Caching, see: https://pythonhosted.org/Flask-Cache/

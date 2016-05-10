@@ -58,3 +58,8 @@ class LibraryEntry(object):
     def __hash__(self):
         return hash((self.isbn, self.title, self.author, self.illustrator,
           self.translator, self.publisher))
+
+    def __str__(self):
+        return str({"isbn": self.isbn, "title": self.title, "author": str(self.author),
+          "illustrator": str(self.illustrator), "editor": str(self.editor),
+          "translator": str(self.translator), "publisher": str(self.publisher)})

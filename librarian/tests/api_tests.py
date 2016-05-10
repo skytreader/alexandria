@@ -4,11 +4,11 @@ from __future__ import division
 from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user
-from librarian.models import Book, BookCompany, BookParticipant, BookPerson, Genre
+from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre
 from librarian.tests.dummies import LibraryEntry, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, BookPersonFactory, GenreFactory, LibrarianFactory
+  BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
 from librarian.tests.utils import make_name_object, create_library
 
@@ -41,7 +41,7 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(BookPerson, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
@@ -70,16 +70,16 @@ class ApiTests(AppTestCase):
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(BookPerson, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschenbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
     def verify_bookperson_inserted(self, persons, role, bookid):
         for p in persons:
-            _p = self.verify_inserted(BookPerson, firstname=p["firstname"],
+            _p = self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
-            self.verify_inserted(BookParticipant, person_id=_p.id,
+            self.verify_inserted(BookContribution, contributor_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
     def test_book_adder_utf8(self):
@@ -93,9 +93,9 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="English 12")
-        self.verify_does_not_exist(BookPerson, lastname="Pérez-Reverte",
+        self.verify_does_not_exist(Contributor, lastname="Pérez-Reverte",
           firstname="Arturo")
-        self.verify_does_not_exist(BookPerson, lastname="de Onís",
+        self.verify_does_not_exist(Contributor, lastname="de Onís",
           firstname="Harriet")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
@@ -129,7 +129,7 @@ class ApiTests(AppTestCase):
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="English 12")
-        self.verify_inserted(BookPerson, lastname="Pérez-Reverte",
+        self.verify_inserted(Contributor, lastname="Pérez-Reverte",
           firstname="Arturo")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
@@ -145,7 +145,7 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(BookPerson, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
@@ -174,7 +174,7 @@ class ApiTests(AppTestCase):
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(BookPerson, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschenbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
@@ -233,14 +233,14 @@ class ApiTests(AppTestCase):
 
         def insert_bookpersons(persons):
             for p in persons:
-                bp = BookPerson(firstname=p["firstname"],
-                  lastname=p["lastname"], creator=self.admin_user.id)
+                bp = Contributor(firstname=p["firstname"],
+                  lastname=p["lastname"], creator_id=self.admin_user.id)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
         
         def verify_bookperson(p):
-            self.verify_inserted(BookPerson, firstname=p["firstname"],
+            self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
 
         _creator = LibrarianFactory()
@@ -342,9 +342,9 @@ class ApiTests(AppTestCase):
         single_rv = self.client.post("/api/add/books", data=single_author)
         self.assertEquals(200, single_rv.status_code)
         
-        gaimen = (librarian.db.session.query(BookPerson)
-          .filter(BookPerson.firstname == 'Neil')
-          .filter(BookPerson.lastname == 'Gaiman').all())
+        gaimen = (librarian.db.session.query(Contributor)
+          .filter(Contributor.firstname == 'Neil')
+          .filter(Contributor.lastname == 'Gaiman').all())
 
         self.assertEquals(1, len(gaimen))
 
@@ -396,7 +396,7 @@ class ApiTests(AppTestCase):
         empty = json.loads(self.client.get("/api/read/persons").data)
         self.assertEqual(len(empty["data"]), 0)
 
-        persons = [BookPersonFactory() for _ in range(8)]
+        persons = [ContributorFactory() for _ in range(8)]
 
         for p in persons:
             librarian.db.session.add(p)
@@ -411,8 +411,27 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
+        contribs = librarian.db.session.query(Contributor).all()
+        self.assertEquals(0, len(contribs))
+        companies = librarian.db.session.query(BookCompany).all()
+        self.assertEquals(0, len(companies))
+        books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(books))
+        a_contribs = librarian.db.session.query(BookContribution).all()
+        self.assertEquals(0, len(a_contribs))
+
         library = create_library(librarian.db.session, self.admin_user,
           self.ROLE_IDS, book_person_c=12, company_c=8, book_c=12, participant_c=32)
+
+        contribs = librarian.db.session.query(Contributor).all()
+        self.assertEquals(12, len(contribs))
+        companies = librarian.db.session.query(BookCompany).all()
+        self.assertEquals(8, len(companies))
+        books = librarian.db.session.query(Book).all()
+        self.assertEquals(12, len(books))
+        a_contribs = librarian.db.session.query(BookContribution).all()
+        self.assertEquals(32, len(a_contribs))
+
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]

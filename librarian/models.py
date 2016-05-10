@@ -4,6 +4,7 @@ from librarian import app, cache, db
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 
 import config
 
@@ -32,17 +33,17 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
-    given_creator = kwargs.pop("creator", None)
+    given_creator = kwargs.pop("creator_id", None)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
         if given_creator:
-            kwargs["creator"] = given_creator
-        else:
+            kwargs["creator_id"] = given_creator
+        elif not issubclass(model, UserMixin):
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
-            kwargs["creator"] = admin
+            kwargs["creator_id"] = admin.id
 
         instance = model(**kwargs)
         if will_commit:
@@ -96,32 +97,37 @@ class UserTaggedBase(Base):
     __abstract__ = True
 
     @declared_attr
-    def creator(self):
+    def creator_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
     @declared_attr
-    def last_modifier(self):
+    def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
 class Genre(UserTaggedBase):
     __tablename__ = "genres"
     name = db.Column(db.String(40), nullable=False, unique=True)
+    creator = relationship("Librarian", foreign_keys="Genre.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Genre.last_modifier_id")
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Book(UserTaggedBase):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
-    genre = db.Column(db.Integer, db.ForeignKey("genres.id",
+    genre_id = db.Column(db.Integer, db.ForeignKey("genres.id",
       name="book_genre_fk"))
-    publisher = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    publisher_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="book_book_company_fk1"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
       server_default=str(ISBN_START))
+
+    genre = relationship("Genre")
+    publisher = relationship("BookCompany")
 
     def __init__(self, **kwargs):
         if not isbn_check(kwargs["isbn"]):
@@ -130,11 +136,13 @@ class Book(UserTaggedBase):
         self.publish_year = int(kwargs["publish_year"])
         self.isbn = kwargs["isbn"]
         self.title = kwargs["title"]
-        self.genre = kwargs["genre"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
-        self.printer = kwargs["printer"]
-        self.publisher = kwargs["publisher"]
+        self.genre_id = kwargs["genre_id"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
+        self.publisher_id = kwargs["publisher_id"]
+
+    def __str__(self):
+        return self.title + "/" + self.isbn
 
 class BookCompany(UserTaggedBase):
     """
@@ -145,24 +153,32 @@ class BookCompany(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
+
+    def __str__(self):
+        return self.name
 
 class Imprint(UserTaggedBase):
     __tablename__ = "imprints"
-    mother_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk1"))
-    imprint_company = db.Column(db.Integer, db.ForeignKey("book_companies.id",
+    imprint_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk2"))
+    
+    mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
+    #mother_company = relationship("BookCompany")
+    imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
+    #imprint_company = relationship("BookCompany")
 
     def __init__(self, **kwargs):
-        self.mother_company = kwargs["mother_company"]
-        self.imprint_company = kwargs["imprint_company"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.mother_company_id = kwargs["mother_company"]
+        self.imprint_company_id = kwargs["imprint_company"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
-class BookPerson(UserTaggedBase):
-    __tablename__ = "book_persons"
+class Contributor(UserTaggedBase):
+    __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
@@ -170,8 +186,8 @@ class BookPerson(UserTaggedBase):
     def __init__(self, **kwargs):
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
@@ -188,41 +204,51 @@ class Role(UserTaggedBase):
     name = db.Column(db.String(255), unique=True, nullable=False)
     display_text = db.Column(db.String(255), nullable=False)
 
+    creator = relationship("Librarian", foreign_keys="Role.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Role.last_modifier_id")
+
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
         self.display_text = kwargs["display_text"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
     @staticmethod
     @cache.memoize(config.CACHE_TIMEOUT)
     def get_preset_role(role_name):
         role = Role.query.filter_by(name=role_name).first()
         return role
+
+    def __str__(self):
+        return self.name
         
 
-class BookParticipant(UserTaggedBase):
+class BookContribution(UserTaggedBase):
     """
     Consider that 99% of books will need the same roles over and over. 
     """
-    __tablename__ = "book_participants"
+    __tablename__ = "book_contributions"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="book_participant_book_fk1"))
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+    contributor_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
       name="book_participant_book_person_fk1"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
       name="book_pariticipant_role_fk1"))
 
+    book = relationship("Book")
+    contributor = relationship("Contributor")
+    role = relationship("Role")
+
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
-        self.person_id = kwargs["person_id"]
+        self.contributor_id = kwargs["contributor_id"]
         self.role_id = kwargs["role_id"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
-          (str(self.person_id), str(self.book_id), str(self.role_id))
+          (str(self.contributor), str(self.book), str(self.role))
 
 class Printer(UserTaggedBase):
     __tablename__ = "printers"
@@ -231,11 +257,14 @@ class Printer(UserTaggedBase):
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="printer_book_fk1"), primary_key = True)
 
+    company = relationship("BookCompany")
+    book = relationship("Book")
+
     def __init__(self, **kwargs):
         self.book_id = kwargs["book_id"]
         self.company_id = kwargs["company_id"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]
 
 class Pseudonym(UserTaggedBase):
     """
@@ -244,7 +273,7 @@ class Pseudonym(UserTaggedBase):
     Is this table ever going into any use?
     """
     __tablename__ = "pseudonyms"
-    person_id = db.Column(db.Integer, db.ForeignKey("book_persons.id",
+    person_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
       name="pseudonym_book_person_fk1"))
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="pseudonym_book_fk1"))
@@ -252,10 +281,13 @@ class Pseudonym(UserTaggedBase):
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
 
+    person = relationship("Contributor")
+    book = relationship("Book")
+
     def __init__(self, **kwargs):
         self.person_id = kwargs["person_id"]
         self.book_id = kwargs["book_id"]
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator = kwargs["creator"]
-        self.last_modifier = kwargs["creator"]
+        self.creator_id = kwargs["creator_id"]
+        self.last_modifier_id = kwargs["creator_id"]

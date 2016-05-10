@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, BookPerson, BookParticipant
+from librarian.models import Book, BookCompany, Contributor, BookContribution
 from librarian.tests.dummies import LibraryEntry
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, BookPersonFactory,
+  BookFactory, BookCompanyFactory, ContributorFactory,
 )
 
 import random
@@ -23,21 +23,26 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
 
     Returns a list of `LibraryEntry` objects.
     """
-    book_persons = [BookPersonFactory() for _ in range(book_person_c)]
+    book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
-    person_ids = [bp.firstname for bp in book_persons]
+    person_fns = [bp.firstname for bp in book_persons]
 
     for bp in book_persons:
-        bp.creator = admin.id
+        bp.creator_id = admin.id
         session.add(bp)
 
     for co in printers:
+        co.creator_id = admin.id
         session.add(co)
 
-    books = [BookFactory() for _ in range(book_c)]
+    session.commit()
+    printers = session.query(BookCompany).all()
+
+    books = [BookFactory(publisher_id=random.choice(printers).id) for _ in range(book_c)]
     book_isbns = [b.isbn for b in books]
 
     for b in books:
+        b.creator_id = admin.id
         session.add(b)
 
     session.commit()
@@ -48,8 +53,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for _ in range(participant_c):
         rand_isbn = random.choice(book_isbns)
         rand_book = session.query(Book).filter(Book.isbn == rand_isbn).first()
-        rand_person_id = random.choice(person_ids)
-        rand_person = session.query(BookPerson).filter(BookPerson.firstname == rand_person_id).first()
+        rand_person_fn = random.choice(person_fns)
+        rand_person = session.query(Contributor).filter(Contributor.firstname == rand_person_fn).first()
         rand_role = random.choice(roles)
         _role = rand_role.lower()
 
@@ -61,9 +66,9 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
                 library[rand_isbn][_role] = [{"lastname": rand_person. lastname,
                   "firstname": rand_person.firstname},]
 
-            bp = BookParticipant(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_map[rand_role],
-              creator=admin.id)
+            bp = BookContribution(book_id=rand_book.id,
+              contributor_id=rand_person.id, role_id=role_map[rand_role],
+              creator_id=admin.id)
             session.add(bp)
             session.flush()
         else:
@@ -71,14 +76,16 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
             library[rand_isbn]["title"] = rand_book.title
             library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
               "firstname": rand_person.firstname}]
-            library[rand_isbn]["publisher"] = rand_book.publisher
+            library[rand_isbn]["publisher"] = rand_book.publisher.name
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
-            bp = BookParticipant(book_id=rand_book.id,
-              person_id=rand_person.id, role_id=role_map[rand_role],
-              creator=admin.id)
+            bp = BookContribution(book_id=rand_book.id,
+              contributor_id=rand_person.id, role_id=role_map[rand_role],
+              creator_id=admin.id)
             session.add(bp)
             session.flush()
+
+    session.commit()
 
     library_list = []
 

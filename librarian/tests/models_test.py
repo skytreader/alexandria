@@ -26,7 +26,7 @@ class ModelsTest(AppTestCase):
         self.assertEqual([], graphic_novels)
         
         gn_genre = get_or_create(Genre, will_commit=True, name="Graphic Novel",
-          creator=other_librarian.id)
+          creator_id=other_librarian.id)
 
         self.assertEqual("Graphic Novel", gn_genre.name)
 
@@ -40,7 +40,7 @@ class ModelsTest(AppTestCase):
         self.assertEqual([], graphic_novels)
 
         gn_genre = get_or_create(Genre, will_commit=False, name="Graphic Novel",
-          creator = self.admin_user.id)
+          creator_id = self.admin_user.id)
 
         self.assertEqual("Graphic Novel", gn_genre.name)
 
@@ -50,7 +50,7 @@ class ModelsTest(AppTestCase):
 
     def test_get_or_create_preexisting(self):
         other_librarian = LibrarianFactory()
-        horror = Genre(name="Horror", creator=self.admin_user.id)
+        horror = Genre(name="Horror", creator_id=self.admin_user.id)
         librarian.db.session.add(horror)
         librarian.db.session.flush()
 
@@ -64,7 +64,7 @@ class ModelsTest(AppTestCase):
 
         # Test that creator should be ignored when getting via get_or_create
         horror_other = get_or_create(Genre, name="Horror",
-          creator=other_librarian.id)
+          creator_id=other_librarian.id)
         self.assertEqual(horror_goc, horror_other)
     
     def test_get_or_create_insuff(self):
