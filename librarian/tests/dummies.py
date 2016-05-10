@@ -57,17 +57,19 @@ class LibraryEntry(object):
         print "editor", self.editor == le.editor
         print "translator", self.translator == le.translator
         print "publisher", self.publisher == le.publisher
+        print type(self.publisher), "vs", type(le.publisher)
         return (self.isbn == le.isbn and self.title == le.title and
           self.author == le.author and self.illustrator == le.illustrator and
           self.editor == le.editor and self.translator == le.translator and
           self.publisher == le.publisher)
 
     def __hash__(self):
-        print "hashing", str(self), hash((self.isbn, self.title, self.author, self.illustrator,
-          self.translator, self.publisher))
+        print "hashing", str(self), hash((self.isbn, self.title, self.publisher))# self.author, self.illustrator,
+        #  self.translator, self.publisher))
 
-        return hash((self.isbn, self.title, self.author, self.illustrator,
-          self.translator, self.publisher))
+        return hash(self.isbn)
+        #return hash((self.isbn, self.title, self.publisher))# self.author, self.illustrator,
+        #self.translator, self.publisher))
 
     def __str__(self):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.author),

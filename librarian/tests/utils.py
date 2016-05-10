@@ -76,7 +76,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
             library[rand_isbn]["title"] = rand_book.title
             library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
               "firstname": rand_person.firstname}]
-            library[rand_isbn]["publisher"] = rand_book.publisher
+            library[rand_isbn]["publisher"] = rand_book.publisher.name
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
             bp = BookContribution(book_id=rand_book.id,
@@ -92,6 +92,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
+        print "Utils", book
         library_list.insert(0, LibraryEntry(**book))
 
     return library_list
