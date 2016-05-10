@@ -92,7 +92,6 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
-        print "Utils", book
         library_list.insert(0, LibraryEntry(**book))
 
     return library_list
