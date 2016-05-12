@@ -49,7 +49,14 @@
                 </div>
             </div>
         {% endif %}
-        {{ book.publisher }}
+        <div class="row">
+            <div class="col-md-2 creator-label">
+                <i class="fa fa-building"></i> <strong>Publisher:</strong>
+            </div>
+            <div class="col-md-9">
+                {{book.publisher}}
+            </div>
+        </div>
     </div>
 </div>
 {% endmacro %}
