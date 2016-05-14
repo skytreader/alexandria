@@ -63,7 +63,16 @@
 
 {% block title %}Browse Books{% endblock %}
 {% block content %}
-    <h1>Browse the library's collection</h1>
+    {% if query %}
+        <h1>Showing results for "{{query}}"</h1>
+    {% else %}
+        <h1>Browse the library's collection</h1>
+    {% endif %}
+
+    {% if search_form %}
+        {% include "_book-search.jinja" %}
+        <br>
+    {% endif %}
 
     {% for book in books %}
         {{ render_card_catalog(book) }}

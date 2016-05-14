@@ -1,0 +1,14 @@
+{#
+Requires that the search form be in a context variable `search_form`.
+#}
+<form method="GET" action="/search">
+    <div class="input-group input-group-lg" style="width: 100%">
+        {{
+            search_form.q(class="search searchbox form-control",
+            placeholder="Find by title, author, or publisher")
+        }}
+        <span class="input-group-btn">
+            <input type="submit" class="search btn btn-primary" value="Search">
+        </span>
+    </div>
+</form>

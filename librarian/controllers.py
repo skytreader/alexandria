@@ -15,7 +15,7 @@ librarian_bp = Blueprint('librarian', __name__)
 def index():
     form = SearchForm(request.form)
     styles = ("index.css",)
-    return render_template("home.jinja", form=form, stylesheets=styles)
+    return render_template("home.jinja", search_form=form, stylesheets=styles)
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
@@ -89,7 +89,9 @@ def show_books():
 @librarian_bp.route("/search")
 def search():
     from librarian.api import search
+    search_form = SearchForm(request.form)
     searchq = request.args.get("q")
     books = search(searchq)
     styles = ("books.css",)
-    return render_template("books.jinja", stylesheets=styles, books=books)
+    return render_template("books.jinja", stylesheets=styles, books=books,
+      query=searchq, search_form=search_form)

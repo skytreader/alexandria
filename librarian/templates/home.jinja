@@ -11,17 +11,7 @@
             </span>
             <br>
             <br>
-            <form method="GET" action="/search">
-                <div class="input-group input-group-lg" style="width: 100%">
-                    {{
-                        form.q(class="search searchbox form-control",
-                        placeholder="Find by title, author, or publisher")
-                    }}
-                    <span class="input-group-btn">
-                        <input type="submit" class="search btn btn-primary" value="Search">
-                    </span>
-                </div>
-            </form>
+            {% include "_book-search.jinja" %}
             <br>
             <p class="log-in-prompt">
                 An actual Librarian? <a href="/login">Log-in here.</a>
