@@ -5,6 +5,38 @@ import re
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
+
+class BookRecord(object):
+    
+    def __init__(self, isbn, title, publisher, authors=None, translators=None,
+      illustrators=None, editors=None):
+        self.isbn = isbn
+        self.title = title
+        self.publisher = publisher
+        self.authors = authors if authors else []
+        self.translators = translators if translators else []
+        self.illustrators = illustrators if illustrators else []
+        self.editros = editors if editors else []
+
+    @staticmethod
+    def assembler(book_rows):
+        """
+        Takes in rows from a SQL query with the columns in the following order:
+    
+        0 - Book.isbn
+        1 - Book.title
+        2 - Contributor.lastname
+        3 - Contributor.firstname
+        4 - Role.name
+        5 - BookCompany.name
+    
+        And arranges them as an instance of this class.
+
+        Returns a list of instances of this class
+        """
+        structured = {}
+
+
 def isbn_check(isbn):
     """
     Checks for the valididty of the given ISBN string and returns a boolean to
