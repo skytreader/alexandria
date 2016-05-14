@@ -320,6 +320,7 @@ def quick_stats():
     contributors = len(db.session.query(BookContribution).all())
     stats["participants_per_book"] = (contributors / books)
     stats["recent_books"] = get_recent_books()
+    stats["book_count"] = books
     return flask.jsonify(stats)
 
 def search(searchq):

@@ -53,7 +53,10 @@ def dash():
     
     recent_books = stats["recent_books"]
 
-    return render_template("dashboard.jinja", contrib_stat=cpb_stat, recent_books=recent_books)
+    book_count = stats["book_count"]
+
+    return render_template("dashboard.jinja", contrib_stat=cpb_stat,
+      recent_books=recent_books, book_count=book_count)
 
 @librarian_bp.route("/logout")
 @login_required
