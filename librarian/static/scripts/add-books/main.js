@@ -500,6 +500,18 @@ function clearLists(){
     }
 }
 
+/**
+Checks the proxy textboxes for content creators that may not have been entered.
+*/
+function isCreatorPending(){
+    for(var i = 0; i < CREATORS.length; i++){
+        if($("#" + CREATORS[i] + "-proxy-lastname").val() || $("#" + CREATORS[i] + "-proxy-firstname").val()){
+            return true;
+        }
+    }
+    return false;
+}
+
 $.validator.addMethod("isbnVal", function(value, element, param){
     var stripped = value.trim();
     return verifyISBN10(stripped) || verifyISBN13(stripped);
@@ -511,6 +523,7 @@ Just check if it is a 4-digit number.
 $.validator.addMethod("yearVal", function(value, element, param){
     return /^\d{4}$/.test(value);
 }, "Please enter a valid year.");
+
 
 $(document).ready(function(){
     alertify.parent(document.body);
@@ -619,7 +632,9 @@ $(document).ready(function(){
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(function(){
-        if($("#proxy-form").valid()){
+        if(isCreatorPending()){
+            alertify.alert("Did you forget to hit add on a creator's name? Please add all creators first before proceeding.");
+        } else if($("#proxy-form").valid()){
             var spine = renderSpine();
             internalizeBook(spine);
             window.visualQueue.prepend(spine);
@@ -627,7 +642,7 @@ $(document).ready(function(){
             clearProxyForm();
             clearLists();
         } else{
-            alertify.alert("There is a problem with that book's details. Check the fields for specifics.");
+            alertify.alert("There is a problem with this book's details. Check the fields for specifics.");
         }
     });
 
