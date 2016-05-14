@@ -323,8 +323,40 @@ def quick_stats():
     return flask.jsonify(stats)
 
 def search(searchq):
-    results = (db.session.query(Book)
+    results = (db.session.query(Book.isbn, Book.title, Contributor.lastname,
+      Contributor.firstname, Role.name, BookCompany.name)
       .filter(Book.title.like("".join(("%", searchq, "%"))))
+      .filter(Book.id == BookContribution.book_id)
+      .filter(BookContribution.contributor_id == Contributor.id)
+      .filter(BookContribution.role_id == Role.id)
+      .filter(Book.publisher_id == BookCompany.id)
       .all())
 
-    return results
+    structured_catalog = {}
+    
+    for book in results:
+        record_exists = structured_catalog.get(book[0])
+        role = book[4].lower()
+
+        if record_exists:
+            if structured_catalog[book[0]].get(role):
+                structured_catalog[book[0]][role].append({"lastname": book[2],
+                  "firstname": book[3]})
+            else:
+                structured_catalog[book[0]][role] = [{"lastname": book[2],
+                  "firstname": book[3]}]
+        else:
+            fmt = {"title": book[1],
+              role: [{"lastname": book[2], "firstname": book[3]}],
+              "publisher": book[5]}
+
+            structured_catalog[book[0]] = fmt
+
+    book_listing = []
+
+    for isbn in structured_catalog.keys():
+        book = structured_catalog[isbn]
+        book["isbn"] = isbn
+        book_listing.insert(0, book)
+
+    return book_listing
