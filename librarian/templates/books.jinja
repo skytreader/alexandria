@@ -74,6 +74,10 @@
         <br>
     {% endif %}
 
+    {% if not books|length %}
+        <h2>Nothing found.</h2>
+    {% endif %}
+
     {% for book in books %}
         {{ render_card_catalog(book) }}
     {% endfor %}
