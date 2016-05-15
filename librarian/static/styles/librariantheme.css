@@ -73,6 +73,7 @@ div.main_box {
 
 div.content_box {
     margin: 5px;
+    padding: 8px;
     float: left;
     width: 99%;
 }
@@ -143,6 +144,22 @@ label.input-holder{
 
 .panel-body ul{
     padding-left: 1em;
+}
+
+/**
+Use this on rows to have columns be of equal height.
+*/
+.row-eq-height{
+    display: flex;
+}
+
+/**
+Enclose panels in a row to have them of equal height. Then, declare the panel
+and panel-default class in the same div as the column declaration.
+*/
+.row-eq-panels{
+    display: flex;
+    padding: 0px 15px;
 }
 
 /*Forms*/
