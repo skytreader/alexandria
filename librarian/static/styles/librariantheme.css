@@ -163,11 +163,11 @@ and panel-default class in the same div as the column declaration.
     margin-bottom: 8px;
 }
 
-.panel-col:not(:first-child){
+.row-eq-panels .panel-col:not(:first-child){
     margin: 0px 7px;
 }
 
-.panel-col{
+.row-eq-panels .panel-col{
     margin-bottom: 0px;
 }
 
