@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from base import AppTestCase
 from faker import Faker
-from librarian.tests.fakers import BookFieldsProvider
+from librarian.tests.fakers import BookFieldsProvider, ContributorFactory
+from librarian.models import BookContribution
 
 import unittest
+import librarian
 import librarian.utils
 
 class IsbnTests(unittest.TestCase):
@@ -31,3 +34,26 @@ class IsbnTests(unittest.TestCase):
 
         for i in range(100):
             self.assertTrue(librarian.utils.isbn_check(fake.isbn(False)))
+
+class BookRecordTests(AppTestCase):
+    
+    def test_assembler(self):
+        author_a1 = ContributorFactory()
+        translator_a1 = ContributorFactory()
+        illustrator_a1 = ContributorFactory()
+        illustrator_a2 = ContributorFactory()
+        book_a = BookFactory()
+        self.session_add_all((author_a1, translator_a1, illustrator_a1,
+          illustrator_a2, book_a))
+        librarian.db.session.flush()
+
+        booka_author = BookContribution(book_id=book_a.id,
+          role_id=self.ROLE_IDS["Author"], contributor_id=author_a1.id)
+        booka_translator = BookContribution(book_id=book_a.id,
+          role_id=self.ROLE_IDS["Translator"], contributor_id=translator_a1.id)
+        booka_illus_1 = BookContribution(book_id=book_a.id,
+          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a1.id)
+        booka_illus_2 = BookContribution(book_id=book_a.id,
+          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a2.is)
+        self.session_add_all((booka_author, booka_translator, booka_illus_1,
+          booka_illus_2))

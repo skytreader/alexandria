@@ -38,6 +38,10 @@ class AppTestCase(TestCase):
         self.assertTrue(record is not None)
         return record
 
+    def session_add_all(self, records):
+        for r in records:
+            librarian.db.session.add(r)
+
     def verify_does_not_exist(self, model, **kwargs):
         """
         Verify that the record described by **kwargs is not yet in the table
