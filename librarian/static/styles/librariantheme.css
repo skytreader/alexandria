@@ -160,6 +160,15 @@ and panel-default class in the same div as the column declaration.
 .row-eq-panels{
     display: flex;
     padding: 0px 15px;
+    margin-bottom: 8px;
+}
+
+.panel-col:not(:first-child){
+    margin: 0px 7px;
+}
+
+.panel-col{
+    margin-bottom: 0px;
 }
 
 /*Forms*/
