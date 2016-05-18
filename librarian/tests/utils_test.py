@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from base import AppTestCase
 from faker import Faker
-from librarian.tests.fakers import BookFieldsProvider, ContributorFactory
+from librarian.tests.fakers import BookFieldsProvider
+from librarian.tests.factories import BookFactory, ContributorFactory
 from librarian.models import BookContribution
 
 import unittest
@@ -48,12 +49,16 @@ class BookRecordTests(AppTestCase):
         librarian.db.session.flush()
 
         booka_author = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Author"], contributor_id=author_a1.id)
+          role_id=self.ROLE_IDS["Author"], contributor_id=author_a1.id,
+          creator_id=self.admin_user.id)
         booka_translator = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Translator"], contributor_id=translator_a1.id)
+          role_id=self.ROLE_IDS["Translator"], contributor_id=translator_a1.id,
+          creator_id=self.admin_user.id)
         booka_illus_1 = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a1.id)
+          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a1.id,
+          creator_id=self.admin_user.id)
         booka_illus_2 = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a2.is)
+          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a2.id,
+          creator_id=self.admin_user.id)
         self.session_add_all((booka_author, booka_translator, booka_illus_1,
           booka_illus_2))
