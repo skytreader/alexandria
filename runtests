@@ -1,4 +1,4 @@
 #! /bin/bash
 
-export TESTING=True
+export alexandria_TESTING=True
 nosetests $1

@@ -5,9 +5,14 @@ DEVEL environment is understood as running a local instance of the app.
 
 TESTING environment on the other hand is understood as running the unit tests
 for the app.
+
+SUDO environment should only be triggered for running privileged admin commands,
+usually via Fabric.
 """
+APP_NAME = "alexandria"
 DEVEL = True
-TESTING = bool(os.environ.get("TESTING"))
+TESTING = bool(os.environ.get("_".join((APP_NAME, "TESTING"))))
+SUDO = bool(os.environ.get("_".join((APP_NAME, "SUDO"))))
 
 # Define the application directory
 import os

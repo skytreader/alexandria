@@ -20,9 +20,9 @@ def __env_safeguard(fab_method):
     return check
 
 @__env_safeguard
-def reset_db_data():
+def reset_db_data(is_test=False):
     """
-    Truncate all database tables.
+    Truncate all database tables. Pass `is_test:True` to reset test db.
     """
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
