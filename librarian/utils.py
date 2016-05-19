@@ -5,7 +5,6 @@ import re
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
-
 class BookRecord(object):
     
     def __init__(self, isbn, title, publisher, authors=None, translators=None,
@@ -16,7 +15,18 @@ class BookRecord(object):
         self.authors = authors if authors else []
         self.translators = translators if translators else []
         self.illustrators = illustrators if illustrators else []
-        self.editros = editors if editors else []
+        self.editors = editors if editors else []
+
+    def __eq__(self, br):
+        return (self.isbn == br.isbn and self.title == br.title and
+          self.publisher == br.publisher and set(self.authors) == set(br.authors)
+          and set(self.translators) == set(br.translators) and
+          set(self.illustrators) == set(br.illustrators) and
+          set(self.editors) == set(br.illustrators))
+
+    def __hash__(self):
+        return hash((self.isbn, self.title, self.publisher, self.authors,
+          self.translators, self.illustrators, self.editors))
 
     @staticmethod
     def assembler(book_rows):

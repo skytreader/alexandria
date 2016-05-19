@@ -192,6 +192,10 @@ class Contributor(UserTaggedBase):
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
 
+    # TODO Use this even in tests
+    def make_plain_person(self):
+        return {"lastname": self.lastname, "firstname": self.firstname}
+
 class Role(UserTaggedBase):
     """
     The purpose of this table is to enumerate the contributions we are interested
