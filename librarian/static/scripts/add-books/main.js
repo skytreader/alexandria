@@ -206,7 +206,6 @@ same.
 Returns a list of Person objects.
 */
 function getCreatorNames(creator){
-    console.info("looking for", creator);
     var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
     var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
     var persons = [];
@@ -566,11 +565,9 @@ $(document).ready(function(){
     
         if(fromQ){
             var limit = window.realFormIds.length;
-            console.log("fromQ is", fromQ);
     
             for(var i = 0; i < limit; i++){
                 document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
-                console.log("got this", fromQ[window.realFormIds[i]]);
             }
     
             return fromQ;
@@ -673,7 +670,6 @@ $(document).ready(function(){
 
     // Start the polling interval timers.
     setInterval(function(){
-        console.debug("Polling main")
         var foo = loadFromQueueToForm(window.bookQueue);
         if(foo){
             sendSaveForm(foo.domElement);
@@ -681,7 +677,6 @@ $(document).ready(function(){
     }, PROCESS_INTERVAL);
     
     setInterval(function(){
-        console.debug("Polling reprocess");
         var foo = loadFromQueueToForm(window.reprocessQueue);
         if(foo){
             sendSaveForm(foo.domElement);
