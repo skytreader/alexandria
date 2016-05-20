@@ -68,8 +68,9 @@ def logout():
 @login_required
 def add_books():
     form = AddBooksForm()
-    scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js", "add-books/main.js",
-      "add-books/types.js", "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
+    scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
+      "add-books/main.js", "add-books/book-details.js", "add-books/types.js",
+      "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.js"]
 
     if config.DEVEL:
