@@ -26,10 +26,6 @@ var booksSaved = 0;
 var booksErrorNoRetry = 0;
 var booksReprocessable = 0;
 
-var BOOK_PERSONS = [];
-var BOOK_PERSONS_LASTNAME = [];
-var BOOK_PERSONS_FIRSTNAME = [];
-var BOOK_PERSONS_SET = new Set();
 var COMPANIES = [];
 var GENRES = [];
 /**
@@ -78,36 +74,6 @@ function fillCompanies(){
         },
         "error": function(jqXHR, textStatus, error){
             setTimeout(window.fillCompanies, 8000)
-        }
-    });
-}
-
-function fillNames(){
-    $.ajax("/api/read/persons", {
-        "type": "GET",
-        "success": function(data, textStatus, jqXHR){
-            var allNames = data["data"];
-            BOOK_PERSONS = allNames;
-            BOOK_PERSONS_SET.addAll(allNames);
-            var allLastnames = _.map(allNames, function(x){return x["lastname"]});
-            var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
-
-            var lastnameSet = new Set(allLastnames);
-            var firstnameSet = new Set(allFirstnames);
-
-            BOOK_PERSONS_LASTNAME = [...lastnameSet];
-            BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
-
-            $(".auto-lastname").autocomplete({
-                source: window.BOOK_PERSONS_LASTNAME
-            });
-
-            $(".auto-firstname").autocomplete({
-                source: window.BOOK_PERSONS_FIRSTNAME
-            });
-        },
-        "error": function(jqXHR, textStatus, error){
-            setTimeout(window.fillNames, 8000);
         }
     });
 }
@@ -483,6 +449,10 @@ $.validator.addMethod("yearVal", function(value, element, param){
 }, "Please enter a valid year.");
 
 
+/**
+TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
+main.js will only contain this $(document).ready.
+*/
 $(document).ready(function(){
     alertify.parent(document.body);
     /**
@@ -597,6 +567,7 @@ $(document).ready(function(){
             updateStatCounts();
             clearProxyForm();
             clearLists();
+            resetAutocomplete();
         } else{
             alertify.alert("There is a problem with this book's details. Check the fields for specifics.");
         }
