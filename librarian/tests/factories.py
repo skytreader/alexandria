@@ -60,7 +60,8 @@ class BookFactory(factory.alchemy.SQLAlchemyModelFactory):
     isbn = factory.LazyAttribute(lambda x: fake.isbn())
     title = factory.LazyAttribute(lambda x: fake.title())
     genre_id = factory.LazyAttribute(lambda x: GenreFactory().id)
-    publisher_id = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
+    #publisher_id = factory.LazyAttribute(lambda x: BookCompanyFactory().id)
+    publisher = factory.SubFactory(BookCompanyFactory)
     publish_year = factory.LazyAttribute(lambda x: fake.year())
     creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
 
