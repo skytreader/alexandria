@@ -33,17 +33,17 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
-    given_creator = kwargs.pop("creator_id", None)
+    given_creator = kwargs.pop("creator", None)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
         if given_creator:
-            kwargs["creator_id"] = given_creator
+            kwargs["creator"] = given_creator
         elif not issubclass(model, UserMixin):
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
-            kwargs["creator_id"] = admin.id
+            kwargs["creator"] = admin
 
         instance = model(**kwargs)
         if will_commit:
@@ -112,8 +112,10 @@ class Genre(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Book(UserTaggedBase):
     __tablename__ = "books"

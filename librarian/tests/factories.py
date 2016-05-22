@@ -38,7 +38,7 @@ class GenreFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: "Genre%s" % n)
-    creator_id = factory.LazyAttribute(lambda x: LibrarianFactory().id)
+    creator = factory.SubFactory(LibrarianFactory)
 
 
 class BookCompanyFactory(factory.alchemy.SQLAlchemyModelFactory):
