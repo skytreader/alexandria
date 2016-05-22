@@ -152,11 +152,15 @@ class BookCompany(UserTaggedBase):
     """
     __tablename__ = "book_companies"
     name = db.Column(db.String(255), nullable=False, unique=True)
+    creator = relationship("Librarian", foreign_keys="BookCompany.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="BookCompany.last_modifier_id")
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     def __str__(self):
         return self.name
@@ -219,8 +223,10 @@ class Role(UserTaggedBase):
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
         self.display_text = kwargs["display_text"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     @staticmethod
     @cache.memoize(config.CACHE_TIMEOUT)
