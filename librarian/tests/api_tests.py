@@ -234,7 +234,7 @@ class ApiTests(AppTestCase):
         def insert_bookpersons(persons):
             for p in persons:
                 bp = Contributor(firstname=p["firstname"],
-                  lastname=p["lastname"], creator_id=self.admin_user.id)
+                  lastname=p["lastname"], creator=self.admin_user)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()

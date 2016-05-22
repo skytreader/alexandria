@@ -169,9 +169,7 @@ class Imprint(UserTaggedBase):
       name="imprint_book_company_fk2"))
     
     mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
-    #mother_company = relationship("BookCompany")
     imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
-    #imprint_company = relationship("BookCompany")
 
     def __init__(self, **kwargs):
         self.mother_company_id = kwargs["mother_company"]
@@ -183,13 +181,18 @@ class Contributor(UserTaggedBase):
     __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
+    creator = relationship("Librarian", foreign_keys="Contributor.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Contributor.last_modifier_id")
+
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
     def __init__(self, **kwargs):
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
