@@ -72,7 +72,7 @@ class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.Sequence(lambda x: x)
     lastname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
-    firstname = factory.LazyAttribute(lambda x:fuzzy_text.fuzz())
+    firstname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
     creator = factory.SubFactory(LibrarianFactory)
 
 

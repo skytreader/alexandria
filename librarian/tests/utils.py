@@ -3,7 +3,7 @@ from factory.fuzzy import FuzzyText
 from librarian.models import Book, BookCompany, Contributor, BookContribution
 from librarian.tests.dummies import LibraryEntry
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, ContributorFactory,
+  BookFactory, BookCompanyFactory, ContributorFactory
 )
 
 import random
@@ -38,7 +38,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     session.commit()
     printers = session.query(BookCompany).all()
 
-    books = [BookFactory(publisher_id=random.choice(printers).id) for _ in range(book_c)]
+    books = [BookFactory(publisher=random.choice(printers)) for _ in range(book_c)]
     book_isbns = [b.isbn for b in books]
 
     for b in books:

@@ -141,7 +141,8 @@ class Book(UserTaggedBase):
         self.genre_id = kwargs["genre_id"]
         self.creator_id = kwargs["creator_id"]
         self.last_modifier_id = kwargs["creator_id"]
-        self.publisher_id = kwargs["publisher_id"]
+        self.publisher = kwargs["publisher"]
+        self.publisher_id = self.publisher.id
 
     def __str__(self):
         return self.title + "/" + self.isbn
