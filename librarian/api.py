@@ -87,7 +87,7 @@ def book_adder():
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
-              genre_id=genre.id, creator_id=current_user.get_id(),
+              genre=genre, creator=current_user,
               publisher=publisher, publish_year=int(form.year.data))
             db.session.add(book)
             db.session.flush()
