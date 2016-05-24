@@ -269,7 +269,6 @@ class BookContribution(UserTaggedBase):
     last_modifier = relationship("Librarian", foreign_keys="BookContribution.last_modifier_id")
 
     def __init__(self, **kwargs):
-        print "kwargs is", kwargs
         self.book = kwargs["book"]
         self.book_id = self.book.id
         self.contributor = kwargs["contributor"]

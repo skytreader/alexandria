@@ -44,48 +44,43 @@ class BookRecordTests(AppTestCase):
         #translator_a1 = ContributorFactory()
         #illustrator_a1 = ContributorFactory()
         #illustrator_a2 = ContributorFactory()
-        #book_a = BookFactory()
+        book_a = BookFactory()
         #self.session_add_all((author_a1, translator_a1, illustrator_a1,
         #  illustrator_a2, book_a))
         #librarian.db.session.flush()
 
-        booka_author = BookContributionFactory(role=Role.get_preset_role("Author"))
+        booka_author = BookContributionFactory(role=Role.get_preset_role("Author"),
+          book=book_a)
         librarian.db.session.add(booka_author)
-        booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"))
+        booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
+          book=book_a)
         librarian.db.session.add(booka_translator)
-        booka_translator_test = BookContributionFactory(role=Role.get_preset_role("Translator"))
-        librarian.db.session.add(booka_translator_test)
-        booka_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
+        booka_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=book_a)
         librarian.db.session.add(booka_illus_1)
-        booka_illus_2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
+        librarian.db.session.commit()
+        booka_illus_2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=book_a)
         librarian.db.session.add(booka_illus_2)
-        #self.session_add_all((booka_author, booka_translator, booka_illus_1,
-        #  booka_illus_2))
-        librarian.db.session.flush()
+        librarian.db.session.commit()
 
-        authors_a = [author_a1.make_plain_person()]
-        translators_a = [translator_a1.make_plain_person()]
-        illustrators_a = [illustrator_a1.make_plain_person(),
-          illustrator_a2.make_plain_person()]
-        book_record_a = BookRecord(isbn=book_a.isbn, title=book_a.title,
-          publisher=book_a.publisher.name, authors=authors_a,
-          translators=translators_a, illustrators=illustrators_a)
+        #authors_a = [author_a1.make_plain_person()]
+        #translators_a = [translator_a1.make_plain_person()]
+        #illustrators_a = [illustrator_a1.make_plain_person(),
+        #  illustrator_a2.make_plain_person()]
+        #book_record_a = BookRecord(isbn=book_a.isbn, title=book_a.title,
+        #  publisher=book_a.publisher.name, authors=authors_a,
+        #  translators=translators_a, illustrators=illustrators_a)
 
-        author_b1 = ContributorFactory()
-        translator_b1 = ContributorFactory()
-        illustrator_b1 = ContributorFactory()
-        book_b = BookFactory()
-        self.session_add_all((author_b1, translator_b1, illustrator_b1, book_b))
-        librarian.db.session.flush()
+        #author_b1 = ContributorFactory()
+        #translator_b1 = ContributorFactory()
+        #illustrator_b1 = ContributorFactory()
+        #book_b = BookFactory()
+        #self.session_add_all((author_b1, translator_b1, illustrator_b1, book_b))
+        #librarian.db.session.flush()
 
-        bookb_author = BookContribution(book=book_b,
-          role=Role.get_preset_role("Author"), contributor=author_a1,
-          creator=self.admin_user)
-        bookb_translator = BookContribution(book=book_b,
-          role=Role.get_preset_role("Translator"), contributor=translator_b1,
-          creator=self.admin_user)
-        bookb_illus_1 = BookContribution(book=book_b,
-          role=Role.get_preset_role("Illustrator"), contributor=illustrator_b1,
-          creator=self.admin_user)
+        bookb_author = BookContributionFactory(role=Role.get_preset_role("Author"))
+        bookb_translator = BookContributionFactory(role=Role.get_preset_role("Translator"))
+        bookb_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
         self.session_add_all((bookb_author, bookb_translator, bookb_illus_1))
         librarian.db.session.flush()
