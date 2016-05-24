@@ -83,7 +83,7 @@ class Librarian(Base, UserMixin):
         self.is_user_active = kwargs.get("is_user_active", True)
 
     def __repr__(self):
-        return self.username
+        return self.username + "/" + str(self.id)
     
     def get_id(self):
         return self.id
@@ -150,6 +150,9 @@ class Book(UserTaggedBase):
     def __str__(self):
         return self.title + "/" + self.isbn
 
+    def __repr__(self):
+        return self.title + "/" + self.isbn + "/" + str(self.id)
+
 class BookCompany(UserTaggedBase):
     """
     List?! List?! This is better off in NoSQL form!
@@ -205,6 +208,9 @@ class Contributor(UserTaggedBase):
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
 
+    def __repr__(self):
+        return self.__str__()
+
     # TODO Use this even in tests
     def make_plain_person(self):
         return {"lastname": self.lastname, "firstname": self.firstname}
@@ -241,6 +247,8 @@ class Role(UserTaggedBase):
     def __str__(self):
         return self.name
         
+    def __repr__(self):
+        return self.name + "#" + str(self.id)
 
 class BookContribution(UserTaggedBase):
     """
@@ -257,13 +265,21 @@ class BookContribution(UserTaggedBase):
     book = relationship("Book")
     contributor = relationship("Contributor")
     role = relationship("Role")
+    creator = relationship("Librarian", foreign_keys="BookContribution.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="BookContribution.last_modifier_id")
 
     def __init__(self, **kwargs):
-        self.book_id = kwargs["book_id"]
-        self.contributor_id = kwargs["contributor_id"]
-        self.role_id = kwargs["role_id"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        print "kwargs is", kwargs
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
+        self.contributor = kwargs["contributor"]
+        self.contributor_id = self.contributor.id
+        self.role = kwargs["role"]
+        self.role_id = self.role.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
@@ -280,10 +296,14 @@ class Printer(UserTaggedBase):
     book = relationship("Book")
 
     def __init__(self, **kwargs):
-        self.book_id = kwargs["book_id"]
-        self.company_id = kwargs["company_id"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
+        self.company = kwargs["company"]
+        self.company_id = self.company.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Pseudonym(UserTaggedBase):
     """

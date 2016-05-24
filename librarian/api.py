@@ -93,8 +93,8 @@ def book_adder():
             db.session.flush()
 
             # Create printer entry
-            printer_record = Printer(company_id=printer.id, book_id=book.id,
-              creator_id=current_user.get_id())
+            printer_record = Printer(company=printer, book=book,
+              creator=current_user)
             db.session.add(printer_record)
 
             # Create the Contributors
@@ -110,35 +110,30 @@ def book_adder():
 
             # Assign participation
             for author in authors:
-                author_part = BookContribution(book_id=book.id,
-                  contributor_id=author.id, role_id=author_role.id,
-                  creator_id=current_user.get_id())
+                author_part = BookContribution(book=book, contributor=author,
+                  role=author_role, creator=current_user)
                 db.session.add(author)
                 db.session.add(author_part)
-            db.session.commit()
-
-            a = db.session.query(BookContribution).filter(BookContribution.book_id==book.id).all()
+                db.session.commit()
+                print "commit"
 
             for illustrator in illustrators:
-                illus_part = BookContribution(book_id=book.id,
-                  contributor_id=illustrator.id, role_id=illus_role.id,
-                  creator_id=current_user.get_id())
+                illus_part = BookContribution(book=book, contributor=illustrator,
+                  role=illus_role, creator=current_user)
                 db.session.add(illustrator)
                 db.session.add(illus_part)
             db.session.commit()
 
             for editor in editors:
-                editor_part = BookContribution(book_id=book.id,
-                  contributor_id=editor.id, role_id=editor_role.id,
-                  creator_id=current_user.get_id())
+                editor_part = BookContribution(book=book, contributor=editor,
+                  role=editor_role, creator=current_user)
                 db.session.add(editor)
                 db.session.add(editor_part)
             db.session.commit()
 
             for translator in translators:
-                translator_part = BookContribution(book_id=book.id,
-                  contributor_id=translator.id, role_id=trans_role.id,
-                  creator_id=current_user.get_id())
+                translator_part = BookContribution(book=book, 
+                  contributor=translator, role=trans_role, creator=current_user)
                 db.session.add(translator)
                 db.session.add(translator_part)
 

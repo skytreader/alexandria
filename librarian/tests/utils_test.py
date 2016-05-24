@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from base import AppTestCase
 from faker import Faker
-from librarian.models import BookContribution
+from librarian.models import BookContribution, Role
 from librarian.tests.fakers import BookFieldsProvider
-from librarian.tests.factories import BookFactory, ContributorFactory
+from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
 from librarian.utils import BookRecord
 
 import unittest
@@ -40,29 +40,27 @@ class IsbnTests(unittest.TestCase):
 class BookRecordTests(AppTestCase):
     
     def test_assembler(self):
-        author_a1 = ContributorFactory()
-        translator_a1 = ContributorFactory()
-        illustrator_a1 = ContributorFactory()
-        illustrator_a2 = ContributorFactory()
-        book_a = BookFactory()
-        self.session_add_all((author_a1, translator_a1, illustrator_a1,
-          illustrator_a2, book_a))
-        librarian.db.session.flush()
+        #author_a1 = ContributorFactory()
+        #translator_a1 = ContributorFactory()
+        #illustrator_a1 = ContributorFactory()
+        #illustrator_a2 = ContributorFactory()
+        #book_a = BookFactory()
+        #self.session_add_all((author_a1, translator_a1, illustrator_a1,
+        #  illustrator_a2, book_a))
+        #librarian.db.session.flush()
 
-        booka_author = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Author"], contributor_id=author_a1.id,
-          creator_id=self.admin_user.id)
-        booka_translator = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Translator"], contributor_id=translator_a1.id,
-          creator_id=self.admin_user.id)
-        booka_illus_1 = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a1.id,
-          creator_id=self.admin_user.id)
-        booka_illus_2 = BookContribution(book_id=book_a.id,
-          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_a2.id,
-          creator_id=self.admin_user.id)
-        self.session_add_all((booka_author, booka_translator, booka_illus_1,
-          booka_illus_2))
+        booka_author = BookContributionFactory(role=Role.get_preset_role("Author"))
+        librarian.db.session.add(booka_author)
+        booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"))
+        librarian.db.session.add(booka_translator)
+        booka_translator_test = BookContributionFactory(role=Role.get_preset_role("Translator"))
+        librarian.db.session.add(booka_translator_test)
+        booka_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
+        librarian.db.session.add(booka_illus_1)
+        booka_illus_2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
+        librarian.db.session.add(booka_illus_2)
+        #self.session_add_all((booka_author, booka_translator, booka_illus_1,
+        #  booka_illus_2))
         librarian.db.session.flush()
 
         authors_a = [author_a1.make_plain_person()]
@@ -80,14 +78,14 @@ class BookRecordTests(AppTestCase):
         self.session_add_all((author_b1, translator_b1, illustrator_b1, book_b))
         librarian.db.session.flush()
 
-        bookb_author = BookContribution(book_id=book_b.id,
-         role_id=self.ROLE_IDS["Author"], contributor_id=author_a1.id,
-         creator_id=self.admin_user.id)
-        bookb_translator = BookContribution(book_id=book_b.id,
-          role_id=self.ROLE_IDS["Translator"], contributor_id=translator_b1.id,
-          creator_id=self.admin_user.id)
-        bookb_illus_1 = BookContribution(book_id=book_b.id,
-          role_id=self.ROLE_IDS["Illustrator"], contributor_id=illustrator_b1.id,
-          creator_id=self.admin_user.id)
+        bookb_author = BookContribution(book=book_b,
+          role=Role.get_preset_role("Author"), contributor=author_a1,
+          creator=self.admin_user)
+        bookb_translator = BookContribution(book=book_b,
+          role=Role.get_preset_role("Translator"), contributor=translator_b1,
+          creator=self.admin_user)
+        bookb_illus_1 = BookContribution(book=book_b,
+          role=Role.get_preset_role("Illustrator"), contributor=illustrator_b1,
+          creator=self.admin_user)
         self.session_add_all((bookb_author, bookb_translator, bookb_illus_1))
         librarian.db.session.flush()

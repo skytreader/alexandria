@@ -16,7 +16,7 @@ fuzzy_text = FuzzyText()
 def make_name_object():
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
 
-def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_c=8,
+def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8,
   participant_c=8):
     """
     Create a library in the database with the given counts.
@@ -48,7 +48,6 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
     session.commit()
     library = {}
     # Randomly assign persons to books as roles
-    roles = role_map.keys()
 
     for _ in range(participant_c):
         rand_isbn = random.choice(book_isbns)
@@ -56,7 +55,7 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
         rand_person_fn = random.choice(person_fns)
         rand_person = session.query(Contributor).filter(Contributor.firstname == rand_person_fn).first()
         rand_role = random.choice(roles)
-        _role = rand_role.lower()
+        _role = rand_role.name.lower()
 
         if library.get(rand_isbn):
             if library[rand_isbn].get(_role):
@@ -66,9 +65,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
                 library[rand_isbn][_role] = [{"lastname": rand_person. lastname,
                   "firstname": rand_person.firstname},]
 
-            bp = BookContribution(book_id=rand_book.id,
-              contributor_id=rand_person.id, role_id=role_map[rand_role],
-              creator_id=admin.id)
+            bp = BookContribution(book=rand_book, contributor=rand_person,
+              role=rand_role, creator=admin)
             session.add(bp)
             session.flush()
         else:
@@ -79,9 +77,8 @@ def create_library(session, admin, role_map, book_person_c=8, company_c=8, book_
             library[rand_isbn]["publisher"] = rand_book.publisher.name
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
-            bp = BookContribution(book_id=rand_book.id,
-              contributor_id=rand_person.id, role_id=role_map[rand_role],
-              creator_id=admin.id)
+            bp = BookContribution(book=rand_book, contributor=rand_person,
+              role=rand_role, creator=admin)
             session.add(bp)
             session.flush()
 

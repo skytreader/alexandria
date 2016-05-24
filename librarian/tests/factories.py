@@ -76,6 +76,28 @@ class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
     creator = factory.SubFactory(LibrarianFactory)
 
 
+class RoleFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = models.Role
+        sqlalchemy_session = librarian.db.session
+
+    id = factory.Sequence(lambda x: x)
+    name = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
+    display_text = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
+
+
+class BookContributionFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = models.BookContribution
+        sqlalchemy_session = librarian.db.session
+
+    id = factory.Sequence(lambda x: x)
+    book = factory.SubFactory(BookFactory)
+    contributor = factory.SubFactory(ContributorFactory)
+    role = factory.SubFactory(RoleFactory)
+    creator = factory.SubFactory(LibrarianFactory)
+
+
 class PrinterFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.Printer
