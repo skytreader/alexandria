@@ -183,10 +183,14 @@ class Imprint(UserTaggedBase):
     imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
 
     def __init__(self, **kwargs):
-        self.mother_company_id = kwargs["mother_company"]
-        self.imprint_company_id = kwargs["imprint_company"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.mother_company = kwargs["mother_company"]
+        self.mother_company_id = self.mother_company.id
+        self.imprint_company = kwargs["imprint_company"]
+        self.imprint_company_id = self.imprint_company.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Contributor(UserTaggedBase):
     __tablename__ = "contributors"
