@@ -327,9 +327,13 @@ class Pseudonym(UserTaggedBase):
     book = relationship("Book")
 
     def __init__(self, **kwargs):
-        self.person_id = kwargs["person_id"]
-        self.book_id = kwargs["book_id"]
+        self.person = kwargs["person"]
+        self.person_id = self.person.id
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
