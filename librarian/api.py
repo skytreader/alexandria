@@ -47,7 +47,7 @@ def __create_bookperson(form_data):
         for parson in parse:
             persons_created.insert(0, get_or_create(Contributor, will_commit=True,
               firstname=parson["firstname"], lastname=parson["lastname"],
-              creator_id=current_user.get_id()))
+              creator=current_user))
 
         return persons_created
     except ValueError:
@@ -77,7 +77,7 @@ def book_adder():
             from flask.ext.login import current_user
             # Genre first
             genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
-              creator_id=current_user.get_id())
+              creator=current_user)
 
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,
@@ -87,14 +87,14 @@ def book_adder():
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
-              genre_id=genre.id, creator_id=current_user.get_id(),
-              publisher_id=publisher.id, publish_year=int(form.year.data))
+              genre=genre, creator=current_user,
+              publisher=publisher, publish_year=int(form.year.data))
             db.session.add(book)
             db.session.flush()
 
             # Create printer entry
-            printer_record = Printer(company_id=printer.id, book_id=book.id,
-              creator_id=current_user.get_id())
+            printer_record = Printer(company=printer, book=book,
+              creator=current_user)
             db.session.add(printer_record)
 
             # Create the Contributors
@@ -110,35 +110,30 @@ def book_adder():
 
             # Assign participation
             for author in authors:
-                author_part = BookContribution(book_id=book.id,
-                  contributor_id=author.id, role_id=author_role.id,
-                  creator_id=current_user.get_id())
+                author_part = BookContribution(book=book, contributor=author,
+                  role=author_role, creator=current_user)
                 db.session.add(author)
                 db.session.add(author_part)
-            db.session.commit()
-
-            a = db.session.query(BookContribution).filter(BookContribution.book_id==book.id).all()
+                db.session.commit()
+                print "commit"
 
             for illustrator in illustrators:
-                illus_part = BookContribution(book_id=book.id,
-                  contributor_id=illustrator.id, role_id=illus_role.id,
-                  creator_id=current_user.get_id())
+                illus_part = BookContribution(book=book, contributor=illustrator,
+                  role=illus_role, creator=current_user)
                 db.session.add(illustrator)
                 db.session.add(illus_part)
             db.session.commit()
 
             for editor in editors:
-                editor_part = BookContribution(book_id=book.id,
-                  contributor_id=editor.id, role_id=editor_role.id,
-                  creator_id=current_user.get_id())
+                editor_part = BookContribution(book=book, contributor=editor,
+                  role=editor_role, creator=current_user)
                 db.session.add(editor)
                 db.session.add(editor_part)
             db.session.commit()
 
             for translator in translators:
-                translator_part = BookContribution(book_id=book.id,
-                  contributor_id=translator.id, role_id=trans_role.id,
-                  creator_id=current_user.get_id())
+                translator_part = BookContribution(book=book, 
+                  contributor=translator, role=trans_role, creator=current_user)
                 db.session.add(translator)
                 db.session.add(translator_part)
 

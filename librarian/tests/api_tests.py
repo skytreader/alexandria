@@ -4,7 +4,7 @@ from __future__ import division
 from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user
-from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre
+from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, Role
 from librarian.tests.dummies import LibraryEntry, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
@@ -234,7 +234,7 @@ class ApiTests(AppTestCase):
         def insert_bookpersons(persons):
             for p in persons:
                 bp = Contributor(firstname=p["firstname"],
-                  lastname=p["lastname"], creator_id=self.admin_user.id)
+                  lastname=p["lastname"], creator=self.admin_user)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
@@ -420,8 +420,10 @@ class ApiTests(AppTestCase):
         a_contribs = librarian.db.session.query(BookContribution).all()
         self.assertEquals(0, len(a_contribs))
 
-        library = create_library(librarian.db.session, self.admin_user,
-          self.ROLE_IDS, book_person_c=12, company_c=8, book_c=12, participant_c=32)
+        roles = librarian.db.session.query(Role).all()
+
+        library = create_library(librarian.db.session, self.admin_user, roles,
+          book_person_c=12, company_c=8, book_c=12, participant_c=32)
 
         contribs = librarian.db.session.query(Contributor).all()
         self.assertEquals(12, len(contribs))
@@ -447,9 +449,10 @@ class ApiTests(AppTestCase):
         company_count = 9
         book_count = 28
         participant_count = 33
-        library = create_library(librarian.db.session, self.admin_user,
-          self.ROLE_IDS, book_person_c=person_count, company_c=company_count,
-          book_c=book_count, participant_c=participant_count)
+        roles = librarian.db.session.query(Role).all()
+        library = create_library(librarian.db.session, self.admin_user, roles,
+          book_person_c=person_count, company_c=company_count, book_c=book_count,
+          participant_c=participant_count)
 
         get_stats = self.client.get("/api/util/stats")
         stats = json.loads(get_stats.data)

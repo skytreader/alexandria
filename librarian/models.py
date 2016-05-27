@@ -33,17 +33,17 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
-    given_creator = kwargs.pop("creator_id", None)
+    given_creator = kwargs.pop("creator", None)
     instance = db.session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
         if given_creator:
-            kwargs["creator_id"] = given_creator
+            kwargs["creator"] = given_creator
         elif not issubclass(model, UserMixin):
             admin = (db.session.query(Librarian)
               .filter(Librarian.username=='admin').first())
-            kwargs["creator_id"] = admin.id
+            kwargs["creator"] = admin
 
         instance = model(**kwargs)
         if will_commit:
@@ -83,7 +83,7 @@ class Librarian(Base, UserMixin):
         self.is_user_active = kwargs.get("is_user_active", True)
 
     def __repr__(self):
-        return self.username
+        return self.username + "/" + str(self.id)
     
     def get_id(self):
         return self.id
@@ -112,8 +112,10 @@ class Genre(UserTaggedBase):
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Book(UserTaggedBase):
     __tablename__ = "books"
@@ -136,13 +138,20 @@ class Book(UserTaggedBase):
         self.publish_year = int(kwargs["publish_year"])
         self.isbn = kwargs["isbn"]
         self.title = kwargs["title"]
-        self.genre_id = kwargs["genre_id"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
-        self.publisher_id = kwargs["publisher_id"]
+        self.genre = kwargs["genre"]
+        self.genre_id = self.genre.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.last_modifier.id
+        self.publisher = kwargs["publisher"]
+        self.publisher_id = self.publisher.id
 
     def __str__(self):
         return self.title + "/" + self.isbn
+
+    def __repr__(self):
+        return self.title + "/" + self.isbn + "/" + str(self.id)
 
 class BookCompany(UserTaggedBase):
     """
@@ -150,11 +159,15 @@ class BookCompany(UserTaggedBase):
     """
     __tablename__ = "book_companies"
     name = db.Column(db.String(255), nullable=False, unique=True)
+    creator = relationship("Librarian", foreign_keys="BookCompany.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="BookCompany.last_modifier_id")
 
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     def __str__(self):
         return self.name
@@ -167,30 +180,40 @@ class Imprint(UserTaggedBase):
       name="imprint_book_company_fk2"))
     
     mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
-    #mother_company = relationship("BookCompany")
     imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
-    #imprint_company = relationship("BookCompany")
 
     def __init__(self, **kwargs):
-        self.mother_company_id = kwargs["mother_company"]
-        self.imprint_company_id = kwargs["imprint_company"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.mother_company = kwargs["mother_company"]
+        self.mother_company_id = self.mother_company.id
+        self.imprint_company = kwargs["imprint_company"]
+        self.imprint_company_id = self.imprint_company.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Contributor(UserTaggedBase):
     __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
+    creator = relationship("Librarian", foreign_keys="Contributor.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="Contributor.last_modifier_id")
+
     __table_args__ = (db.UniqueConstraint("lastname", "firstname", name="uname"),)
     
     def __init__(self, **kwargs):
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     def __str__(self):
         return str({"id": self.id, "lastname": self.lastname, "firstname": self.firstname})
+
+    def __repr__(self):
+        return self.__str__()
 
     # TODO Use this even in tests
     def make_plain_person(self):
@@ -214,8 +237,10 @@ class Role(UserTaggedBase):
     def __init__(self, **kwargs):
         self.name = kwargs["name"]
         self.display_text = kwargs["display_text"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
     @staticmethod
     @cache.memoize(config.CACHE_TIMEOUT)
@@ -226,6 +251,8 @@ class Role(UserTaggedBase):
     def __str__(self):
         return self.name
         
+    def __repr__(self):
+        return self.name + "#" + str(self.id)
 
 class BookContribution(UserTaggedBase):
     """
@@ -242,13 +269,20 @@ class BookContribution(UserTaggedBase):
     book = relationship("Book")
     contributor = relationship("Contributor")
     role = relationship("Role")
+    creator = relationship("Librarian", foreign_keys="BookContribution.creator_id")
+    last_modifier = relationship("Librarian", foreign_keys="BookContribution.last_modifier_id")
 
     def __init__(self, **kwargs):
-        self.book_id = kwargs["book_id"]
-        self.contributor_id = kwargs["contributor_id"]
-        self.role_id = kwargs["role_id"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
+        self.contributor = kwargs["contributor"]
+        self.contributor_id = self.contributor.id
+        self.role = kwargs["role"]
+        self.role_id = self.role.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
     
     def __str__(self):
         return "Person %s worked on book %s as the role %s" % \
@@ -265,10 +299,14 @@ class Printer(UserTaggedBase):
     book = relationship("Book")
 
     def __init__(self, **kwargs):
-        self.book_id = kwargs["book_id"]
-        self.company_id = kwargs["company_id"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
+        self.company = kwargs["company"]
+        self.company_id = self.company.id
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
 
 class Pseudonym(UserTaggedBase):
     """
@@ -289,9 +327,13 @@ class Pseudonym(UserTaggedBase):
     book = relationship("Book")
 
     def __init__(self, **kwargs):
-        self.person_id = kwargs["person_id"]
-        self.book_id = kwargs["book_id"]
+        self.person = kwargs["person"]
+        self.person_id = self.person.id
+        self.book = kwargs["book"]
+        self.book_id = self.book.id
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
-        self.creator_id = kwargs["creator_id"]
-        self.last_modifier_id = kwargs["creator_id"]
+        self.creator = kwargs["creator"]
+        self.creator_id = self.creator.id
+        self.last_modifier = kwargs["creator"]
+        self.last_modifier_id = self.creator.id
