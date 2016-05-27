@@ -454,7 +454,6 @@ TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
 main.js will only contain this $(document).ready.
 */
 $(document).ready(function(){
-    alertify.parent(document.body);
     /**
     Return a function that generates an input row for a given creatorType. The
     generated function was meant to be called for the click event on the add button.
@@ -559,7 +558,8 @@ $(document).ready(function(){
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(function(){
         if(isCreatorPending()){
-            alertify.alert("Did you forget to hit add on a creator's name? Please add all creators first before proceeding.");
+            alertify.alert("Forgot something?",
+              "Did you forget to hit add on a creator's name? Please add all creators first before proceeding.");
         } else if($("#proxy-form").valid()){
             var spine = renderSpine();
             internalizeBook(spine);
@@ -569,7 +569,8 @@ $(document).ready(function(){
             clearLists();
             resetAutocomplete();
         } else{
-            alertify.alert("There is a problem with this book's details. Check the fields for specifics.");
+            alertify.alert("Oh no!",
+              "There is a problem with this book's details. Check the fields for specifics.");
         }
     });
 
