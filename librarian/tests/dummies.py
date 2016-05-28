@@ -1,22 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from librarian.utils import Person
+
 """
 Contains plain object definitions for use in testing purposes.
 """
 
-class Person(object):
-    def __init__(self, lastname, firstname):
-        self.lastname = lastname
-        self.firstname = firstname
-
-    def __eq__(self, p):
-        return p.lastname == self.lastname and p.firstname == self.firstname
-
-    def __hash__(self):
-        return hash((self.lastname, self.firstname))
-    
-    def __str__(self):
-        return self.lastname + ", " + self.firstname
 
 class LibraryEntry(object):
     """

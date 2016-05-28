@@ -5,10 +5,40 @@ import re
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
+ 
+class Person(object):
+    def __init__(self, lastname, firstname):
+        self.lastname = lastname
+        self.firstname = firstname
+
+    def __eq__(self, p):
+        return p.lastname == self.lastname and p.firstname == self.firstname
+
+    def __hash__(self):
+        return hash((self.lastname, self.firstname))
+    
+    def __str__(self):
+        return self.lastname + ", " + self.firstname
+        
+
 class BookRecord(object):
+    """
+    Class to consolidate DB records for easier listing. Each BookRecord instance
+    consolidates the records of a single book.
+    """
     
     def __init__(self, isbn, title, publisher, authors=None, translators=None,
       illustrators=None, editors=None):
+        """
+        isbn: string
+        title: string
+        publisher: string
+            The name of the publisher for this book.
+        authors: list of Person objects
+        translators: list of Person objects
+        illustrators: list of Person objects
+        editors: list of Person objects
+        """
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
