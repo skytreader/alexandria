@@ -82,14 +82,14 @@ class BookRecord(object):
 
             if record_exists:
                 if structured_catalog[book[0]].get(role):
-                    structured_catalog[book[0]][role].append({"lastname": book[2],
-                      "firstname": book[3]})
+                    structured_catalog[book[0]][role].append(Person(lastname= book[2],
+                      firstname=book[3]))
                 else:
-                    structured_catalog[book[0]][role] = [{"lastname": book[2],
-                      "firstname": book[3]}]
+                    structured_catalog[book[0]][role] = [Person(lastname=book[2],
+                      firstname=book[3])]
             else:
                 fmt = {"title": book[1],
-                  role: [{"lastname": book[2], "firstname": book[3]}],
+                  role: [Person(lastname=book[2], firstname=book[3])],
                   "publisher": book[5]}
 
                 structured_catalog[book[0]] = fmt
@@ -99,9 +99,9 @@ class BookRecord(object):
         for isbn in structured_catalog.keys():
             book = structured_catalog[isbn]
             book["isbn"] = isbn
+            br = BookRecord(**book)
             book_listing.insert(0, book)
 
-        print "return type", type(book_listing)
         return book_listing
 
 
