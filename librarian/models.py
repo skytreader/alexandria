@@ -2,7 +2,7 @@
 from flask.ext.login import current_user, UserMixin
 from librarian import app, cache, db
 from librarian.errors import ConstraintError
-from librarian.utils import isbn_check
+from librarian.utils import isbn_check, Person
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
@@ -217,7 +217,7 @@ class Contributor(UserTaggedBase):
 
     # TODO Use this even in tests
     def make_plain_person(self):
-        return {"lastname": self.lastname, "firstname": self.firstname}
+        return Person(lastname=self.lastname, firstname=self.firstname)
 
 class Role(UserTaggedBase):
     """

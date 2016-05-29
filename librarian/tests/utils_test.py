@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from base import AppTestCase
 from faker import Faker
-from librarian.models import BookContribution, Role
+from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
 from librarian.utils import BookRecord
@@ -41,29 +41,59 @@ class BookRecordTests(AppTestCase):
     
     def test_assembler(self):
         # Create the DB records
-        book_a = BookFactory()
+        booka = BookFactory()
 
         booka_author = BookContributionFactory(role=Role.get_preset_role("Author"),
-          book=book_a)
+          book=booka)
         librarian.db.session.add(booka_author)
         booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
-          book=book_a)
+          book=booka)
         librarian.db.session.add(booka_translator)
-        booka_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=book_a)
-        librarian.db.session.add(booka_illus_1)
+        booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=booka)
+        librarian.db.session.add(booka_illus1)
         librarian.db.session.commit()
-        booka_illus_2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=book_a)
-        librarian.db.session.add(booka_illus_2)
+        booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=booka)
+        librarian.db.session.add(booka_illus2)
         librarian.db.session.commit()
 
-        bookb_author = BookContributionFactory(role=Role.get_preset_role("Author"))
-        bookb_translator = BookContributionFactory(role=Role.get_preset_role("Translator"))
-        bookb_illus_1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"))
-        self.session_add_all((bookb_author, bookb_translator, bookb_illus_1))
+        bookb = BookFactory()
+        bookb_author = BookContributionFactory(role=Role.get_preset_role("Author"),
+          book=bookb)
+        bookb_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
+          book=bookb)
+        bookb_illus = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=bookb)
+        self.session_add_all((bookb_author, bookb_translator, bookb_illus))
         librarian.db.session.flush()
 
         # Create the BookRecord objects
-        book_a_record = BookRecord(isbn=book_a.isbn, title=book_a.title,
-          publisher=book_a.publisher.name)
+        booka_authors = [booka_author.contributor.make_plain_person()]
+        booka_translators = [booka_translator.contributor.make_plain_person()]
+        booka_illustrators = [booka_illus1.contributor.make_plain_person(),
+          booka_illus2.contributor.make_plain_person]
+        booka_record = BookRecord(isbn=booka.isbn, title=booka.title,
+          publisher=booka.publisher.name, authors=booka_authors,
+          translators=booka_translators, illustrators=booka_illustrators)
+
+        bookb_authors = [bookb_author.contributor.make_plain_person()]
+        bookb_translators = [bookb_translator.contributor.make_plain_person()]
+        bookb_illustrators = [bookb_illus.contributor.make_plain_person()]
+        bookb_record = BookRecord(isbn=bookb.isbn, title=bookb.title,
+          publisher=bookb.publisher.name, authors=bookb_authors,
+          translators=bookb_translators, illustrators=bookb_illustrators)
+
+        expected_records = [booka_record, bookb_record]
+
+        bookq = (librarian.db.session.query(Book.isbn, Book.title,
+          Contributor.lastname, Contributor.firstname, Role.name,
+          BookCompany.name)
+          .filter(Book.id == BookContribution.book_id)
+          .filter(BookContribution.contributor_id == Contributor.id)
+          .filter(BookContribution.role_id == Role.id)
+          .filter(Book.publisher_id == BookCompany.id))
+
+        books = bookq.all()
+        
+        self.assertEqual(expected_records, BookRecord.assembler(books))
