@@ -42,10 +42,10 @@ class BookRecord(object):
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
-        self.authors = authors if authors else []
-        self.translators = translators if translators else []
-        self.illustrators = illustrators if illustrators else []
-        self.editors = editors if editors else []
+        self.authors = frozenset(authors if authors else [])
+        self.translators = frozenset(translators if translators else [])
+        self.illustrators = frozenset(illustrators if illustrators else [])
+        self.editors = frozenset(editors if editors else [])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
@@ -74,7 +74,35 @@ class BookRecord(object):
 
         Returns a list of instances of this class
         """
-        structured = {}
+        structured_catalog = {}
+        
+        for book in book_rows:
+            record_exists = structured_catalog.get(book[0])
+            role = book[4].lower()
+
+            if record_exists:
+                if structured_catalog[book[0]].get(role):
+                    structured_catalog[book[0]][role].append({"lastname": book[2],
+                      "firstname": book[3]})
+                else:
+                    structured_catalog[book[0]][role] = [{"lastname": book[2],
+                      "firstname": book[3]}]
+            else:
+                fmt = {"title": book[1],
+                  role: [{"lastname": book[2], "firstname": book[3]}],
+                  "publisher": book[5]}
+
+                structured_catalog[book[0]] = fmt
+
+        book_listing = []
+
+        for isbn in structured_catalog.keys():
+            book = structured_catalog[isbn]
+            book["isbn"] = isbn
+            book_listing.insert(0, book)
+
+        print "return type", type(book_listing)
+        return book_listing
 
 
 def isbn_check(isbn):

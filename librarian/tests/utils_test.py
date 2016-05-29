@@ -96,4 +96,4 @@ class BookRecordTests(AppTestCase):
 
         books = bookq.all()
         
-        self.assertEqual(expected_records, BookRecord.assembler(books))
+        self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
