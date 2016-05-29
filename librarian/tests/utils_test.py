@@ -72,17 +72,17 @@ class BookRecordTests(AppTestCase):
         booka_authors = [booka_author.contributor.make_plain_person()]
         booka_translators = [booka_translator.contributor.make_plain_person()]
         booka_illustrators = [booka_illus1.contributor.make_plain_person(),
-          booka_illus2.contributor.make_plain_person]
+          booka_illus2.contributor.make_plain_person()]
         booka_record = BookRecord(isbn=booka.isbn, title=booka.title,
-          publisher=booka.publisher.name, authors=booka_authors,
-          translators=booka_translators, illustrators=booka_illustrators)
+          publisher=booka.publisher.name, author=booka_authors,
+          translator=booka_translators, illustrator=booka_illustrators)
 
         bookb_authors = [bookb_author.contributor.make_plain_person()]
         bookb_translators = [bookb_translator.contributor.make_plain_person()]
         bookb_illustrators = [bookb_illus.contributor.make_plain_person()]
         bookb_record = BookRecord(isbn=bookb.isbn, title=bookb.title,
-          publisher=bookb.publisher.name, authors=bookb_authors,
-          translators=bookb_translators, illustrators=bookb_illustrators)
+          publisher=bookb.publisher.name, author=bookb_authors,
+          translator=bookb_translators, illustrator=bookb_illustrators)
 
         expected_records = [booka_record, bookb_record]
 

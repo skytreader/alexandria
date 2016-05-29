@@ -27,36 +27,47 @@ class BookRecord(object):
     consolidates the records of a single book.
     """
     
-    def __init__(self, isbn, title, publisher, authors=None, translators=None,
-      illustrators=None, editors=None):
+    def __init__(self, isbn, title, publisher, author=None, translator=None,
+      illustrator=None, editor=None):
         """
+        Note that because language is a b*tch, the actual fields for the
+        Person list parameters are accessible via their plural form (e.g.,
+        whatever you gave for `author` is accessible via `self.author`).
+
         isbn: string
         title: string
         publisher: string
             The name of the publisher for this book.
-        authors: list of Person objects
-        translators: list of Person objects
-        illustrators: list of Person objects
-        editors: list of Person objects
+        author: list of Person objects
+        translator: list of Person objects
+        illustrator: list of Person objects
+        editor: list of Person objects
         """
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
-        self.authors = frozenset(authors if authors else [])
-        self.translators = frozenset(translators if translators else [])
-        self.illustrators = frozenset(illustrators if illustrators else [])
-        self.editors = frozenset(editors if editors else [])
+        self.authors = frozenset(author if author else [])
+        self.translators = frozenset(translator if translator else [])
+        self.illustrators = frozenset(illustrator if illustrator else [])
+        self.editors = frozenset(editor if editor else [])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
-          self.publisher == br.publisher and set(self.authors) == set(br.authors)
-          and set(self.translators) == set(br.translators) and
-          set(self.illustrators) == set(br.illustrators) and
-          set(self.editors) == set(br.illustrators))
+          self.publisher == br.publisher and self.authors == br.authors
+          and self.translators == br.translators and
+          self.illustrators == br.illustrators and self.editors == br.editors)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
           self.translators, self.illustrators, self.editors))
+
+    def __str__(self):
+        return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
+          "illustrator": str(self.illustrators), "editor": str(self.editors),
+          "translator": str(self.translators), "publisher": str(self.publisher)})
+
+    def __repr__(self):
+        return str(self)
 
     @staticmethod
     def assembler(book_rows):
@@ -100,7 +111,7 @@ class BookRecord(object):
             book = structured_catalog[isbn]
             book["isbn"] = isbn
             br = BookRecord(**book)
-            book_listing.insert(0, book)
+            book_listing.insert(0, br)
 
         return book_listing
 
