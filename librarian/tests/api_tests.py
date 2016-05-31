@@ -5,7 +5,7 @@ from base import AppTestCase
 from faker import Faker
 from flask.ext.login import login_user
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, Role
-from librarian.tests.dummies import LibraryEntry, Person
+from librarian.utils import BookRecord as LibraryEntry, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
@@ -440,7 +440,7 @@ class ApiTests(AppTestCase):
         return_set = set()
         
         for book in ret_data:
-            return_set.add(LibraryEntry(**book))
+            return_set.add(LibraryEntry.make_hashable(book))
 
         self.assertEquals(set(library), return_set)
 

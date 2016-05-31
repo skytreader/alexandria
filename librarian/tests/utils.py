@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
 from librarian.models import Book, BookCompany, Contributor, BookContribution
-from librarian.tests.dummies import LibraryEntry
+from librarian.utils import BookRecord as LibraryEntry, Person
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory
 )
@@ -59,11 +59,11 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
 
         if library.get(rand_isbn):
             if library[rand_isbn].get(_role):
-                library[rand_isbn][_role].append({"lastname": rand_person.lastname,
-                  "firstname": rand_person.firstname})
+                library[rand_isbn][_role].append(Person(lastname=rand_person.lastname,
+                  firstname=rand_person.firstname))
             else:
-                library[rand_isbn][_role] = [{"lastname": rand_person. lastname,
-                  "firstname": rand_person.firstname},]
+                library[rand_isbn][_role] = [Person(lastname=rand_person. lastname,
+                  firstname=rand_person.firstname),]
 
             bp = BookContribution(book=rand_book, contributor=rand_person,
               role=rand_role, creator=admin)
@@ -72,8 +72,8 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
         else:
             library[rand_isbn] = {}
             library[rand_isbn]["title"] = rand_book.title
-            library[rand_isbn][_role] = [{"lastname": rand_person.lastname,
-              "firstname": rand_person.firstname}]
+            library[rand_isbn][_role] = [Person(**{"lastname": rand_person.lastname,
+              "firstname": rand_person.firstname})]
             library[rand_isbn]["publisher"] = rand_book.publisher.name
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()

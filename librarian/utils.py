@@ -51,6 +51,26 @@ class BookRecord(object):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
 
+    @staticmethod
+    def make_hashable(dict_struct):
+        """
+        Takes a dictionary representation of this class and converts it to an
+        actual instance of this class. For hashability.
+
+        Note that because language is a b*tch, the keys pointing to the
+        contributor list should be _singular_ form.
+        """
+        # Get each possible Contributor list and turn them into persons.
+        person_authors = [Person(**spam) for spam in dict_struct.get("author")]
+        person_translators = [Person(**spam) for spam in dict_struct.get("translator")]
+        person_illustrators = [Person(**spam) for spam in dict_struct.get("illustrator")]
+        person_editors = [Person(**spam) for spam in dict_struct.get("editor")]
+
+        return Person(isbn=dict_struct["isbn"], title=dict_struct["title"],
+          publisher=dict_struct["publisher"], author=person_authors,
+          translator=person_translators, illustrator=person_illustrators,
+          editor=person_editors)
+
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
           self.publisher == br.publisher and self.authors == br.authors
