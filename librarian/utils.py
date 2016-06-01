@@ -61,10 +61,14 @@ class BookRecord(object):
         contributor list should be _singular_ form.
         """
         # Get each possible Contributor list and turn them into persons.
-        person_authors = [Person(**spam) for spam in dict_struct.get("author")]
-        person_translators = [Person(**spam) for spam in dict_struct.get("translator")]
-        person_illustrators = [Person(**spam) for spam in dict_struct.get("illustrator")]
-        person_editors = [Person(**spam) for spam in dict_struct.get("editor")]
+        auths = dict_struct.get("author")
+        person_authors = [Person(**spam) for spam in auths] if auths else []
+        trans = dict_struct.get("translators")
+        person_translators = [Person(**spam) for spam in trans] if trans else []
+        illus = dict_struct.get("illustrator")
+        person_illustrators = [Person(**spam) for spam in illus] if illus else []
+        edits = dict_struct.get("editor")
+        person_editors = [Person(**spam) for spam in edits] if edits else []
 
         return Person(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
