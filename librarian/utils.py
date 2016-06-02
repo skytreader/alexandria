@@ -19,6 +19,9 @@ class Person(object):
     
     def __str__(self):
         return self.lastname + ", " + self.firstname
+
+    def __repr__(self):
+        return str(self)
         
 
 class BookRecord(object):
@@ -70,7 +73,7 @@ class BookRecord(object):
         edits = dict_struct.get("editor")
         person_editors = [Person(**spam) for spam in edits] if edits else []
 
-        return Person(isbn=dict_struct["isbn"], title=dict_struct["title"],
+        return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
           translator=person_translators, illustrator=person_illustrators,
           editor=person_editors)
@@ -94,7 +97,7 @@ class BookRecord(object):
         return str(self)
 
     @staticmethod
-    def assembler(book_rows):
+    def assembler(book_rows, as_obj=True):
         """
         Takes in rows from a SQL query with the columns in the following order:
     
@@ -107,7 +110,10 @@ class BookRecord(object):
     
         And arranges them as an instance of this class.
 
-        Returns a list of instances of this class
+        Return type will vary depending on the `as_obj` parameter but will
+        essentially contain the same data in the same structure. If `as_obj`
+        is True, return instances of this class. Otherwise, return maps.
+        Note that maps are non-hashable but instances of this class is.
         """
         structured_catalog = {}
         
@@ -134,8 +140,11 @@ class BookRecord(object):
         for isbn in structured_catalog.keys():
             book = structured_catalog[isbn]
             book["isbn"] = isbn
-            br = BookRecord(**book)
-            book_listing.insert(0, br)
+            if as_obj:
+                br = BookRecord(**book)
+                book_listing.insert(0, br)
+            else:
+                book_listing.insert(0, book)
 
         return book_listing
 

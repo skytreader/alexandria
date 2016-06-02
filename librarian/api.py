@@ -5,7 +5,7 @@ from datetime import datetime
 
 from librarian import app, db
 from librarian.forms import AddBooksForm, EditBookForm
-from librarian.utils import NUMERIC_REGEX
+from librarian.utils import BookRecord, NUMERIC_REGEX
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
@@ -115,7 +115,6 @@ def book_adder():
                 db.session.add(author)
                 db.session.add(author_part)
                 db.session.commit()
-                print "commit"
 
             for illustrator in illustrators:
                 illus_part = BookContribution(book=book, contributor=illustrator,
@@ -229,34 +228,8 @@ def get_books():
         return "Error", 400
         
     books = bookq.all()
+    book_listing = BookRecord.assembler(books, as_obj=False)
     app.logger.debug("Got these books" + str(books))
-    structured_catalog = {}
-    
-    for book in books:
-        record_exists = structured_catalog.get(book[0])
-        role = book[4].lower()
-
-        if record_exists:
-            if structured_catalog[book[0]].get(role):
-                structured_catalog[book[0]][role].append({"lastname": book[2],
-                  "firstname": book[3]})
-            else:
-                structured_catalog[book[0]][role] = [{"lastname": book[2],
-                  "firstname": book[3]}]
-        else:
-            fmt = {"title": book[1],
-              role: [{"lastname": book[2], "firstname": book[3]}],
-              "publisher": book[5]}
-
-            structured_catalog[book[0]] = fmt
-
-    book_listing = []
-
-    for isbn in structured_catalog.keys():
-        book = structured_catalog[isbn]
-        book["isbn"] = isbn
-        book_listing.insert(0, book)
-
     return flask.jsonify({"data": book_listing})
 
 @librarian_api.route("/api/read/genres")
