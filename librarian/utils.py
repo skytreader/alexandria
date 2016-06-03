@@ -140,14 +140,14 @@ class BookRecord(object):
         for isbn in structured_catalog.keys():
             book = structured_catalog[isbn]
             book["isbn"] = isbn
-            if as_obj:
-                br = BookRecord(**book)
-                book_listing.insert(0, br)
-            else:
-                book_listing.insert(0, book)
+            br = BookRecord(**book)
+            book_listing.insert(0, br)
+
+        if not as_obj:
+            book_listing = [book.__dict__ for book in book_listing]
 
         return book_listing
-
+    
 
 def isbn_check(isbn):
     """
