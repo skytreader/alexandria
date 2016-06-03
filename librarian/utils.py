@@ -66,7 +66,7 @@ class BookRecord(object):
         # Get each possible Contributor list and turn them into persons.
         auths = dict_struct.get("author")
         person_authors = [Person(**spam) for spam in auths] if auths else []
-        trans = dict_struct.get("translators")
+        trans = dict_struct.get("translator")
         person_translators = [Person(**spam) for spam in trans] if trans else []
         illus = dict_struct.get("illustrator")
         person_illustrators = [Person(**spam) for spam in illus] if illus else []

@@ -229,8 +229,7 @@ def get_books():
         
     books = bookq.all()
     book_listing = BookRecord.assembler(books, as_obj=False)
-    #app.logger.debug("Got these books" + str(books))
-    app.logger.debug("book list" + str(book_listing))
+    app.logger.debug("Got these books" + str(books))
     return flask.jsonify({"data": book_listing})
 
 @librarian_api.route("/api/read/genres")
