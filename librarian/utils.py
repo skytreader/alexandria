@@ -147,6 +147,16 @@ class BookRecord(object):
             book_listing = [book.__dict__ for book in book_listing]
 
         return book_listing
+
+    @property
+    def __dict__(self):
+        base = {"isbn": self.isbn, "title": self.title, "publisher": self.publisher}
+        base["author"] = [p.__dict__ for p in self.authors]
+        base["translator"] = [p.__dict__ for p in self.translators]
+        base["illustrator"] = [p.__dict__ for p in self.illustrators]
+        base["editor"] = [p.__dict__ for p in self.editors]
+
+        return base
     
 
 def isbn_check(isbn):
