@@ -301,31 +301,6 @@ def search(searchq):
       .filter(Book.publisher_id == BookCompany.id)
       .all())
 
-    structured_catalog = {}
-    
-    for book in results:
-        record_exists = structured_catalog.get(book[0])
-        role = book[4].lower()
-
-        if record_exists:
-            if structured_catalog[book[0]].get(role):
-                structured_catalog[book[0]][role].append({"lastname": book[2],
-                  "firstname": book[3]})
-            else:
-                structured_catalog[book[0]][role] = [{"lastname": book[2],
-                  "firstname": book[3]}]
-        else:
-            fmt = {"title": book[1],
-              role: [{"lastname": book[2], "firstname": book[3]}],
-              "publisher": book[5]}
-
-            structured_catalog[book[0]] = fmt
-
-    book_listing = []
-
-    for isbn in structured_catalog.keys():
-        book = structured_catalog[isbn]
-        book["isbn"] = isbn
-        book_listing.insert(0, book)
+    book_listing = BookRecord.assembler(results, as_obj=False)
 
     return book_listing
