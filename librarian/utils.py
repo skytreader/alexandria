@@ -194,10 +194,33 @@ def isbn_check(isbn):
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())
 
-def stats_adjective(val):
-    if 1 <= val < 2:
-        return "focused"
-    elif 2 <= val < 3:
-        return "collaborative"
-    else:
-        return "diverse"
+class StatsDescriptor(object):
+    """
+    A collection of methods to give out an adjective depending on the value.
+    The arguments are expected to be particular statistics. The method name
+    reflects the statistic it tries to flavor.
+
+    Each method returns a lowercase string of an English adjective.
+    """
+
+    @staticmethod
+    def contrib_density(val):
+        if 1 <= val < 2:
+            return "focused"
+        elif 2 <= val < 3:
+            return "collaborative"
+        else:
+            return "spanning"
+
+    @staticmethod
+    def book_count(val):
+        if val < 50:
+            return "green"
+        elif 50 <= val < 100:
+            return "growing"
+        elif 100 <= val < 200:
+            return "substantial"
+        elif 300 <= val < 400:
+            return "voluminous"
+        else:
+            return "diverse"

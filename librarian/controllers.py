@@ -2,6 +2,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
+from librarian.utils import StatsDescriptor
 from utils import route_exists
 
 import config
@@ -48,17 +49,18 @@ def login():
 @login_required
 def dash():
     stats = json.loads(librarian.api.quick_stats().data)
-    contribs_per_book = librarian.utils.stats_adjective(stats["participants_per_book"])
+    contribs_per_book = StatsDescriptor.contrib_density(stats["participants_per_book"])
     cpb_stat = ("%.2f. Your library features %.2f contributors per book. %s." %
       (stats["participants_per_book"], stats["participants_per_book"],
       contribs_per_book.title()))
     
+    book_count_stat = ("%d. Number of books currently in your library. %s" %
+      (stats["book_count"], StatsDescriptor.book_count(stats["book_count"]).title()))
+    
     recent_books = stats["recent_books"]
 
-    book_count = stats["book_count"]
-
     return render_template("dashboard.jinja", contrib_stat=cpb_stat,
-      recent_books=recent_books, book_count=book_count)
+      recent_books=recent_books, book_count_stat=book_count_stat)
 
 @librarian_bp.route("/logout")
 @login_required
