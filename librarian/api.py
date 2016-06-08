@@ -275,7 +275,8 @@ def get_recent_contributors(contrib_type, limit=4):
 
 def get_recent_books(limit=4):
     """
-    Returns a list of size `limit` containing the most recently added books.
+    Returns a list of size `limit` containing the title of the most recently
+    added books.
     """
     top = db.session.query(Book.title).order_by(desc(Book.date_created)).limit(limit).all()
 

@@ -13,9 +13,11 @@ librarian_bp = Blueprint('librarian', __name__)
 
 @librarian_bp.route("/")
 def index():
+    from flask.ext.login import current_user
     form = SearchForm(request.form)
     styles = ("index.css",)
-    return render_template("home.jinja", search_form=form, stylesheets=styles)
+    return render_template("home.jinja", search_form=form, stylesheets=styles,
+      has_current_user=current_user.get_id() is not None)
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():

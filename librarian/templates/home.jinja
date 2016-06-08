@@ -13,9 +13,16 @@
             <br>
             {% include "_book-search.jinja" %}
             <br>
-            <p class="log-in-prompt">
-                An actual Librarian? <a href="/login">Log-in here.</a>
-            </p>
+            {% if has_current_user %}
+                <p class="log-in-prompt">
+                    <strong>You are currently logged-in. Please make sure you
+                    are not in a public terminal. <a href="/logout">Logout?</a></strong>
+                </p>
+            {% else %}
+                <p class="log-in-prompt">
+                    An actual Librarian? <a href="/login">Log-in here.</a>
+                </p>
+            {% endif %}
         </div>
         <div class="col-md-3"></div>
     </div>
