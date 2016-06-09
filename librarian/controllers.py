@@ -2,13 +2,13 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
+from librarian import api
 from librarian.utils import StatsDescriptor
 from utils import route_exists
 
 import config
 import flask
 import json
-import librarian
 
 librarian_bp = Blueprint('librarian', __name__)
 
@@ -48,7 +48,7 @@ def login():
 @librarian_bp.route("/dashboard")
 @login_required
 def dash():
-    stats = json.loads(librarian.api.quick_stats().data)
+    stats = json.loads(api.quick_stats().data)
     contribs_per_book = StatsDescriptor.contrib_density(stats["participants_per_book"])
     cpb_stat = ("%.2f. Your library features %.2f contributors per book. %s." %
       (stats["participants_per_book"], stats["participants_per_book"],
@@ -86,9 +86,7 @@ def add_books():
 
 @librarian_bp.route("/books")
 def show_books():
-    from librarian.api import get_books
-
-    books = json.loads(get_books().data)["data"]
+    books = json.loads(api.get_books().data)["data"]
     scripts = ("show-books/main.js",)
     styles = ("books.css",)
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
@@ -96,10 +94,9 @@ def show_books():
 
 @librarian_bp.route("/search")
 def search():
-    from librarian.api import search
     search_form = SearchForm(request.form)
     searchq = request.args.get("q")
-    books = search(searchq)
+    books = api.search(searchq)
     styles = ("books.css",)
     return render_template("books.jinja", stylesheets=styles, books=books,
       query=searchq, search_form=search_form)
