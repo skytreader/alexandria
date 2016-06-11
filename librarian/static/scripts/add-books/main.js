@@ -416,40 +416,6 @@ function loadToForm(reqData){
 }
 
 /**
-Clear all the user listings of their children li elements.
-*/
-function clearLists(){
-    for(var i = 0; i < CREATORS.length; i++){
-        $("#" + CREATORS[i] + "-list").empty();
-    }
-}
-
-/**
-Checks the proxy textboxes for content creators that may not have been entered.
-*/
-function isCreatorPending(){
-    for(var i = 0; i < CREATORS.length; i++){
-        if($("#" + CREATORS[i] + "-proxy-lastname").val() || $("#" + CREATORS[i] + "-proxy-firstname").val()){
-            return true;
-        }
-    }
-    return false;
-}
-
-$.validator.addMethod("isbnVal", function(value, element, param){
-    var stripped = value.trim();
-    return verifyISBN10(stripped) || verifyISBN13(stripped);
-}, "Invalid ISBN input.");
-
-/*
-Just check if it is a 4-digit number.
-*/
-$.validator.addMethod("yearVal", function(value, element, param){
-    return /^\d{4}$/.test(value);
-}, "Please enter a valid year.");
-
-
-/**
 TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
 main.js will only contain this $(document).ready.
 */
@@ -553,26 +519,6 @@ $(document).ready(function(){
     window.visualQueue = new VisualQueue(qContainer, defs);
     window.visualQueue.render();
     updateStatCounts();
-
-    // Event handlers
-    $("#clear-proxy").click(clearProxyForm);
-    $("#queue-book").click(function(){
-        if(isCreatorPending()){
-            alertify.alert("Forgot something?",
-              "Did you forget to hit add on a creator's name? Please add all creators first before proceeding.");
-        } else if($("#proxy-form").valid()){
-            var spine = renderSpine();
-            internalizeBook(spine);
-            window.visualQueue.prepend(spine);
-            updateStatCounts();
-            clearProxyForm();
-            clearLists();
-            resetAutocomplete();
-        } else{
-            alertify.alert("Oh no!",
-              "There is a problem with this book's details. Check the fields for specifics.");
-        }
-    });
 
     $("#author-proxy-lastname").blur(function(){
         setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
