@@ -18,6 +18,9 @@ var BOOK_PERSONS_LASTNAME = [];
 var BOOK_PERSONS_FIRSTNAME = [];
 var BOOK_PERSONS_SET = new Set();
 
+var COMPANIES = [];
+var GENRES = [];
+
 function fillNames(){
     $.ajax("/api/read/persons", {
         "type": "GET",
@@ -44,6 +47,42 @@ function fillNames(){
         },
         "error": function(jqXHR, textStatus, error){
             setTimeout(window.fillNames, 8000);
+        }
+    });
+}
+
+/**
+I am not sure if this is a good idea.
+*/
+function fillGenres(){
+    $.ajax("/api/read/genres", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            window.GENRES = data["data"];
+            $("#genre-proxy").autocomplete({
+                source: window.GENRES
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillGenres, 8000);
+        }
+    });
+}
+
+function fillCompanies(){
+    $.ajax("/api/read/companies", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            window.COMPANIES = data["data"]
+            $("#publisher-proxy").autocomplete({
+                source: window.COMPANIES
+            });
+            $("#printer-proxy").autocomplete({
+                source: window.COMPANIES
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillCompanies, 8000)
         }
     });
 }
@@ -147,7 +186,7 @@ $(document).ready(function() {
     $("#queue-book").click(function(){
         if(isCreatorPending()){
             alertify.alert("Forgot something?",
-              "Did you forget to hit add on a creator's name? Please add all creators first before proceeding.");
+              "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
         } else if($("#proxy-form").valid()){
             var spine = renderSpine();
             internalizeBook(spine);
@@ -160,5 +199,34 @@ $(document).ready(function() {
             alertify.alert("Oh no!",
               "There is a problem with this book's details. Check the fields for specifics.");
         }
+    });
+
+    fillGenres();
+    fillCompanies();
+    fillNames();
+
+    $("#author-proxy-lastname").blur(function(){
+        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+    });
+    $("#author-proxy-firstname").blur(function(){
+        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+    });
+    $("#illustrator-proxy-lastname").blur(function(){
+        setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+    });
+    $("#illustrator-proxy-firstname").blur(function(){
+        setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+    });
+    $("#editor-proxy-lastname").blur(function(){
+        setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+    });
+    $("#editor-proxy-firstname").blur(function(){
+        setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+    });
+    $("#translator-proxy-lastname").blur(function(){
+        setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+    });
+    $("#translator-proxy-firstname").blur(function(){
+        setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 })

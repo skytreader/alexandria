@@ -26,8 +26,6 @@ var booksSaved = 0;
 var booksErrorNoRetry = 0;
 var booksReprocessable = 0;
 
-var COMPANIES = [];
-var GENRES = [];
 /**
 This is needed by the loadToForm method.
 
@@ -40,42 +38,6 @@ function updateStatCounts(){
     $("#saved-count").text("" + booksSaved);
     $("#error-count").text("" + booksErrorNoRetry);
     $("#reprocessed-count").text("" + booksReprocessable);
-}
-
-/**
-I am not sure if this is a good idea.
-*/
-function fillGenres(){
-    $.ajax("/api/read/genres", {
-        "type": "GET",
-        "success": function(data, textStatus, jqXHR){
-            window.GENRES = data["data"];
-            $("#genre-proxy").autocomplete({
-                source: window.GENRES
-            });
-        },
-        "error": function(jqXHR, textStatus, error){
-            setTimeout(window.fillGenres, 8000);
-        }
-    });
-}
-
-function fillCompanies(){
-    $.ajax("/api/read/companies", {
-        "type": "GET",
-        "success": function(data, textStatus, jqXHR){
-            window.COMPANIES = data["data"]
-            $("#publisher-proxy").autocomplete({
-                source: window.COMPANIES
-            });
-            $("#printer-proxy").autocomplete({
-                source: window.COMPANIES
-            });
-        },
-        "error": function(jqXHR, textStatus, error){
-            setTimeout(window.fillCompanies, 8000)
-        }
-    });
 }
 
 /**
@@ -128,7 +90,7 @@ This relies _a lot_ on the guaranteed return order of jQuery selectors. At least
 it must be guaranteed that the order of lastnames and firstnames returned is the
 same.
 
-Returns a list of Person objects.
+@return Array.Person
 */
 function getCreatorNames(creator){
     var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
@@ -500,10 +462,6 @@ $(document).ready(function(){
         }
     });
 
-    fillGenres();
-    fillCompanies();
-    fillNames();
-
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
@@ -519,31 +477,6 @@ $(document).ready(function(){
     window.visualQueue = new VisualQueue(qContainer, defs);
     window.visualQueue.render();
     updateStatCounts();
-
-    $("#author-proxy-lastname").blur(function(){
-        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
-    });
-    $("#author-proxy-firstname").blur(function(){
-        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
-    });
-    $("#illustrator-proxy-lastname").blur(function(){
-        setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
-    });
-    $("#illustrator-proxy-firstname").blur(function(){
-        setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
-    });
-    $("#editor-proxy-lastname").blur(function(){
-        setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
-    });
-    $("#editor-proxy-firstname").blur(function(){
-        setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
-    });
-    $("#translator-proxy-lastname").blur(function(){
-        setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
-    });
-    $("#translator-proxy-firstname").blur(function(){
-        setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
-    });
 
     // Start the polling interval timers.
     setInterval(function(){
@@ -570,4 +503,5 @@ $(document).ready(function(){
                   $("#" + creatorTitle + "-proxy-lastname").focus();
               }
           });
-    }); });
+    });
+});
