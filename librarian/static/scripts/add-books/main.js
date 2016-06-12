@@ -298,6 +298,7 @@ function sendSaveForm(domElement){
                 }
             });
         });
+        BOOK_PERSONS = [...BOOK_PERSONS_SET]
         resetAutocomplete();
 
         _.forEach(possibleNewCompanies, function(company){
