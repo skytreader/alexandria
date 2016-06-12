@@ -181,6 +181,19 @@ $.validator.addMethod("yearVal", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function() {
+    /**
+    Return a function that generates an input row for a given creatorType. The
+    generated function was meant to be called for the click event on the add button.
+    */
+    function rendererFactory(creatorType){
+        return function(){
+            var name = document.createElement("li");
+            var inputLine = renderContentCreatorListing(creatorType);
+    
+            document.getElementById(creatorType + "-list").appendChild(inputLine);
+        }
+    }
+
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(function(){
@@ -228,5 +241,17 @@ $(document).ready(function() {
     });
     $("#translator-proxy-firstname").blur(function(){
         setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
+    });
+
+    CREATORS.forEach(function(creatorTitle){
+        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
+        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+        $("#" + creatorTitle + "-proxy-firstname")
+          .keypress(function(e){
+              if(e.keyCode == 13){
+                  CREATOR_ADD_HANDLERS[creatorTitle]();
+                  $("#" + creatorTitle + "-proxy-lastname").focus();
+              }
+          });
     });
 })

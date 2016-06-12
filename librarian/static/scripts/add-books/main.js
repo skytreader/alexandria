@@ -298,6 +298,7 @@ function sendSaveForm(domElement){
                 }
             });
         });
+        resetAutocomplete();
 
         _.forEach(possibleNewCompanies, function(company){
             if(COMPANIES.indexOf(company) < 0){
@@ -382,19 +383,6 @@ TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
 main.js will only contain this $(document).ready.
 */
 $(document).ready(function(){
-    /**
-    Return a function that generates an input row for a given creatorType. The
-    generated function was meant to be called for the click event on the add button.
-    */
-    function rendererFactory(creatorType){
-        return function(){
-            var name = document.createElement("li");
-            var inputLine = renderContentCreatorListing(creatorType);
-    
-            document.getElementById(creatorType + "-list").appendChild(inputLine);
-        }
-    }
-
     /**
     Clear the actual form.
     
@@ -492,16 +480,4 @@ $(document).ready(function(){
             sendSaveForm(foo.domElement);
         }
     }, REPROCESS_INTERVAL);
-
-    CREATORS.forEach(function(creatorTitle){
-        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
-        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
-        $("#" + creatorTitle + "-proxy-firstname")
-          .keypress(function(e){
-              if(e.keyCode == 13){
-                  CREATOR_ADD_HANDLERS[creatorTitle]();
-                  $("#" + creatorTitle + "-proxy-lastname").focus();
-              }
-          });
-    });
 });
