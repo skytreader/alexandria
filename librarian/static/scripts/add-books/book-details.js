@@ -1,5 +1,8 @@
 /**
 Javascript code related to the book details form.
+
+@module addbooks.book_details
+@namespace addbooks.book_details
 */
 
 /**
@@ -20,6 +23,109 @@ var BOOK_PERSONS_SET = new Set();
 
 var COMPANIES = [];
 var GENRES = [];
+
+/**
+@class
+@namespace addBooks.bookDetails
+*/
+function BookDetailsCtrl(){
+    /**
+    @member 
+    @const
+    @type Array.Person
+    */
+    this.BOOK_PERSONS = [];
+    
+    /**
+    @member
+    @const
+    @type Array.String
+    */
+    this.BOOK_PERSONS_FIRSTNAME = [];
+
+    /**
+    @member
+    @const
+    @type Array.String
+    */
+    this.BOOK_PERSONS_LASTNAME = [];
+
+    /**
+    @member
+    @const
+    @type Set.Person
+    */
+    this.BOOK_PERSONS_SET = new Set();
+
+    /**
+    @member
+    @const
+    @type Array.String
+    */
+    this.COMPANIES = [];
+
+    /**
+    @member
+    @const
+    @type Array.String
+    */
+    this.GENRES = [];
+}
+
+/**
+Initialize the autocomplete for names.
+
+@class BookDetailsCtrl
+@private
+@function
+*/
+BookDetailsCtrl.prototype.fillNames = function(){
+    $.ajax("/api/read/persons", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            var allNames = data["data"];
+            BOOK_PERSONS = allNames;
+            BOOK_PERSONS_SET.addAll(allNames);
+            var allLastnames = _.map(allNames, function(x){return x["lastname"]});
+            var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
+
+            var lastnameSet = new Set(allLastnames);
+            var firstnameSet = new Set(allFirstnames);
+
+            this.BOOK_PERSONS_LASTNAME = [...lastnameSet];
+            this.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
+
+            $(".auto-lastname").autocomplete({
+                source: this.BOOK_PERSONS_LASTNAME
+            });
+
+            $(".auto-firstname").autocomplete({
+                source: this.BOOK_PERSONS_FIRSTNAME
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillNames, 8000);
+        }
+    });
+}
+
+/**
+@private
+*/
+BookDetailsCtrl.prototype.fillGenres = function(){
+    $.ajax("/api/read/genres", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            window.GENRES = data["data"];
+            $("#genre-proxy").autocomplete({
+                source: window.GENRES
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(window.fillGenres, 8000);
+        }
+    });
+}
 
 function fillNames(){
     $.ajax("/api/read/persons", {
