@@ -11,3 +11,5 @@ dist/
 build/
 db_playground.py
 node_modules/
+out/
+*.sql
