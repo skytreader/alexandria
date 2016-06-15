@@ -1,8 +1,8 @@
 /**
 Javascript code related to the book details form.
 
-@module addbooks.book_details
-@namespace addbooks.book_details
+@module addBooks.bookDetails
+@namespace addBooks.bookDetails
 */
 
 /**
@@ -25,8 +25,7 @@ var COMPANIES = [];
 var GENRES = [];
 
 /**
-@class
-@namespace addBooks.bookDetails
+@constructor
 */
 function BookDetailsCtrl(){
     /**
@@ -70,14 +69,15 @@ function BookDetailsCtrl(){
     @type Array.String
     */
     this.GENRES = [];
+    this.fillNames();
+    this.fillGenres();
+    this.fillCompanies();
 }
 
 /**
 Initialize the autocomplete for names.
 
-@class BookDetailsCtrl
 @private
-@function
 */
 BookDetailsCtrl.prototype.fillNames = function(){
     $.ajax("/api/read/persons", {
@@ -104,7 +104,7 @@ BookDetailsCtrl.prototype.fillNames = function(){
             });
         },
         "error": function(jqXHR, textStatus, error){
-            setTimeout(window.fillNames, 8000);
+            setTimeout(this.fillNames, 8000);
         }
     });
 }
@@ -118,13 +118,122 @@ BookDetailsCtrl.prototype.fillGenres = function(){
         "success": function(data, textStatus, jqXHR){
             window.GENRES = data["data"];
             $("#genre-proxy").autocomplete({
-                source: window.GENRES
+                source: this.GENRES
             });
         },
         "error": function(jqXHR, textStatus, error){
-            setTimeout(window.fillGenres, 8000);
+            setTimeout(this.fillGenres, 8000);
         }
     });
+}
+
+/**
+@private
+*/
+BookDetailsCtrl.prototype.fillCompanies = function(){
+    $.ajax("/api/read/companies", {
+        "type": "GET",
+        "success": function(data, textStatus, jqXHR){
+            this.COMPANIES = data["data"]
+            $("#publisher-proxy").autocomplete({
+                source: this.COMPANIES
+            });
+            $("#printer-proxy").autocomplete({
+                source: this.COMPANIES
+            });
+        },
+        "error": function(jqXHR, textStatus, error){
+            setTimeout(this.fillCompanies, 8000)
+        }
+    });
+}
+
+/**
+Sets the autocomplete of the element with identifier `targetId` based on the
+value held by the element with identifier `partnerId`.
+
+This function expects certain elements from the page. In particular, this needs
+that the elements described by `targetId` and `partnerId` also have the class
+`auto-lastname` xor `auto-firstname`, depending on their actual purpose.
+
+@param {string} targetId
+@param {string} partnerId
+@throws If the page where this method is used does not conform to the expected
+stucture.
+@public
+*/
+BookDetailsCtrl.prototype.setAutoComplete = function(targetId, partnerId){
+    "use strict";
+    function mapAndSet(partner, target){
+        var acSource = _.map(_.filter(this.BOOK_PERSONS, function(person){
+            return person[partner] == partnerElement.val();
+          }), function(person){
+            return person[target];
+          });
+
+        if(acSource.length > 0){
+            $("#" + targetId).autocomplete({
+                source: acSource
+            });
+        }
+    }
+
+    var partnerElement = $("#" + partnerId);
+    var acSource;
+
+    if(partnerElement.hasClass("auto-lastname")){
+        mapAndSet("lastname", "firstname");
+    } else if(partnerElement.hasClass("auto-firstname")){
+        mapAndSet("firstname", "lastname");
+    } else{
+        throw "Missing expected elements."
+    }
+}
+
+/**
+Reset all name autocomplete based on the BOOK_PERSONS field.
+
+@public
+*/
+BookDetailsCtrl.prototype.resetAutocomplete = function(){
+    "use strict";
+    this.BOOK_PERSONS_FIRSTNAME = _.map(this.BOOK_PERSONS,
+      function(x){return x["firstname"]});
+    this.BOOK_PERSONS_LASTNAME = _.map(this.BOOK_PERSONS,
+      function(x){return x["lastname"]});
+
+    $(".auto-lastname").autocomplete({
+        source: this.BOOK_PERSONS_LASTNAME
+    });
+
+    $(".auto-firstname").autocomplete({
+        source: this.BOOK_PERSONS_FIRSTNAME
+    });
+}
+
+/**
+Clear all the user listings of their children li elements.
+
+@public
+*/
+BookDetailsCtrl.prototype.clearLists = function(){
+    for(var i = 0; i < this.CREATORS.length; i++){
+        $("#" + this.CREATORS[i] + "-list").empty();
+    }
+}
+
+/**
+Checks the proxy textboxes for content creators that may not have been entered.
+
+@public
+*/
+BookDetailsCtrl.prototype.isCreatorPending = function(){
+    for(var i = 0; i < this.CREATORS.length; i++){
+        if($("#" + this.CREATORS[i] + "-proxy-lastname").val() || $("#" + this.CREATORS[i] + "-proxy-firstname").val()){
+            return true;
+        }
+    }
+    return false;
 }
 
 function fillNames(){
