@@ -171,6 +171,7 @@ def edit_book():
 
             # Delete the book_contributions involved
             BookContribution.query.filter(BookConribution.book_id == book_id).delete()
+            __insert_contributions(book, form, db.session, current_user)
         except IntegrityError, ierr:
             app.logger.error(traceback.format_exc())
             return "IntegrityError", 409
