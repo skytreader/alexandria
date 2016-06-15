@@ -54,6 +54,8 @@ def __create_bookperson(form_data):
         # For errors in pasing JSON
         return None
 
+def __insert_contributions(form_data, session):
+    pass
 
 @librarian_api.route("/api/add/books", methods=["POST"])
 @login_required
@@ -114,21 +116,18 @@ def book_adder():
                   role=author_role, creator=current_user)
                 db.session.add(author)
                 db.session.add(author_part)
-                db.session.commit()
 
             for illustrator in illustrators:
                 illus_part = BookContribution(book=book, contributor=illustrator,
                   role=illus_role, creator=current_user)
                 db.session.add(illustrator)
                 db.session.add(illus_part)
-            db.session.commit()
 
             for editor in editors:
                 editor_part = BookContribution(book=book, contributor=editor,
                   role=editor_role, creator=current_user)
                 db.session.add(editor)
                 db.session.add(editor_part)
-            db.session.commit()
 
             for translator in translators:
                 translator_part = BookContribution(book=book, 
@@ -166,8 +165,8 @@ def edit_book():
             book.title = form.title.data
             book.publish_year = form.year.data
 
-            # Delete the book_participants involved
-            BookParticipant.query.filter(BookParticipant.book_id == book_id).delete()
+            # Delete the book_contributions involved
+            BookContribution.query.filter(BookConribution.book_id == book_id).delete()
         except IntegrityError, ierr:
             app.logger.error(traceback.format_exc())
             return "IntegrityError", 409

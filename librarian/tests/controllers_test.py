@@ -6,7 +6,7 @@ class ControllersTest(AppTestCase):
     def setUp(self):
         super(ControllersTest, self).setUp()
 
-    def ntest_login(self):
+    def test_login(self):
         successful_data = {"librarian_username": "admin", "librarian_password": "admin"}
         
         success_case = self.client.post("/login/", data=successful_data)
