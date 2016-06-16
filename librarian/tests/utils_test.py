@@ -4,11 +4,11 @@ from faker import Faker
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
-from librarian.utils import BookRecord
+from librarian.tests.utils import create_library
+from librarian.utils import BookRecord, isbn_check
 
 import unittest
 import librarian
-import librarian.utils
 
 class IsbnTests(unittest.TestCase):
     
@@ -19,23 +19,23 @@ class IsbnTests(unittest.TestCase):
         isbn10_incorrect = "0306406155"
         isbn13_incorrect = "9780306406155"
 
-        self.assertTrue(librarian.utils.isbn_check(isbn10_correct))
-        self.assertTrue(librarian.utils.isbn_check(isbn13_correct))
-        self.assertFalse(librarian.utils.isbn_check(isbn10_incorrect))
-        self.assertFalse(librarian.utils.isbn_check(isbn13_incorrect))
+        self.assertTrue(isbn_check(isbn10_correct))
+        self.assertTrue(isbn_check(isbn13_correct))
+        self.assertFalse(isbn_check(isbn10_incorrect))
+        self.assertFalse(isbn_check(isbn13_incorrect))
         
-        self.assertFalse(librarian.utils.isbn_check("lettersabc"))
-        self.assertFalse(librarian.utils.isbn_check("123456789"))
+        self.assertFalse(isbn_check("lettersabc"))
+        self.assertFalse(isbn_check("123456789"))
 
     def test_faker(self):
         fake = Faker()
         fake.add_provider(BookFieldsProvider)
         # dual-validation
         for i in range(100):
-            self.assertTrue(librarian.utils.isbn_check(fake.isbn()))
+            self.assertTrue(isbn_check(fake.isbn()))
 
         for i in range(100):
-            self.assertTrue(librarian.utils.isbn_check(fake.isbn(False)))
+            self.assertTrue(isbn_check(fake.isbn(False)))
 
 class BookRecordTests(AppTestCase):
     
@@ -98,3 +98,32 @@ class BookRecordTests(AppTestCase):
         
         set(expected_records)
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
+
+class FunctionsTests(AppTestCase):
+    
+    def test_create_library(self):
+        contribs = librarian.db.session.query(Contributor).all()
+        self.assertEquals(0, len(contribs))
+        companies = librarian.db.session.query(BookCompany).all()
+        self.assertEquals(0, len(companies))
+        books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(books))
+        a_contribs = librarian.db.session.query(BookContribution).all()
+        self.assertEquals(0, len(a_contribs))
+
+        roles = librarian.db.session.query(Role).all()
+
+        library = create_library(librarian.db.session, self.admin_user, roles,
+          book_person_c=12, company_c=8, book_c=12, participant_c=32)
+
+        contribs = librarian.db.session.query(Contributor).all()
+        self.assertEquals(12, len(contribs))
+        companies = librarian.db.session.query(BookCompany).all()
+        self.assertEquals(8, len(companies))
+        books = librarian.db.session.query(Book).all()
+        self.assertEquals(12, len(books))
+        a_contribs = librarian.db.session.query(BookContribution).all()
+        self.assertEquals(32, len(a_contribs))
+
+    def test_create_book(self):
+        isbn13_correct = "9780306406157"

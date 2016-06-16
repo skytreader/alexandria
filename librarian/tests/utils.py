@@ -3,7 +3,7 @@ from factory.fuzzy import FuzzyText
 from librarian.models import Book, BookCompany, Contributor, BookContribution
 from librarian.utils import BookRecord as LibraryEntry, Person
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, ContributorFactory
+  BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
 )
 
 import random
@@ -15,6 +15,22 @@ fuzzy_text = FuzzyText()
 
 def make_name_object():
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
+
+def create_book(session, book_record):
+    """
+    Insert the given book_record into the database. Returns the id of the
+    inserted Book record.
+
+    book_record: librarian.utils.BookRecord
+    """
+    genre = GenreFactory(name="Test")
+    publisher = BookCompanyFactory(name=book_record["publisher"])
+    _book = {"isbn": book_record["isbn"], "title": book_record["title"],
+      "genre": genre, "publisher": publisher}
+    book = Book(**_book)
+    session.flush()
+
+    return book.id
 
 def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8,
   participant_c=8):
