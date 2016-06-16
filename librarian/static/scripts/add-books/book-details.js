@@ -69,9 +69,95 @@ function BookDetailsCtrl(){
     @type Array.String
     */
     this.GENRES = [];
-    this.fillNames();
+
+    /**
+    @member
+    @const
+    @type Array.String
+    */
+    this.CREATORS = ["author", "illustrator", "editor", "translator"]
+
+    this.setUp();
+}
+
+/**
+@private
+*/
+BookDetailsCtrl.prototype.setUp = function(){
+    /**
+    Return a function that generates an input row for a given creatorType. The
+    generated function was meant to be called for the click event on the add
+    button.
+    */
+    function rendererFactory(creatorType){
+        return function(){
+            var name = document.createElement("li");
+            var inputLine = renderContentCreatorListing(creatorType);
+    
+            document.getElementById(creatorType + "-list").appendChild(inputLine);
+        }
+    }
+
+    // Event handlers
+    $("#clear-proxy").click(clearProxyForm);
+    $("#queue-book").click(function(){
+        if(this.isCreatorPending()){
+            alertify.alert("Forgot something?",
+              "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
+        } else if($("#proxy-form").valid()){
+            var spine = renderSpine();
+            internalizeBook(spine);
+            window.visualQueue.prepend(spine);
+            updateStatCounts();
+            clearProxyForm();
+            clearLists();
+            resetAutocomplete();
+        } else{
+            alertify.alert("Oh no!",
+              "There is a problem with this book's details. Check the fields for specifics.");
+        }
+    });
+
     this.fillGenres();
     this.fillCompanies();
+    this.fillNames();
+
+    $("#author-proxy-lastname").blur(function(){
+        this.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+    });
+    $("#author-proxy-firstname").blur(function(){
+        this.setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+    });
+    $("#illustrator-proxy-lastname").blur(function(){
+        this.setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+    });
+    $("#illustrator-proxy-firstname").blur(function(){
+        this.setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+    });
+    $("#editor-proxy-lastname").blur(function(){
+        this.setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+    });
+    $("#editor-proxy-firstname").blur(function(){
+        this.setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+    });
+    $("#translator-proxy-lastname").blur(function(){
+        this.setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+    });
+    $("#translator-proxy-firstname").blur(function(){
+        this.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
+    });
+
+    this.CREATORS.forEach(function(creatorTitle){
+        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
+        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+        $("#" + creatorTitle + "-proxy-firstname")
+          .keypress(function(e){
+              if(e.keyCode == 13){
+                  CREATOR_ADD_HANDLERS[creatorTitle]();
+                  $("#" + creatorTitle + "-proxy-lastname").focus();
+              }
+          });
+    });
 }
 
 /**
@@ -396,77 +482,5 @@ $.validator.addMethod("yearVal", function(value, element, param){
 }, "Please enter a valid year.");
 
 $(document).ready(function() {
-    /**
-    Return a function that generates an input row for a given creatorType. The
-    generated function was meant to be called for the click event on the add button.
-    */
-    function rendererFactory(creatorType){
-        return function(){
-            var name = document.createElement("li");
-            var inputLine = renderContentCreatorListing(creatorType);
-    
-            document.getElementById(creatorType + "-list").appendChild(inputLine);
-        }
-    }
-
-    // Event handlers
-    $("#clear-proxy").click(clearProxyForm);
-    $("#queue-book").click(function(){
-        if(isCreatorPending()){
-            alertify.alert("Forgot something?",
-              "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
-        } else if($("#proxy-form").valid()){
-            var spine = renderSpine();
-            internalizeBook(spine);
-            window.visualQueue.prepend(spine);
-            updateStatCounts();
-            clearProxyForm();
-            clearLists();
-            resetAutocomplete();
-        } else{
-            alertify.alert("Oh no!",
-              "There is a problem with this book's details. Check the fields for specifics.");
-        }
-    });
-
-    fillGenres();
-    fillCompanies();
-    fillNames();
-
-    $("#author-proxy-lastname").blur(function(){
-        setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
-    });
-    $("#author-proxy-firstname").blur(function(){
-        setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
-    });
-    $("#illustrator-proxy-lastname").blur(function(){
-        setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
-    });
-    $("#illustrator-proxy-firstname").blur(function(){
-        setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
-    });
-    $("#editor-proxy-lastname").blur(function(){
-        setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
-    });
-    $("#editor-proxy-firstname").blur(function(){
-        setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
-    });
-    $("#translator-proxy-lastname").blur(function(){
-        setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
-    });
-    $("#translator-proxy-firstname").blur(function(){
-        setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
-    });
-
-    CREATORS.forEach(function(creatorTitle){
-        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
-        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
-        $("#" + creatorTitle + "-proxy-firstname")
-          .keypress(function(e){
-              if(e.keyCode == 13){
-                  CREATOR_ADD_HANDLERS[creatorTitle]();
-                  $("#" + creatorTitle + "-proxy-lastname").focus();
-              }
-          });
-    });
+    var bookDetailsCtrl = new BookDetailsCtrl();
 })

@@ -1,6 +1,5 @@
 var PROCESS_INTERVAL = 8888;
 var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
-var CREATORS = ["author", "illustrator", "editor", "translator"];
 
 /**
 THE BOOK QUEUE. This is the internal representation of the book queue.
