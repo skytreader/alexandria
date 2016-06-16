@@ -16,7 +16,7 @@ fuzzy_text = FuzzyText()
 def make_name_object():
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
 
-def create_book(session, book_record):
+def create_book(session, book_record, creator):
     """
     Insert the given book_record into the database. Returns the id of the
     inserted Book record.
@@ -24,9 +24,10 @@ def create_book(session, book_record):
     book_record: librarian.utils.BookRecord
     """
     genre = GenreFactory(name="Test")
-    publisher = BookCompanyFactory(name=book_record["publisher"])
-    _book = {"isbn": book_record["isbn"], "title": book_record["title"],
-      "genre": genre, "publisher": publisher}
+    publisher = BookCompanyFactory(name=book_record.publisher)
+    _book = {"isbn": book_record.isbn, "title": book_record.title,
+      "genre": genre, "publisher": publisher, "creator": creator,
+      "publish_year": book_record.publish_year}
     book = Book(**_book)
     session.flush()
 

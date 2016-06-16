@@ -30,8 +30,8 @@ class BookRecord(object):
     consolidates the records of a single book.
     """
     
-    def __init__(self, isbn, title, publisher, author=None, translator=None,
-      illustrator=None, editor=None):
+    def __init__(self, isbn, title, publisher, publish_year=None, author=None,
+      translator=None, illustrator=None, editor=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
@@ -49,6 +49,7 @@ class BookRecord(object):
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
+        self.publish_year = publish_year
         self.authors = frozenset(author if author else [])
         self.translators = frozenset(translator if translator else [])
         self.illustrators = frozenset(illustrator if illustrator else [])

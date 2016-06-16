@@ -4,8 +4,8 @@ from faker import Faker
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
-from librarian.tests.utils import create_library
-from librarian.utils import BookRecord, isbn_check
+from librarian.tests import utils
+from librarian.utils import BookRecord, isbn_check, Person
 
 import unittest
 import librarian
@@ -113,8 +113,8 @@ class FunctionsTests(AppTestCase):
 
         roles = librarian.db.session.query(Role).all()
 
-        library = create_library(librarian.db.session, self.admin_user, roles,
-          book_person_c=12, company_c=8, book_c=12, participant_c=32)
+        library = utils.create_library(librarian.db.session, self.admin_user,
+          roles, book_person_c=12, company_c=8, book_c=12, participant_c=32)
 
         contribs = librarian.db.session.query(Contributor).all()
         self.assertEquals(12, len(contribs))
@@ -126,4 +126,16 @@ class FunctionsTests(AppTestCase):
         self.assertEquals(32, len(a_contribs))
 
     def test_create_book(self):
-        isbn13_correct = "9780306406157"
+        sample_isbn = "9780306406157"
+        # ensure it does not exist
+        bookq = librarian.db.session.query(Book).filter(Book.isbn==sample_isbn)
+        book = bookq.first()
+
+        self.assertTrue(book is None)
+        br = BookRecord(isbn=sample_isbn, title="Another Chance for Poland",
+          publisher="Eurosport", author=(Person(lastname="Enrique",
+          firstname="Luis"),), publish_year=2016)
+        utils.create_book(librarian.db.session, br, self.admin_user)
+
+        book = bookq.first()
+        self.assertTrue(book is not None)
