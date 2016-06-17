@@ -6,25 +6,6 @@ Javascript code related to the book details form.
 */
 
 /**
-@const
-*/
-var BOOK_PERSONS = [];
-/**
-@const
-@type Array.String
-*/
-var BOOK_PERSONS_LASTNAME = [];
-/**
-@const
-@type Array.String
-*/
-var BOOK_PERSONS_FIRSTNAME = [];
-var BOOK_PERSONS_SET = new Set();
-
-var COMPANIES = [];
-var GENRES = [];
-
-/**
 @constructor
 */
 function BookDetailsCtrl(){
