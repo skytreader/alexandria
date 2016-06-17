@@ -3,6 +3,7 @@ Responsible for sending book data to the server. Manages queues and all.
 
 @module addBooks.main
 @namespace addBook.main
+@author Chad Estioco
 */
 var PROCESS_INTERVAL = 8888;
 var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
@@ -81,8 +82,12 @@ function BookSenderCtrl(){
     This script will manipulate ids a lot. We derive certain converntions from the
     actual ids of the hidden form field. This hidden form field is the one that
     is mapped to the Flask form. These are the fields to be included in the request.
+
+    TODO Make this all caps for standards!
+
+    @const {Array.String}
     */
-    var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
+    this.realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
       "editors", "translators", "year", "publisher", "printer"];
     
     var visualQueue;

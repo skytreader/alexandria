@@ -3,6 +3,7 @@ Javascript code related to the book details form.
 
 @module addBooks.bookDetails
 @namespace addBooks.bookDetails
+@author Chad Estioco
 */
 
 /**
