@@ -139,3 +139,9 @@ class FunctionsTests(AppTestCase):
 
         book = bookq.first()
         self.assertTrue(book is not None)
+
+        # Ensure that it has contributors
+        contribs = (librarian.db.session.query(BookContribution)
+          .filter(BookContribution.book_id == book.id).all())
+
+        self.assertTrue(len(contribs) > 0)

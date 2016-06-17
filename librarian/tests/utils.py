@@ -29,6 +29,7 @@ def create_book(session, book_record, creator):
       "genre": genre, "publisher": publisher, "creator": creator,
       "publish_year": book_record.publish_year}
     book = Book(**_book)
+    session.add(book)
     session.flush()
 
     return book.id
