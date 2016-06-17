@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, BookCompany, Contributor, BookContribution
+from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
 from librarian.utils import BookRecord as LibraryEntry, Person
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
@@ -23,6 +23,18 @@ def create_book(session, book_record, creator):
 
     book_record: librarian.utils.BookRecord
     """
+    
+    def create_contribution(role_name, persons):
+        role = Role.get_preset_role(role_name)
+        
+        for p in persons:
+            contributor = Contributor(lastname=p.lastname, firstname=p.firstname,
+              creator=creator)
+            session.add(contributor)
+            contribution = BookContribution(book=book, contributor=contributor,
+              role=role, creator=creator)
+            session.add(contribution)
+
     genre = GenreFactory(name="Test")
     publisher = BookCompanyFactory(name=book_record.publisher)
     _book = {"isbn": book_record.isbn, "title": book_record.title,
@@ -30,6 +42,10 @@ def create_book(session, book_record, creator):
       "publish_year": book_record.publish_year}
     book = Book(**_book)
     session.add(book)
+    create_contribution("Author", book_record.authors)
+    create_contribution("Illustrator", book_record.illustrators)
+    create_contribution("Translator", book_record.translators)
+    create_contribution("Editor", book_record.editors)
     session.flush()
 
     return book.id
