@@ -1,3 +1,9 @@
+/**
+Responsible for sending book data to the server. Manages queues and all.
+
+@module addBooks.main
+@namespace addBook.main
+*/
 var PROCESS_INTERVAL = 8888;
 var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
 
@@ -31,6 +37,67 @@ This is needed by the loadToForm method.
 Maps the creator type to the event handler used to add an entry to the creator list.
 */
 var CREATOR_ADD_HANDLERS = {};
+
+/**
+@constructor
+*/
+function BookSenderCtrl(){
+    /**
+    The interval of time, in milliseconds, in which we process books.
+
+    @const {number}
+    */
+    this.PROCESS_INTERVAL = 8888;
+
+    /**
+    The interval of time, in milliseconds, in which we reprocess books that
+    failed and in reprocessable.
+
+    @const {number}
+    */
+    this.REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
+    
+    /**
+    This is the internal representation of the book queue.
+
+    TODO Make this all caps for standards! Or is this really supposed to be a
+    constant?
+
+    @const {Queue}
+    */
+    this.bookQueue = new Queue();
+    
+    /**
+    Where the books eligible for reprocessing go.
+
+    TODO Make this all caps for standards! Or is this really supposed to be a
+    constant?
+
+    @const {Queue}
+    */
+    this.reprocessQueue = new Queue();
+    
+    /**
+    This script will manipulate ids a lot. We derive certain converntions from the
+    actual ids of the hidden form field. This hidden form field is the one that
+    is mapped to the Flask form. These are the fields to be included in the request.
+    */
+    var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
+      "editors", "translators", "year", "publisher", "printer"];
+    
+    var visualQueue;
+    
+    var booksSaved = 0;
+    var booksErrorNoRetry = 0;
+    var booksReprocessable = 0;
+    
+    /**
+    This is needed by the loadToForm method.
+    
+    Maps the creator type to the event handler used to add an entry to the creator list.
+    */
+    var CREATOR_ADD_HANDLERS = {};
+}
 
 function updateStatCounts(){
     $("#unsaved-count").text("" + visualQueue.getLength());
