@@ -144,9 +144,11 @@ def book_adder():
             return "Accepted", 200
         except IntegrityError, ierr:
             app.logger.error(traceback.format_exc())
-            return "IntegrityError", 409
+            err_str = '"%s" has been catalogued before. Ignoring.' % (form.title.data)
+            return err_str, 409
     
-    return "Error", 400
+    err_str = "Did not validate for %s. Please re-enter book to try again." % (form.title.data)
+    return err_str, 400
 
 @librarian_api.route("/api/edit/books", methods=["POST"])
 @login_required
