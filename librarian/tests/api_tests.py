@@ -445,6 +445,7 @@ class ApiTests(AppTestCase):
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
 
     def test_edit_book(self):
-        bfp = BookFieldsProvider()
-        book = BookRecord(isbn=bfp.isbn(), title=bfp.title(),
+        fake = Faker()
+        fake.add_provider(BookFieldsProvider)
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons")
