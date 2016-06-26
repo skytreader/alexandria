@@ -10,7 +10,7 @@ from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import make_name_object, create_library
+from librarian.tests.utils import make_name_object, create_library, create_book
 
 import dateutil.parser
 import factory
