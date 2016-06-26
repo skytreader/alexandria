@@ -7,6 +7,11 @@ NUMERIC_REGEX = re.compile("\d+")
 
  
 class Person(object):
+    """
+    Sometimes, you don't need a full Contributor object---i.e., you don't need
+    the creation date for the record, just the first name and last name. This
+    class is for that.
+    """
     def __init__(self, lastname, firstname):
         self.lastname = lastname
         self.firstname = firstname
