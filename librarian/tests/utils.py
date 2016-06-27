@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
-from librarian.utils import BookRecord as LibraryEntry, Person
+from librarian.utils import BookRecord, Person
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
 )
@@ -55,7 +55,7 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
     """
     Create a library in the database with the given counts.
 
-    Returns a list of `LibraryEntry` objects.
+    Returns a list of `BookRecord` objects.
     """
     book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
@@ -123,6 +123,6 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
-        library_list.insert(0, LibraryEntry(**book))
+        library_list.insert(0, BookRecord(**book))
 
     return library_list

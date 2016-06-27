@@ -447,5 +447,7 @@ class ApiTests(AppTestCase):
     def test_edit_book(self):
         fake = Faker()
         fake.add_provider(BookFieldsProvider)
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
-          publisher="Mumford and Sons")
+          publisher="Mumford and Sons", author=authors, publish_year=2016)
+        create_book(librarian.db.session, book, self.admin_user)
