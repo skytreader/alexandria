@@ -47,6 +47,7 @@ function BookSenderCtrl(){
     The interval of time, in milliseconds, in which we process books.
 
     @const {number}
+    @member
     */
     this.PROCESS_INTERVAL = 8888;
 
@@ -55,6 +56,7 @@ function BookSenderCtrl(){
     failed and in reprocessable.
 
     @const {number}
+    @member
     */
     this.REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
     
@@ -65,6 +67,7 @@ function BookSenderCtrl(){
     constant?
 
     @const {Queue}
+    @member
     */
     this.bookQueue = new Queue();
     
@@ -75,6 +78,7 @@ function BookSenderCtrl(){
     constant?
 
     @const {Queue}
+    @member
     */
     this.reprocessQueue = new Queue();
     
@@ -86,29 +90,50 @@ function BookSenderCtrl(){
     TODO Make this all caps for standards!
 
     @const {Array.String}
+    @member
     */
     this.realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
       "editors", "translators", "year", "publisher", "printer"];
     
-    var visualQueue;
+    /**
+    Visual representation of what is going on with the sending of books.
+
+    @member
+    */
+    this.visualQueue;
     
-    var booksSaved = 0;
-    var booksErrorNoRetry = 0;
-    var booksReprocessable = 0;
+    /**
+    @member
+    */
+    this.booksSaved = 0;
+    /**
+    @member
+    */
+    this.booksErrorNoRetry = 0;
+    /**
+    @member
+    */
+    this.booksReprocessable = 0;
     
     /**
     This is needed by the loadToForm method.
     
-    Maps the creator type to the event handler used to add an entry to the creator list.
+    Maps the creator type to the event handler used to add an entry to the
+    creator list.
+
+    @member
     */
-    var CREATOR_ADD_HANDLERS = {};
+    this.CREATOR_ADD_HANDLERS = {};
 }
 
-function updateStatCounts(){
-    $("#unsaved-count").text("" + visualQueue.getLength());
-    $("#saved-count").text("" + booksSaved);
-    $("#error-count").text("" + booksErrorNoRetry);
-    $("#reprocessed-count").text("" + booksReprocessable);
+/**
+@public
+*/
+BookSenderCtrl.prototype.updateStatCounts = function(){
+    $("#unsaved-count").text("" + this.visualQueue.getLength());
+    $("#saved-count").text("" + this.booksSaved);
+    $("#error-count").text("" + this.booksErrorNoRetry);
+    $("#reprocessed-count").text("" + this.booksReprocessable);
 }
 
 /**
@@ -117,8 +142,9 @@ directly.
 
 @return {HTMLElement} A div element which displays like a spine of a book. The
 div element has the isbn for its id.
+@public
 */
-function renderSpine(){
+BookSenderCtrl.prototype.renderSpine = function(){
     var spine = document.createElement("div");
     spine.className = "unsaved_book queued_block";
     var allInputs = $("#proxy-form input");
@@ -133,7 +159,7 @@ function renderSpine(){
     titleText.innerHTML = title.val();
 
     var authorsText = document.createElement("h3");
-    authorsText.innerHTML = listNames(getCreatorNames("author"));
+    authorsText.innerHTML = this.listNames(getCreatorNames("author"));
 
     spine.appendChild(isbnText);
     spine.appendChild(titleText);
@@ -144,8 +170,12 @@ function renderSpine(){
 
 /**
 Get a list of persons and return a string to display them..
+
+@param {Array.Person} nameList
+@return {string} the names listed, separated by semi-colons.
+@private
 */
-function listNames(nameList){
+BookSenderCtrl.prototype.listNames = function(nameList){
     var names = [];
     for(var i = 0; i < nameList.length; i++){
         names.push(nameList[i].lastname + ", " + nameList[i].firstname);
