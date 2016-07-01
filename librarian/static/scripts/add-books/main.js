@@ -191,9 +191,12 @@ This relies _a lot_ on the guaranteed return order of jQuery selectors. At least
 it must be guaranteed that the order of lastnames and firstnames returned is the
 same.
 
-@return Array.Person
+@param {string} creator
+    The name given to the creator type.
+@return {Array.Person} An array of persons.
+@public
 */
-function getCreatorNames(creator){
+BookSenderCtrl.prototype.getCreatorNames = function(creator){
     var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
     var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
     var persons = [];
@@ -215,11 +218,12 @@ Append the book described in #proxy-form to the internal queue.
 The DOM element representing the book is a required parameter since we use it to
 map the Book object to its visual representation.
 
-@param {HTMLElement} spineDom - the DOM element representing the book spine.
-  This is just necessary for mapping, which in turn is necessary for the
-  reprocess function.
+@param {HTMLElement} spineDom
+  The DOM element representing the book spine. This is just necessary for mapping,
+  which in turn is necessary for the reprocess function.
+@public
 */
-function internalizeBook(spineDom){
+BookSenderCtrl.prototype.internalizeBook = function(spineDom){
     var allInputs = $("#proxy-form input");
     var isbn = $(allInputs).filter("#isbn-proxy").val();
     var title = $(allInputs).filter("#title-proxy").val();
@@ -235,15 +239,16 @@ function internalizeBook(spineDom){
     var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
       translators, publisher, printer, year, spineDom);
 
-    window.bookQueue.enqueue(bookObj);
+    this.bookQueue.enqueue(bookObj);
 }
 
 /**
 Generates the delete button to be added at the end of every row record.
 
 @return {HTMLElement}
+@private
 */
-function renderDeleteButton(){
+BookSenderCtrl.prototype.enderDeleteButton = function(){
     var container = document.createElement("input");
     container.onclick = removeRow;
     container.type = "button";
