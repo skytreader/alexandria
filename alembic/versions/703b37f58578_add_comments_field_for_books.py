@@ -22,8 +22,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    pass
+    op.add_column("books", sa.Column("comments", sa.Text, nullable=True))
 
 
 def downgrade():
-    pass
+    op.drop_column("books", "comments")

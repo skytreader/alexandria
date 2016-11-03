@@ -128,6 +128,7 @@ class Book(UserTaggedBase):
       name="book_book_company_fk1"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
       server_default=str(ISBN_START))
+    comments = db.Column(db.Text, nullable=True)
 
     genre = relationship("Genre")
     publisher = relationship("BookCompany")
