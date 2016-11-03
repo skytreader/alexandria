@@ -19,7 +19,7 @@ When the world ends according to the Long Now Foundation.
 LONG_NOW_WORLD_END = 99999
 
 
-def get_or_create(model, will_commit=False, **kwargs):
+def get_or_create(model, session=None, will_commit=False, **kwargs):
     """
     Get the record from the table represented by the given model which
     corresponds to **kwargs.
@@ -33,8 +33,9 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
+    session = session if session else db.session
     given_creator = kwargs.pop("creator", None)
-    instance = db.session.query(model).filter_by(**kwargs).first()
+    instance = session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
@@ -47,8 +48,8 @@ def get_or_create(model, will_commit=False, **kwargs):
 
         instance = model(**kwargs)
         if will_commit:
-            db.session.add(instance)
-            db.session.commit()
+            session.add(instance)
+            session.commit()
         return instance
 
 

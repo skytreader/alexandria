@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
+from librarian.models import Book, BookCompany, BookContribution, Contributor, get_or_create, Role
 from librarian.utils import BookRecord, Person
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
@@ -23,17 +23,27 @@ def create_book(session, book_record, creator):
 
     book_record: librarian.utils.BookRecord
     """
+    # IMPORTANT: Do not remove the following all query line. Else tests will
+    # mysteriously fail about records that don't exist but, when added, will
+    # raise an IntegrityError. Effing MySQL Heisenbug.
+    spam = session.query(Contributor).all()
     
     def create_contribution(role_name, persons):
-        role = Role.get_preset_role(role_name)
-        
-        for p in persons:
-            contributor = Contributor(lastname=p.lastname, firstname=p.firstname,
-              creator=creator)
-            session.add(contributor)
-            contribution = BookContribution(book=book, contributor=contributor,
-              role=role, creator=creator)
-            session.add(contribution)
+        with session.no_autoflush:
+            role = Role.get_preset_role(role_name)
+            
+            for p in persons:
+                contributor = get_or_create(Contributor, session=session, will_commit=True,
+                  lastname=p.lastname, firstname=p.firstname, creator=creator)
+                #contributor = Contributor(lastname=p.lastname, firstname=p.firstname,
+                #  creator=creator)
+                try:
+                    session.add(contributor)
+                except IntegrityError:
+                    pass
+                contribution = BookContribution(book=book, contributor=contributor,
+                  role=role, creator=creator)
+                session.add(contribution)
 
     genre = GenreFactory(name="Test")
     publisher = BookCompanyFactory(name=book_record.publisher)
@@ -42,9 +52,13 @@ def create_book(session, book_record, creator):
       "publish_year": book_record.publish_year}
     book = Book(**_book)
     session.add(book)
+    print "authors %s" % book_record.authors
     create_contribution("Author", book_record.authors)
+    print "illustrators %s" % book_record.illustrators
     create_contribution("Illustrator", book_record.illustrators)
+    print "translators %s" % book_record.translators
     create_contribution("Translator", book_record.translators)
+    print "editors %s" % book_record.editors
     create_contribution("Editor", book_record.editors)
     session.flush()
 

@@ -2,7 +2,7 @@
 from base import AppTestCase
 from factories import *
 from librarian.errors import ConstraintError
-from librarian.models import Book, Genre, get_or_create, ISBN_START
+from librarian.models import Book, Contributor, Genre, get_or_create, ISBN_START
 
 import librarian
 import unittest
@@ -66,6 +66,11 @@ class ModelsTest(AppTestCase):
         horror_other = get_or_create(Genre, name="Horror",
           creator=other_librarian)
         self.assertEqual(horror_goc, horror_other)
+
+    def test_get_or_create_contributors_dne(self):
+        contrib = get_or_create(Contributor, will_commit=True, firstname="David", lastname="Tennant", creator=self.admin_user)
+
+        self.assertTrue(contrib is not None)
     
     def test_get_or_create_insuff(self):
         templar = (librarian.db.session.query(Book)
