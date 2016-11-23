@@ -24,7 +24,10 @@ def reset_db_data(is_test=False):
     """
     Truncate all database tables. Pass `is_test:True` to reset test db.
     """
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    if is_test:
+        engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
+    else:
+        engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
     engine.execute("TRUNCATE alembic_version;")
