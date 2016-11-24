@@ -6,7 +6,12 @@ ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
  
-class Person(object):
+class RequestData(object):
+    
+    def request_data(self):
+        pass
+
+class Person(RequestData):
     """
     Sometimes, you don't need a full Contributor object---i.e., you don't need
     the creation date for the record, just the first name and last name. This
@@ -27,9 +32,12 @@ class Person(object):
 
     def __repr__(self):
         return str(self)
+
+    def request_data(self):
+        return '{"lastname": %s, "firstname": %s}' % (self.lastname, self.firstname)
         
 
-class BookRecord(object):
+class BookRecord(RequestData):
     """
     Class to consolidate DB records for easier listing. Each BookRecord instance
     consolidates the records of a single book.
@@ -98,6 +106,29 @@ class BookRecord(object):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
           "illustrator": str(self.illustrators), "editor": str(self.editors),
           "translator": str(self.translators), "publisher": str(self.publisher)})
+
+    def request_data(self):
+        def create_person_request_data(persons):
+            return ", ".join([p.request_data() for p in persons])
+
+        authors = create_person_request_data(self.authors)
+        illustrators = create_person_request_data(self.illustrators)
+        editors = create_person_request_data(self.editors)
+        translators = create_person_request_data(self.translators)
+
+        return """
+"isbn": "%s",
+"title": "%s",
+"authors": "[%s]",
+"illustrators": "[%s]",
+"editors": "[%s]",
+"translators": "[%s]",
+"publisher": "%s",
+"year": %d
+""" % (
+        self.isbn, self.title, authors, illustrators, editors, translators,
+        self.publisher, self.year
+      )
 
     def __repr__(self):
         return str(self)
