@@ -156,10 +156,9 @@ def edit_book():
     from flask.ext.login import current_user
 
     form = EditBookForm(request.form)
-    app.logger.infp(str(form))
+    app.logger.info(str(form))
     app.logger.debug(form.debug_validate())
 
-    # TODO Testme especially integrating foreign keys with db-standardization branch
     if form.validate_on_submit():
         book_id = int(form.book_id)
         try:
@@ -174,9 +173,14 @@ def edit_book():
             # Delete the book_contributions involved
             BookContribution.query.filter(BookConribution.book_id == book_id).delete()
             __insert_contributions(book, form, db.session, current_user)
+            return "Accepted", 200
         except IntegrityError, ierr:
             app.logger.error(traceback.format_exc())
             return "IntegrityError", 409
+        except:
+            return "Unknown error", 500
+    else:
+        return "Unknown error", 500
 
 @librarian_api.route("/api/util/servertime")
 def servertime():

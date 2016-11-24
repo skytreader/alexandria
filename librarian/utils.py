@@ -116,19 +116,16 @@ class BookRecord(RequestData):
         editors = create_person_request_data(self.editors)
         translators = create_person_request_data(self.translators)
 
-        return """
-"isbn": "%s",
-"title": "%s",
-"authors": "[%s]",
-"illustrators": "[%s]",
-"editors": "[%s]",
-"translators": "[%s]",
-"publisher": "%s",
-"year": %d
-""" % (
-        self.isbn, self.title, authors, illustrators, editors, translators,
-        self.publisher, self.year
-      )
+        return {
+            "isbn": self.isbn,
+            "title": self.title,
+            "authors": authors,
+            "illustrators": illustrators,
+            "editors": editors,
+            "translators": translators,
+            "publisher": self.publisher,
+            "year": str(self.publish_year)
+        }
 
     def __repr__(self):
         return str(self)
