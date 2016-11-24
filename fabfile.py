@@ -47,11 +47,14 @@ def reset_db_data(is_test=False):
     insert_fixtures(engine, session)
 
 @__env_safeguard
-def destroy_db_tables():
+def destroy_db_tables(is_test=False):
     """
     Drop all database tables.
     """
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    if is_test:
+        engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
+    else:
+        engine = create_engine(SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
     engine.execute("DROP TABLE IF EXISTS alembic_version;")
