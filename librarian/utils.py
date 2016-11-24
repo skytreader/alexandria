@@ -44,7 +44,7 @@ class BookRecord(RequestData):
     """
     
     def __init__(self, isbn, title, publisher, publish_year=None, author=None,
-      translator=None, illustrator=None, editor=None):
+      translator=None, illustrator=None, editor=None, genre=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
@@ -58,6 +58,7 @@ class BookRecord(RequestData):
         translator: list of Person objects
         illustrator: list of Person objects
         editor: list of Person objects
+        genre: string
         """
         self.isbn = isbn
         self.title = title
@@ -67,6 +68,7 @@ class BookRecord(RequestData):
         self.translators = frozenset(translator if translator else [])
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
+        self.genre = genre
 
     @staticmethod
     def make_hashable(dict_struct):
@@ -124,7 +126,8 @@ class BookRecord(RequestData):
             "editors": editors,
             "translators": translators,
             "publisher": self.publisher,
-            "year": str(self.publish_year)
+            "year": str(self.publish_year),
+            "genre": self.genre
         }
 
     def __repr__(self):

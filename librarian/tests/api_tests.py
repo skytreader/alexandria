@@ -449,7 +449,8 @@ class ApiTests(AppTestCase):
         fake.add_provider(BookFieldsProvider)
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
-          publisher="Mumford and Sons", author=authors, publish_year=2016)
+          publisher="Mumford and Sons", author=authors, publish_year=2016,
+          genre="Fiction")
         create_book(librarian.db.session, book, self.admin_user)
         edit_book = self.client.post("/api/edit/books", data=book.request_data())
         self.assertEqual(200, edit_book.status_code)
