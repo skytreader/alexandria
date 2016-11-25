@@ -230,8 +230,8 @@ def get_books():
     elif limit and not offset:
         offset = "0"
 
-    bookq = (db.session.query(Book.id, Book.isbn, Book.title,
-      Contributor.lastname, Contributor.firstname, Role.name, BookCompany.name)
+    bookq = (
+      BookRecord.base_assembler_query()
       .filter(Book.id == BookContribution.book_id)
       .filter(BookContribution.contributor_id == Contributor.id)
       .filter(BookContribution.role_id == Role.id)
@@ -311,8 +311,8 @@ def quick_stats():
     return flask.jsonify(stats)
 
 def search(searchq):
-    results = (db.session.query(Book.id, Book.isbn, Book.title,
-      Contributor.lastname, Contributor.firstname, Role.name, BookCompany.name)
+    results = (
+      BookRecord.base_assembler_query()
       .filter(Book.title.like("".join(("%", searchq, "%"))))
       .filter(Book.id == BookContribution.book_id)
       .filter(BookContribution.contributor_id == Contributor.id)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import librarian
 import re
 
@@ -42,6 +43,19 @@ class BookRecord(RequestData):
     Class to consolidate DB records for easier listing. Each BookRecord instance
     consolidates the records of a single book.
     """
+
+    @staticmethod
+    def base_assembler_query():
+        """
+        Use this when the results of your query is meant to be assembled via
+        BookRecord.assembler. This is just a query that enumerates the result set
+        as expected by BookRecord.assembler. Filter as necessary.
+        """
+        from librarian.models import Book, BookCompany, Contributor, Role
+        return librarian.db.session.query(
+            Book.id, Book.isbn, Book.title, Contributor.lastname,
+            Contributor.firstname, Role.name, BookCompany.name
+        )
     
     def __init__(self, id, isbn, title, publisher, publish_year=None,
       author=None, translator=None, illustrator=None, editor=None, genre=None):
