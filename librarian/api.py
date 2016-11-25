@@ -160,7 +160,7 @@ def edit_book():
     app.logger.debug(form.debug_validate())
 
     if form.validate_on_submit():
-        book_id = int(form.book_id)
+        book_id = int(form.book_id.data)
         try:
             # Update records in books table
             publisher = get_or_create(BookCompany, will_commit=True, 

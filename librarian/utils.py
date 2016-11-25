@@ -43,13 +43,15 @@ class BookRecord(RequestData):
     consolidates the records of a single book.
     """
     
-    def __init__(self, isbn, title, publisher, publish_year=None, author=None,
-      translator=None, illustrator=None, editor=None, genre=None):
+    def __init__(self, id, isbn, title, publisher, publish_year=None,
+      author=None, translator=None, illustrator=None, editor=None, genre=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
         whatever you gave for `author` is accessible via `self.author`).
 
+        id: integer
+            The book id.
         isbn: string
         title: string
         publisher: string
@@ -60,6 +62,7 @@ class BookRecord(RequestData):
         editor: list of Person objects
         genre: string
         """
+        self.id = id
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
@@ -119,6 +122,7 @@ class BookRecord(RequestData):
         translators = create_person_request_data(self.translators)
 
         return {
+            "book_id": self.id,
             "isbn": self.isbn,
             "title": self.title,
             "authors": authors,

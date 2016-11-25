@@ -123,6 +123,7 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
             library[rand_isbn][_role] = [Person(**{"lastname": rand_person.lastname,
               "firstname": rand_person.firstname})]
             library[rand_isbn]["publisher"] = rand_book.publisher.name
+            library[rand_isbn]["id"] = random.randint(8, 8888)
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
             bp = BookContribution(book=rand_book, contributor=rand_person,
