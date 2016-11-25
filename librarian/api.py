@@ -52,7 +52,7 @@ def __create_bookperson(form_data):
         return persons_created
     except ValueError:
         # For errors in pasing JSON
-        return None
+        return []
 
 def __insert_contributions(book, form, session, current_user):
     """
@@ -164,22 +164,27 @@ def edit_book():
         try:
             # Update records in books table
             publisher = get_or_create(BookCompany, will_commit=True, 
-              name=form.publisher.data, creator=current_user.get_id())
-            book = Book.query.get(book_id)
+              name=form.publisher.data, creator=current_user)
+            book = db.session.query(Book).filter(Book.id==book_id)
+            app.logger.debug("book is %s" % book)
             book.isbn = form.isbn.data
             book.title = form.title.data
             book.publish_year = form.year.data
 
             # Delete the book_contributions involved
-            BookContribution.query.filter(BookConribution.book_id == book_id).delete()
+            BookContribution.query.filter(BookContribution.book_id == book_id).delete()
             __insert_contributions(book, form, db.session, current_user)
             return "Accepted", 200
         except IntegrityError, ierr:
-            app.logger.error(traceback.format_exc())
+            app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
-        except:
+        except Exception as ex:
+            import traceback
+            traceback.print_exc()
+            app.logger.error("error except")
             return "Unknown error", 500
     else:
+        app.logger.error("error else")
         return "Unknown error", 500
 
 @librarian_api.route("/api/util/servertime")
