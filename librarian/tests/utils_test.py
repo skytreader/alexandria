@@ -75,18 +75,20 @@ class BookRecordTests(AppTestCase):
           booka_illus2.contributor.make_plain_person()]
         booka_record = BookRecord(isbn=booka.isbn, title=booka.title,
           publisher=booka.publisher.name, author=booka_authors,
-          translator=booka_translators, illustrator=booka_illustrators)
+          translator=booka_translators, illustrator=booka_illustrators,
+          id=booka.id)
 
         bookb_authors = [bookb_author.contributor.make_plain_person()]
         bookb_translators = [bookb_translator.contributor.make_plain_person()]
         bookb_illustrators = [bookb_illus.contributor.make_plain_person()]
         bookb_record = BookRecord(isbn=bookb.isbn, title=bookb.title,
           publisher=bookb.publisher.name, author=bookb_authors,
-          translator=bookb_translators, illustrator=bookb_illustrators)
+          translator=bookb_translators, illustrator=bookb_illustrators,
+          id=bookb.id)
 
         expected_records = [booka_record, bookb_record]
 
-        bookq = (librarian.db.session.query(Book.isbn, Book.title,
+        bookq = (librarian.db.session.query(Book.id, Book.isbn, Book.title,
           Contributor.lastname, Contributor.firstname, Role.name,
           BookCompany.name)
           .filter(Book.id == BookContribution.book_id)
@@ -134,7 +136,7 @@ class FunctionsTests(AppTestCase):
         self.assertTrue(book is None)
         br = BookRecord(isbn=sample_isbn, title="Another Chance for Poland",
           publisher="Eurosport", author=(Person(lastname="Enrique",
-          firstname="Luis"),), publish_year=2016)
+          firstname="Luis"),), publish_year=2016, id=314)
         utils.create_book(librarian.db.session, br, self.admin_user)
 
         book = bookq.first()

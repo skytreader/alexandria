@@ -95,7 +95,7 @@ class BookRecord(RequestData):
         return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
           translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors)
+          editor=person_editors, id=dict_struct["id"])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
@@ -142,12 +142,13 @@ class BookRecord(RequestData):
         """
         Takes in rows from a SQL query with the columns in the following order:
     
-        0 - Book.isbn
-        1 - Book.title
-        2 - Contributor.lastname
-        3 - Contributor.firstname
-        4 - Role.name
-        5 - BookCompany.name
+        0 - Book.id
+        1 - Book.isbn
+        2 - Book.title
+        3 - Contributor.lastname
+        4 - Contributor.firstname
+        5 - Role.name
+        6 - BookCompany.name
     
         And arranges them as an instance of this class.
 
@@ -158,23 +159,23 @@ class BookRecord(RequestData):
         """
         structured_catalog = {}
         
-        for book in book_rows:
-            record_exists = structured_catalog.get(book[0])
-            role = book[4].lower()
+        for id, isbn, title, contrib_lastname, contrib_firstname, role, publisher in book_rows:
+            record_exists = structured_catalog.get(isbn)
+            role = role.lower()
 
             if record_exists:
-                if structured_catalog[book[0]].get(role):
-                    structured_catalog[book[0]][role].append(Person(lastname= book[2],
-                      firstname=book[3]))
+                if structured_catalog[isbn].get(role):
+                    structured_catalog[isbn][role].append(Person(
+                      lastname=contrib_lastname, firstname=contrib_firstname))
                 else:
-                    structured_catalog[book[0]][role] = [Person(lastname=book[2],
-                      firstname=book[3])]
+                    structured_catalog[isbn][role] = [Person(
+                      lastname=contrib_lastname, firstname=contrib_firstname)]
             else:
-                fmt = {"title": book[1],
-                  role: [Person(lastname=book[2], firstname=book[3])],
-                  "publisher": book[5]}
+                fmt = {"title": title, "id": id,
+                  role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
+                  "publisher": publisher}
 
-                structured_catalog[book[0]] = fmt
+                structured_catalog[isbn] = fmt
 
         book_listing = []
 
@@ -191,7 +192,8 @@ class BookRecord(RequestData):
 
     @property
     def __dict__(self):
-        base = {"isbn": self.isbn, "title": self.title, "publisher": self.publisher}
+        base = {"isbn": self.isbn, "title": self.title,
+          "publisher": self.publisher, "id": self.id}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]
