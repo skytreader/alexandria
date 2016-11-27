@@ -7,6 +7,21 @@ Citing related repos compels me to mention [this one](https://github.com/skytrea
 
 # Dev Set-up
 
+## System packages
+
+Assuming you are in Ubuntu/Debian:
+
+    sudo apt-get install -y mysql-server-5.7
+    sudo apt-get install -y mysql-client-core-5.7
+    sudo apt-get install -y mysql-client-5.7
+
+Experimental MySQL set-ups (e.g., testing an upgrade to a new version) may also
+need to install
+
+    sudo apt-get install libmysqlclient-dev
+
+## Python set-up
+
 Assuming you have a local mysql server accessbile by passwordless account
 account `root`, create the relevant virtualenv and then,
 
