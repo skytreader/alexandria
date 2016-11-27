@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import config
 import librarian
 import re
 
@@ -51,10 +52,15 @@ class BookRecord(RequestData):
         BookRecord.assembler. This is just a query that enumerates the result set
         as expected by BookRecord.assembler. Filter as necessary.
         """
-        from librarian.models import Book, BookCompany, Contributor, Role
-        return librarian.db.session.query(
-            Book.id, Book.isbn, Book.title, Contributor.lastname,
-            Contributor.firstname, Role.name, BookCompany.name
+        from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
+        return (
+            librarian.db.session.query(
+                Book.id, Book.isbn, Book.title, Contributor.lastname,
+                Contributor.firstname, Role.name, BookCompany.name
+            ).filter(Book.id == BookContribution.book_id)
+            .filter(BookContribution.contributor_id == Contributor.id)
+            .filter(BookContribution.role_id == Role.id)
+            .filter(Book.publisher_id == BookCompany.id)
         )
     
     def __init__(self, id, isbn, title, publisher, publish_year=None,

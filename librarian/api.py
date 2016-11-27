@@ -230,12 +230,7 @@ def get_books():
     elif limit and not offset:
         offset = "0"
 
-    bookq = (
-      BookRecord.base_assembler_query()
-      .filter(Book.id == BookContribution.book_id)
-      .filter(BookContribution.contributor_id == Contributor.id)
-      .filter(BookContribution.role_id == Role.id)
-      .filter(Book.publisher_id == BookCompany.id))
+    bookq = BookRecord.base_assembler_query()
 
     if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
         bookq = bookq.limit(limit).offset(offset)
@@ -314,10 +309,6 @@ def search(searchq):
     results = (
       BookRecord.base_assembler_query()
       .filter(Book.title.like("".join(("%", searchq, "%"))))
-      .filter(Book.id == BookContribution.book_id)
-      .filter(BookContribution.contributor_id == Contributor.id)
-      .filter(BookContribution.role_id == Role.id)
-      .filter(Book.publisher_id == BookCompany.id)
       .all())
 
     book_listing = BookRecord.assembler(results, as_obj=False)
