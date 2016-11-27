@@ -121,9 +121,9 @@ def book_adder():
 
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,
-              name=form.publisher.data, creator_id=current_user.get_id())
+              name=form.publisher.data, creator=current_user)
             printer = get_or_create(BookCompany, will_commit=True,
-              name=form.printer.data, creator_id=current_user.get_id())
+              name=form.printer.data, creator=current_user)
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
@@ -163,13 +163,18 @@ def edit_book():
         book_id = int(form.book_id.data)
         try:
             # Update records in books table
-            publisher = get_or_create(BookCompany, will_commit=True, 
+            #genre = get_or_create(Genre, will_commit=False, session=db.session,
+            #  name=form.genre.data, creator=current_user)
+            publisher = get_or_create(BookCompany, will_commit=False, 
               name=form.publisher.data, creator=current_user)
             book = db.session.query(Book).filter(Book.id==book_id)
-            app.logger.debug("book is %s" % book)
             book.isbn = form.isbn.data
             book.title = form.title.data
             book.publish_year = form.year.data
+            #book.genre_id = genre.id
+            book.publisher_id = publisher.id
+
+            db.session.commit()
 
             # Delete the book_contributions involved
             BookContribution.query.filter(BookContribution.book_id == book_id).delete()
