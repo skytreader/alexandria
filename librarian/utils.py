@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from librarian import app, cache, db
+
 import config
-import librarian
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
@@ -46,6 +47,7 @@ class BookRecord(RequestData):
     """
 
     @staticmethod
+    @cache.memoize(config.FOREVER_TIMEOUT)
     def base_assembler_query():
         """
         Use this when the results of your query is meant to be assembled via
@@ -54,7 +56,7 @@ class BookRecord(RequestData):
         """
         from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
         return (
-            librarian.db.session.query(
+            db.session.query(
                 Book.id, Book.isbn, Book.title, Contributor.lastname,
                 Contributor.firstname, Role.name, BookCompany.name
             ).filter(Book.id == BookContribution.book_id)
