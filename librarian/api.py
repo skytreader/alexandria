@@ -163,8 +163,8 @@ def edit_book():
         book_id = int(form.book_id.data)
         try:
             # Update records in books table
-            #genre = get_or_create(Genre, will_commit=False, session=db.session,
-            #  name=form.genre.data, creator=current_user)
+            genre = get_or_create(Genre, will_commit=False, session=db.session,
+             name=form.genre.data, creator=current_user)
             publisher = get_or_create(BookCompany, will_commit=False, 
               name=form.publisher.data, creator=current_user)
             book = db.session.query(Book).filter(Book.id==book_id)

@@ -445,6 +445,10 @@ class ApiTests(AppTestCase):
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
 
     def test_edit_book(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
         fake = Faker()
         fake.add_provider(BookFieldsProvider)
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
