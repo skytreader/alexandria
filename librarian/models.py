@@ -290,12 +290,17 @@ class BookContribution(UserTaggedBase):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.contributor), str(self.book), str(self.role))
 
-class Printer(UserTaggedBase):
+class Printer(db.Model):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="printer_book_company_fk1"), primary_key = True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="printer_book_fk1"), primary_key = True)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp(),
+      onupdate=db.func.current_timestamp())
 
     company = relationship("BookCompany")
     book = relationship("Book")
