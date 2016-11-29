@@ -56,11 +56,6 @@ def get_or_create(model, session=None, will_commit=False, **kwargs):
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
-      server_default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-      server_default=db.func.current_timestamp(),
-      onupdate=db.func.current_timestamp())
 
 class Librarian(Base, UserMixin):
     __tablename__ = "librarians"
@@ -90,12 +85,17 @@ class Librarian(Base, UserMixin):
         return self.id
 
 
-class UserTaggedBase(Base):
+class UserTags(db.Model):
     """
     Those that will extend this class may take the convention that, upon creation,
     the last_modifier is the same as the creator.
     """
     __abstract__ = True
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp(),
+      onupdate=db.func.current_timestamp())
 
     @declared_attr
     def creator_id(self):
@@ -105,7 +105,7 @@ class UserTaggedBase(Base):
     def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
-class Genre(UserTaggedBase):
+class Genre(Base, UserTags):
     __tablename__ = "genres"
     name = db.Column(db.String(40), nullable=False, unique=True)
     creator = relationship("Librarian", foreign_keys="Genre.creator_id")
@@ -118,7 +118,7 @@ class Genre(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Book(UserTaggedBase):
+class Book(Base, UserTags):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
@@ -155,7 +155,7 @@ class Book(UserTaggedBase):
     def __repr__(self):
         return self.title + "/" + self.isbn + "/" + str(self.id)
 
-class BookCompany(UserTaggedBase):
+class BookCompany(Base, UserTags):
     """
     List?! List?! This is better off in NoSQL form!
     """
@@ -174,7 +174,7 @@ class BookCompany(UserTaggedBase):
     def __str__(self):
         return self.name
 
-class Imprint(UserTaggedBase):
+class Imprint(Base, UserTags):
     __tablename__ = "imprints"
     mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="imprint_book_company_fk1"))
@@ -194,7 +194,7 @@ class Imprint(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Contributor(UserTaggedBase):
+class Contributor(Base, UserTags):
     __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
@@ -221,7 +221,7 @@ class Contributor(UserTaggedBase):
     def make_plain_person(self):
         return Person(lastname=self.lastname, firstname=self.firstname)
 
-class Role(UserTaggedBase):
+class Role(Base, UserTags):
     """
     The purpose of this table is to enumerate the contributions we are interested
     in for the books.
@@ -256,7 +256,7 @@ class Role(UserTaggedBase):
     def __repr__(self):
         return self.name + "#" + str(self.id)
 
-class BookContribution(UserTaggedBase):
+class BookContribution(Base, UserTags):
     """
     Consider that 99% of books will need the same roles over and over. 
     """
@@ -290,7 +290,7 @@ class BookContribution(UserTaggedBase):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.contributor), str(self.book), str(self.role))
 
-class Printer(UserTaggedBase):
+class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
       name="printer_book_company_fk1"), primary_key = True)
@@ -310,7 +310,7 @@ class Printer(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Pseudonym(UserTaggedBase):
+class Pseudonym(Base, UserTags):
     """
     Copied from original schema:
 
