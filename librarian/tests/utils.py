@@ -56,7 +56,7 @@ def create_book(session, book_record, creator):
     create_contribution("Illustrator", book_record.illustrators)
     create_contribution("Translator", book_record.translators)
     create_contribution("Editor", book_record.editors)
-    session.commit()
+    session.flush()
 
     return book.id
 

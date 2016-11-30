@@ -161,16 +161,13 @@ def edit_book():
 
     if form.validate_on_submit():
         book_id = int(form.book_id.data)
-        app.logger.debug("book_id is %s" % book_id)
         try:
             # Update records in books table
             genre = get_or_create(Genre, will_commit=False, session=db.session,
              name=form.genre.data, creator=current_user)
             publisher = get_or_create(BookCompany, will_commit=False, 
               name=form.publisher.data, creator=current_user)
-            # FIXME: This should query on ID. This will make ISBN unchangeable.
-            book = db.session.query(Book).filter(Book.isbn==form.isbn.data).first()
-            app.logger.debug("got book? %s" % book)
+            book = db.session.query(Book).filter(Book.id==book_id).first()
             book.isbn = form.isbn.data
             book.title = form.title.data
             book.publish_year = form.year.data

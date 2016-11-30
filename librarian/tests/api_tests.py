@@ -454,8 +454,8 @@ class ApiTests(AppTestCase):
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
-          genre="Fiction", id=random.randint(8, 8888))
-        create_book(librarian.db.session, book, self.admin_user)
+          genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
         librarian.db.session.commit()
 
         existing = (
@@ -467,7 +467,7 @@ class ApiTests(AppTestCase):
 
         edit_data = BookRecord(isbn=book.isbn, title="This is a Ret Con",
           publisher=book.publisher, author=book.authors,
-          publish_year=book.publish_year, genre=book.genre, id=book.id)
+          publish_year=book.publish_year, genre=book.genre, id=book_id)
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
 
