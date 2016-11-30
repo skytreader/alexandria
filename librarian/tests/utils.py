@@ -52,15 +52,11 @@ def create_book(session, book_record, creator):
       "publish_year": book_record.publish_year}
     book = Book(**_book)
     session.add(book)
-    print "authors %s" % book_record.authors
     create_contribution("Author", book_record.authors)
-    print "illustrators %s" % book_record.illustrators
     create_contribution("Illustrator", book_record.illustrators)
-    print "translators %s" % book_record.translators
     create_contribution("Translator", book_record.translators)
-    print "editors %s" % book_record.editors
     create_contribution("Editor", book_record.editors)
-    session.flush()
+    session.commit()
 
     return book.id
 

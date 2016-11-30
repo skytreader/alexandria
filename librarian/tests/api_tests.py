@@ -456,8 +456,24 @@ class ApiTests(AppTestCase):
           publisher="Mumford and Sons", author=authors, publish_year=2016,
           genre="Fiction", id=random.randint(8, 8888))
         create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        existing = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==book.isbn)
+            .first()
+        )
+        self.assertEquals(book.title, existing.title)
+
         edit_data = BookRecord(isbn=book.isbn, title="This is a Ret Con",
           publisher=book.publisher, author=book.authors,
           publish_year=book.publish_year, genre=book.genre, id=book.id)
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
+
+        edited = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==book.isbn)
+            .first()
+        )
+        self.assertEquals(edit_data.title, edited.title)
