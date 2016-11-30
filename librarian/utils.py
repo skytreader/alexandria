@@ -65,8 +65,8 @@ class BookRecord(RequestData):
             .filter(Book.publisher_id == BookCompany.id)
         )
     
-    def __init__(self, id, isbn, title, publisher, publish_year=None,
-      author=None, translator=None, illustrator=None, editor=None, genre=None):
+    def __init__(self, isbn, title, publisher, publish_year=None, author=None,
+      translator=None, illustrator=None, editor=None, genre=None, id=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
