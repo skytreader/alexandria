@@ -54,11 +54,13 @@ def __create_bookperson(form_data):
         # For errors in pasing JSON
         return []
 
-def __insert_contributions(book, form, session, current_user):
+def __insert_contributions(book, form, session):
     """
     Insert the contributions in the form to the session. No commits will take
     place.
     """
+    from flask.ext.login import current_user
+
     # Create the Contributors
     authors = __create_bookperson(form.authors.data)
     illustrators = __create_bookperson(form.illustrators.data)
@@ -137,7 +139,7 @@ def book_adder():
               creator=current_user)
             db.session.add(printer_record)
 
-            __insert_contributions(book, form, db.session, current_user)
+            __insert_contributions(book, form, db.session)
 
             db.session.commit()
 
@@ -153,6 +155,15 @@ def book_adder():
 @librarian_api.route("/api/edit/books", methods=["POST"])
 @login_required
 def edit_book():
+    def contribution_exists(all_contribs, role_id, person_id):
+        return [
+            contrib for contrib in all_contribs if (
+                contrib.role_id == role_if and contrib.person_id == person_id
+            )]
+
+    def edit_contrib(role_id, submitted_roles):
+        pass
+
     from flask.ext.login import current_user
 
     form = EditBookForm(request.form)
@@ -174,11 +185,17 @@ def edit_book():
             book.genre_id = genre.id
             book.publisher_id = publisher.id
 
-            db.session.commit()
+            # Get all the contributions for this book
+            all_contribs = (
+                BookContribution.query
+                .filter(BookContribution.book_id == book_id)
+                .all()
+            )
 
             # Delete the book_contributions involved
             BookContribution.query.filter(BookContribution.book_id == book_id).delete()
-            __insert_contributions(book, form, db.session, current_user)
+
+            db.session.commit()
             return "Accepted", 200
         except IntegrityError, ierr:
             app.logger.exception(traceback.format_exc())
