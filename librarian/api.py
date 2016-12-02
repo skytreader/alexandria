@@ -5,7 +5,7 @@ from datetime import datetime
 
 from librarian import app, db
 from librarian.forms import AddBooksForm, EditBookForm
-from librarian.utils import BookRecord, NUMERIC_REGEX
+from librarian.utils import BookRecord, NUMERIC_REGEX, Person
 from flask import Blueprint, request
 from flask.ext.login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
@@ -155,14 +155,70 @@ def book_adder():
 @librarian_api.route("/api/edit/books", methods=["POST"])
 @login_required
 def edit_book():
-    def contribution_exists(all_contribs, role_id, person_id):
-        return [
+    def contribution_exists(all_contribs, role_id, person):
+        """
+        Where
+        
+        `all_contribs` is all the BookContribution records for the book being
+        edited.
+
+        person is an instance of librarian.utils.Person.
+
+        Returns the person_id if the described BookContribution exists, else
+        False.
+        """
+        spam = [
             contrib for contrib in all_contribs if (
-                contrib.role_id == role_if and contrib.person_id == person_id
+                contrib.role_id == role_id and
+                contrib.contributor.firstname == person.firstname,
+                contrib.contributor.lastname == person.lastname
             )]
 
-    def edit_contrib(role_id, submitted_roles):
-        pass
+    def edit_contrib(book, all_contribs, role, submitted_persons):
+        """
+        Adds all new contributors to the session and deletes all removed
+        contributors to the session. This does not commit.
+
+        Where `submitted_persons` is the data straight out of the form (hence it
+        is a JSON string).
+        """
+        # Note: I feel that somewhere here is a good check for InvalidStateException
+        parsons = json.loads(submitted_persons)
+        # Set of tuples (role_id, person_id)
+        existing_records = set()
+
+        for p in parsons:
+            ce = contribution_exists(all_contribs, role.id, Person(**p))
+            if ce is not False:
+                existing_records.add((role.id, ce))
+            else:
+                contributor_record = get_or_create(
+                    Contributor, will_commit=False, firstname=p["firstname"],
+                    lastname=p["lastname"], creator=current_user
+                )
+
+                contribution = BookContribution(
+                    book=book, contributor=contributor_record, role=role,
+                    creator=current_user
+                )
+                db.session.add(contribution)
+                existing_records.add((role.id, contributor_record.id))
+
+        recorded_contribs = set([
+            (contrib.role.id, contrib.contributor.id) for contrib in all_conribs
+            if contrib.role.id == role.id
+        ])
+
+        deletables = recorded_contribs - existing_records
+        
+        for d in deletables:
+            db.session.delete(
+                BookContribution.query
+                .filter(BookContribution.role_id == d[0])
+                .filter(BookContribution.book_id == book.id)
+                .filter(BookContribution.contributor_id == d[1])
+                .first()
+            )
 
     from flask.ext.login import current_user
 
