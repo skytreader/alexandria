@@ -1,4 +1,7 @@
 class ConstraintError(Exception):
+    """
+    When a given constraint in input has been violated.
+    """
     
     def __init__(self, constraint_desc, operation_value):
         self.constraint_desc = constraint_desc
@@ -7,3 +10,9 @@ class ConstraintError(Exception):
     def __str__(self):
         return "Not respecting constraint %s given %s." % (str(self.constraint_desc),
           str(self.operation_value))
+
+class InvalidRecordState(Exception):
+    """
+    Throw whenever you think that the records in the database is inconsistent. 
+    """
+    pass
