@@ -4,7 +4,6 @@ python:
 sudo: required
 dist: trusty
 before_install:
-    - cat /opt/jdk_switcher/jdk_switcher.sh
     - switch_to_oraclejdk7
     - sudo apt-get update -qq
     - sudo apt-get install -y xvfb
