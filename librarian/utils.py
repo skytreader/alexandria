@@ -37,7 +37,7 @@ class Person(RequestData):
         return str(self)
 
     def request_data(self):
-        return '{"lastname": %s, "firstname": %s}' % (self.lastname, self.firstname)
+        return '{"lastname": "%s", "firstname": "%s"}' % (self.lastname, self.firstname)
         
 
 class BookRecord(RequestData):
@@ -136,7 +136,7 @@ class BookRecord(RequestData):
 
     def request_data(self):
         def create_person_request_data(persons):
-            return ", ".join([p.request_data() for p in persons])
+            return "[%s]" % ", ".join([p.request_data() for p in persons])
 
         authors = create_person_request_data(self.authors)
         illustrators = create_person_request_data(self.illustrators)

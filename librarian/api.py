@@ -183,6 +183,7 @@ def edit_book():
         is a JSON string).
         """
         # Note: I feel that somewhere here is a good check for InvalidStateException
+        print submitted_persons
         parsons = json.loads(submitted_persons)
         # Set of tuples (role_id, person_id)
         existing_records = set()
@@ -205,7 +206,7 @@ def edit_book():
                 existing_records.add((role.id, contributor_record.id))
 
         recorded_contribs = set([
-            (contrib.role.id, contrib.contributor.id) for contrib in all_conribs
+            (contrib.role.id, contrib.contributor.id) for contrib in all_contribs
             if contrib.role.id == role.id
         ])
 
@@ -248,8 +249,21 @@ def edit_book():
                 .all()
             )
 
-            # Delete the book_contributions involved
-            BookContribution.query.filter(BookContribution.book_id == book_id).delete()
+            if form.authors.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
+                  form.authors.data)
+
+            if form.illustrators.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
+                  form.illustrators.data)
+
+            if form.editors.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
+                  form.editors.data)
+
+            if form.translators.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
+                  form.editors.data)
 
             db.session.commit()
             return "Accepted", 200
