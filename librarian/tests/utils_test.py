@@ -7,6 +7,7 @@ from librarian.tests.factories import BookContributionFactory, BookFactory, Cont
 from librarian.tests import utils
 from librarian.utils import BookRecord, isbn_check, Person
 
+import copy
 import unittest
 import librarian
 
@@ -100,6 +101,13 @@ class BookRecordTests(AppTestCase):
         
         set(expected_records)
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
+
+class PersonTests(AppTestCase):
+    
+    def test_copy(self):
+        ronaldo = Person(firstname="Ronaldo", lastname="Nazario")
+        cr7 = copy.deepcopy(ronaldo)
+        self.assertFalse(cr7 is ronaldo)
 
 class FunctionsTests(AppTestCase):
     

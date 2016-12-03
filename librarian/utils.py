@@ -3,6 +3,7 @@
 from librarian import app, cache, db
 
 import config
+import copy
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
@@ -38,6 +39,9 @@ class Person(RequestData):
 
     def request_data(self):
         return '{"lastname": "%s", "firstname": "%s"}' % (self.lastname, self.firstname)
+
+    def __deepcopy__(self, memo):
+        return Person(lastname=self.lastname, firstname=self.firstname)
         
 
 class BookRecord(RequestData):
@@ -94,6 +98,20 @@ class BookRecord(RequestData):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
+
+    def __deepcopy__(self, memo):
+        # Create record first then set authors later because constructors expect
+        # lists while actual fields are frozensets.
+        record = BookRecord(isbn=self.isbn, title=self.title,
+          publisher=self.publisher, publish_year=self.publish_year,
+          genre=self.genre, id=self.id)
+
+        record.authors = copy.deepcopy(self.authors)
+        record.translators = copy.deepcopy(self.translators)
+        record.illustrators = copy.deepcopy(self.illustrators)
+        record.editors = copy.deepcopy(self.editors)
+
+        return record
 
     @staticmethod
     def make_hashable(dict_struct):
