@@ -12,6 +12,7 @@ from librarian.tests.factories import (
 )
 from librarian.tests.utils import make_name_object, create_library, create_book
 
+import copy
 import dateutil.parser
 import factory
 import flask.ext.login
@@ -444,13 +445,11 @@ class ApiTests(AppTestCase):
         participants_per_book = participant_count / book_count
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
 
-    def test_edit_book(self):
+    def test_title_edit_book(self):
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
-        fake = Faker()
-        fake.add_provider(BookFieldsProvider)
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -477,3 +476,38 @@ class ApiTests(AppTestCase):
             .first()
         )
         self.assertEquals(edit_data.title, edited.title)
+
+    def test_edit_book_contrib_add(self):
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
+          publisher="Mumford and Sons", author=authors, publish_year=2016,
+          genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        author_role = Role.get_preset_role("Author")
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEquals(set(authors), set(author_persons))
+
+        additional_author = ContributorFactory().make_plain_person()
+        _book_authors = copy.deepcopy(list(book.authors))
+        _book_authors.append(additional_author)
+        edit_data = BookRecord(isbn=book.isbn, title=book.title,
+          publisher=book.publisher, author=_book_authors,
+          publish_year=book.publish_year, genre=book.genre, id=book_id)
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
