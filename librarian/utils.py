@@ -50,6 +50,12 @@ class BookRecord(RequestData):
     consolidates the records of a single book.
     """
 
+    """
+    When an instance of this class is converted to a dictionary, the following
+    fields will hold lists.
+    """
+    LIST_TYPES = ["author", "translator", "illustrator", "editor"]
+
     @staticmethod
     @cache.memoize(config.FOREVER_TIMEOUT)
     def base_assembler_query():

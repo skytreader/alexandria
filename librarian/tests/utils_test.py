@@ -114,7 +114,20 @@ class BookRecordTests(AppTestCase):
         self.assertTrue(book is not _book)
         original_attrs = book.__dict__
         deepcopy_attrs = _book.__dict__
-        self.assertEquals(original_attrs, deepcopy_attrs)
+        attrs = original_attrs.keys()
+        self.assertEquals(attrs, deepcopy_attrs.keys())
+
+        for a in attrs:
+            orig_type = type(original_attrs[a])
+            copy_type = type(deepcopy_attrs[a])
+            self.assertTrue(orig_type is copy_type)
+
+            if a in BookRecord.LIST_TYPES:
+                original_persons = [Person(**pdict) for pdict in original_attrs[a]]
+                deepcopy_persons = [Person(**pdict) for pdict in deepcopy_attrs[a]]
+                self.assertEquals(original_persons, deepcopy_persons)
+            else:
+                self.assertEquals(original_attrs[a], deepcopy_attrs[a])
 
         authors.append(Person(firstname="Sid", lastname="Meier"))
         _book.authors = frozenset(authors)
