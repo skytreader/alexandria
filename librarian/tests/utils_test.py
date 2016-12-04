@@ -116,6 +116,10 @@ class BookRecordTests(AppTestCase):
         deepcopy_attrs = _book.__dict__
         self.assertEquals(original_attrs, deepcopy_attrs)
 
+        authors.append(Person(firstname="Sid", lastname="Meier"))
+        _book.authors = frozenset(authors)
+        self.assertNotEquals(book.authors, _book.authors)
+
 class PersonTests(AppTestCase):
     
     def test_deepcopy(self):
