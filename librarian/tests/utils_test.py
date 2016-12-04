@@ -102,9 +102,23 @@ class BookRecordTests(AppTestCase):
         set(expected_records)
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
 
+    def test_deepcopy(self):
+        fake = Faker()
+        fake.add_provider(BookFieldsProvider)
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
+          publisher="Firaxis", author=authors, publish_year=2016,
+          genre="Fiction")
+
+        _book = copy.deepcopy(book)
+        self.assertTrue(book is not _book)
+        original_attrs = book.__dict__
+        deepcopy_attrs = _book.__dict__
+        self.assertEquals(original_attrs, deepcopy_attrs)
+
 class PersonTests(AppTestCase):
     
-    def test_copy(self):
+    def test_deepcopy(self):
         ronaldo = Person(firstname="Ronaldo", lastname="Nazario")
         cr7 = copy.deepcopy(ronaldo)
         self.assertFalse(cr7 is ronaldo)
