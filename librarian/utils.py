@@ -96,9 +96,9 @@ class BookRecord(RequestData):
         genre: string
         """
         self.id = id
-        self.printer = printer
         self.isbn = isbn
         self.title = title
+        self.printer = printer
         self.publisher = publisher
         self.publish_year = publish_year
         self.authors = frozenset(author if author else [])
@@ -150,18 +150,16 @@ class BookRecord(RequestData):
         return (self.isbn == br.isbn and self.title == br.title and
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
-          self.illustrators == br.illustrators and self.editors == br.editors
-          and self.id == br.id and self.printer == br.printer)
+          self.illustrators == br.illustrators and self.editors == br.editors)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
-          self.translators, self.illustrators, self.editors, self.id, self.printer))
+          self.translators, self.illustrators, self.editors))
 
     def __str__(self):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
           "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher),
-          "printer": str(self.printer)})
+          "translator": str(self.translators), "publisher": str(self.publisher)})
 
     def request_data(self):
         def create_person_request_data(persons):
@@ -181,7 +179,6 @@ class BookRecord(RequestData):
             "editors": editors,
             "translators": translators,
             "publisher": self.publisher,
-            "printer": self.printer,
             "year": str(self.publish_year),
             "genre": self.genre
         }
@@ -245,8 +242,7 @@ class BookRecord(RequestData):
     @property
     def __dict__(self):
         base = {"isbn": self.isbn, "title": self.title,
-          "publisher": self.publisher, "id": self.id,
-          "printer": self.printer}
+          "publisher": self.publisher, "id": self.id}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]
