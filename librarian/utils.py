@@ -242,7 +242,7 @@ class BookRecord(RequestData):
     @property
     def __dict__(self):
         base = {"isbn": self.isbn, "title": self.title,
-          "publisher": self.publisher, "id": self.id}
+          "publisher": self.publisher, "id": self.id, "printer": self.printer}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]
