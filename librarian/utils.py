@@ -76,7 +76,8 @@ class BookRecord(RequestData):
         )
     
     def __init__(self, isbn, title, publisher, publish_year=None, author=None,
-      translator=None, illustrator=None, editor=None, genre=None, id=None):
+      translator=None, illustrator=None, editor=None, genre=None, id=None,
+      printer=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
@@ -95,6 +96,7 @@ class BookRecord(RequestData):
         genre: string
         """
         self.id = id
+        self.printer = printer
         self.isbn = isbn
         self.title = title
         self.publisher = publisher
@@ -110,7 +112,7 @@ class BookRecord(RequestData):
         # lists while actual fields are frozensets.
         record = BookRecord(isbn=self.isbn, title=self.title,
           publisher=self.publisher, publish_year=self.publish_year,
-          genre=self.genre, id=self.id)
+          genre=self.genre, id=self.id, printer=self.printer)
 
         record.authors = copy.deepcopy(self.authors)
         record.translators = copy.deepcopy(self.translators)
@@ -147,16 +149,18 @@ class BookRecord(RequestData):
         return (self.isbn == br.isbn and self.title == br.title and
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
-          self.illustrators == br.illustrators and self.editors == br.editors)
+          self.illustrators == br.illustrators and self.editors == br.editors
+          and self.id == br.id and self.printer == br.printer)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
-          self.translators, self.illustrators, self.editors))
+          self.translators, self.illustrators, self.editors, self.id, self.printer))
 
     def __str__(self):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
           "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher)})
+          "translator": str(self.translators), "publisher": str(self.publisher),
+          "printer": str(self.printer)})
 
     def request_data(self):
         def create_person_request_data(persons):
@@ -176,6 +180,7 @@ class BookRecord(RequestData):
             "editors": editors,
             "translators": translators,
             "publisher": self.publisher,
+            "printer": self.printer,
             "year": str(self.publish_year),
             "genre": self.genre
         }

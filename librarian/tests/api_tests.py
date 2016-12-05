@@ -151,6 +151,12 @@ class ApiTests(AppTestCase):
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
 
+        author = [Person(lastname="Eschenbach", firstname="Andreas")]
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press"
+        )
+
         single_author = {
             "isbn": isbn,
             "title": "The Carpet Makers",
