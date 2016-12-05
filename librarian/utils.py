@@ -143,7 +143,8 @@ class BookRecord(RequestData):
         return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
           translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors, id=dict_struct["id"])
+          editor=person_editors, id=dict_struct["id"],
+          printer=dict_struct["printer"])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
@@ -244,7 +245,8 @@ class BookRecord(RequestData):
     @property
     def __dict__(self):
         base = {"isbn": self.isbn, "title": self.title,
-          "publisher": self.publisher, "id": self.id}
+          "publisher": self.publisher, "id": self.id,
+          "printer": self.printer}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]
