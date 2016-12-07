@@ -79,9 +79,19 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="UP Press")
 
     def verify_bookperson_inserted(self, persons, role, bookid):
+        """
+        Will be deprected in favor of `verify_persons_inserted` below. Soon.
+        """
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
+            self.verify_inserted(BookContribution, contributor_id=_p.id,
+              role_id=self.ROLE_IDS[role], book_id=bookid)
+
+    def verify_persons_inserted(self, persons, role, bookid):
+        for p in persons:
+            _p = self.verify_inserted(Contributor, firstname=p.firstname,
+              lastname=p.lastname)
             self.verify_inserted(BookContribution, contributor_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
@@ -204,10 +214,10 @@ class ApiTests(AppTestCase):
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
         
-        self.verify_bookperson_inserted(authors, "Author", created_book.id)
-        self.verify_bookperson_inserted(illustrators, "Illustrator", created_book.id)
-        self.verify_bookperson_inserted(editors, "Editor", created_book.id)
-        self.verify_bookperson_inserted(translators, "Translator", created_book.id)
+        self.verify_persons_inserted(authors, "Author", created_book.id)
+        self.verify_persons_inserted(illustrators, "Illustrator", created_book.id)
+        self.verify_persons_inserted(editors, "Editor", created_book.id)
+        self.verify_persons_inserted(translators, "Translator", created_book.id)
 
     def test_repeat_people(self):
         """
