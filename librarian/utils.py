@@ -95,7 +95,6 @@ class BookRecord(RequestData):
         editor: list of Person objects
         genre: string
         """
-        print("Creating id: %s, isbn: %s" % (id, isbn))
         self.id = id
         self.isbn = isbn
         self.title = title
@@ -152,7 +151,7 @@ class BookRecord(RequestData):
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
           self.illustrators == br.illustrators and self.editors == br.editors
-          and self.id==br.id)
+          and self.id == br.id and self.printer == br.printer)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
@@ -181,6 +180,7 @@ class BookRecord(RequestData):
             "illustrators": illustrators,
             "editors": editors,
             "translators": translators,
+            "printer": self.printer,
             "publisher": self.publisher,
             "year": str(self.publish_year),
             "genre": self.genre

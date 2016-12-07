@@ -125,7 +125,7 @@ class BookRecordTests(AppTestCase):
             if a in BookRecord.LIST_TYPES:
                 original_persons = [Person(**pdict) for pdict in original_attrs[a]]
                 deepcopy_persons = [Person(**pdict) for pdict in deepcopy_attrs[a]]
-                self.assertEquals(original_persons, deepcopy_persons)
+                self.assertEquals(set(original_persons), set(deepcopy_persons))
             else:
                 self.assertEquals(original_attrs[a], deepcopy_attrs[a])
 
