@@ -93,11 +93,8 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
 
     # Query books for their ids. Note that this bit assumes that the only books
     # in the DB right now are those just-created.
-    isbn_id_map = {}
     books = session.query(Book.id, Book.isbn).all()
-
-    for book_id, isbn in books:
-        isbn_id_map[isbn] = book_id
+    isbn_id_map = {isbn: book_id for book_id, isbn in books}
 
     library = {}
     # Randomly assign persons to books as roles
