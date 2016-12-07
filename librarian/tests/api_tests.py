@@ -420,6 +420,7 @@ class ApiTests(AppTestCase):
     def test_get_books(self):
         roles = librarian.db.session.query(Role).all()
 
+        print("Creating library")
         library = create_library(librarian.db.session, self.admin_user, roles,
           book_person_c=12, company_c=8, book_c=12, participant_c=32)
 
