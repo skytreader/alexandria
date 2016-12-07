@@ -10,7 +10,9 @@ from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import make_name_object, create_library, create_book
+from librarian.tests.utils import (
+    make_name_object, make_person_object, create_library, create_book
+)
 
 import copy
 import dateutil.parser
@@ -186,25 +188,18 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object() for _ in range(4)]
-        illustrators = [make_name_object() for _ in range(4)]
-        editors = [make_name_object() for _ in range(4)]
-        translators = [make_name_object() for _ in range(4)]
+        authors = [make_person_object() for _ in range(4)]
+        illustrators = [make_person_object() for _ in range(4)]
+        editors = [make_person_object() for _ in range(4)]
+        translators = [make_person_object() for _ in range(4)]
 
-        req_data = {
-            "isbn": isbn,
-            "title": title,
-            "genre": "Multinational",
-            "authors": json.dumps(authors),
-            "illustrators": json.dumps(illustrators),
-            "editors": json.dumps(editors),
-            "translators": json.dumps(translators),
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        req_data = BookRecord(
+            isbn=isbn, title=title, genre="Multinational", author=authors,
+            illustrator=illustrators, editor=editors, translator=translators,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        req_val = self.client.post("/api/add/books", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data.request_data())
         self.assertEqual(200, req_val.status_code)
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
