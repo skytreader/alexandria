@@ -76,7 +76,8 @@ class BookRecord(RequestData):
         )
     
     def __init__(self, isbn, title, publisher, publish_year=None, author=None,
-      translator=None, illustrator=None, editor=None, genre=None, id=None):
+      translator=None, illustrator=None, editor=None, genre=None, id=None,
+      printer=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
@@ -97,6 +98,7 @@ class BookRecord(RequestData):
         self.id = id
         self.isbn = isbn
         self.title = title
+        self.printer = printer
         self.publisher = publisher
         self.publish_year = publish_year
         self.authors = frozenset(author if author else [])
@@ -110,7 +112,7 @@ class BookRecord(RequestData):
         # lists while actual fields are frozensets.
         record = BookRecord(isbn=self.isbn, title=self.title,
           publisher=self.publisher, publish_year=self.publish_year,
-          genre=self.genre, id=self.id)
+          genre=self.genre, id=self.id, printer=self.printer)
 
         record.authors = copy.deepcopy(self.authors)
         record.translators = copy.deepcopy(self.translators)
@@ -141,13 +143,15 @@ class BookRecord(RequestData):
         return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
           translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors, id=dict_struct["id"])
+          editor=person_editors, id=dict_struct["id"],
+          printer=dict_struct["printer"])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
-          self.illustrators == br.illustrators and self.editors == br.editors)
+          self.illustrators == br.illustrators and self.editors == br.editors
+          and self.id == br.id and self.printer == br.printer)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
@@ -156,7 +160,8 @@ class BookRecord(RequestData):
     def __str__(self):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
           "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher)})
+          "translator": str(self.translators), "publisher": str(self.publisher),
+          "printer": str(self.printer), "id": self.id})
 
     def request_data(self):
         def create_person_request_data(persons):
@@ -175,6 +180,7 @@ class BookRecord(RequestData):
             "illustrators": illustrators,
             "editors": editors,
             "translators": translators,
+            "printer": self.printer,
             "publisher": self.publisher,
             "year": str(self.publish_year),
             "genre": self.genre
@@ -239,7 +245,7 @@ class BookRecord(RequestData):
     @property
     def __dict__(self):
         base = {"isbn": self.isbn, "title": self.title,
-          "publisher": self.publisher, "id": self.id}
+          "publisher": self.publisher, "id": self.id, "printer": self.printer}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]

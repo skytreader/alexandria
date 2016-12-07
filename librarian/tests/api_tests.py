@@ -151,25 +151,13 @@ class ApiTests(AppTestCase):
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Carpet Makers",
-            "genre": "io9",
-            "authors": """[
-                {
-                    "lastname": "Eschenbach",
-                    "firstname": "Andreas"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        author = [Person(lastname="Eschenbach", firstname="Andreas")]
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -180,7 +168,7 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
-        duplicate = self.client.post("/api/add/books", data=single_author)
+        duplicate = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(duplicate._status_code, 409)
         
@@ -414,6 +402,7 @@ class ApiTests(AppTestCase):
     def test_get_books(self):
         roles = librarian.db.session.query(Role).all()
 
+        print("Creating library")
         library = create_library(librarian.db.session, self.admin_user, roles,
           book_person_c=12, company_c=8, book_c=12, participant_c=32)
 

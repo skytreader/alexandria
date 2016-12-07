@@ -90,6 +90,12 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
         session.add(b)
 
     session.commit()
+
+    # Query books for their ids. Note that this bit assumes that the only books
+    # in the DB right now are those just-created.
+    books = session.query(Book.id, Book.isbn).all()
+    isbn_id_map = {isbn: book_id for book_id, isbn in books}
+
     library = {}
     # Randomly assign persons to books as roles
 
@@ -119,7 +125,6 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
             library[rand_isbn][_role] = [Person(**{"lastname": rand_person.lastname,
               "firstname": rand_person.firstname})]
             library[rand_isbn]["publisher"] = rand_book.publisher.name
-            library[rand_isbn]["id"] = random.randint(8, 8888)
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
             bp = BookContribution(book=rand_book, contributor=rand_person,
@@ -134,6 +139,7 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
+        book["id"] = isbn_id_map[isbn]
         library_list.insert(0, BookRecord(**book))
 
     return library_list
