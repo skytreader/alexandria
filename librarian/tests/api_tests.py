@@ -44,36 +44,24 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="Eschbach", firstname="Andreas")]
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Carpet Makers",
-            "genre": "io9",
-            "authors": """[
-                {
-                    "lastname": "Eschenbach",
-                    "firstname": "Andreas"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(Contributor, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
@@ -112,31 +100,15 @@ class ApiTests(AppTestCase):
           firstname="Harriet")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="Pérez-Reverte", firstname="Arturo")]
+        translator = [Person(lastname="de Onís", firstname="Harriet")]
+        single_author = BookRecord(
+            isbn=isbn, title="The Club Dumas", genre="English 12", author=author,
+            translator=translator, publisher="Scholastic", printer="UP Press",
+            publish_year=2013
+        )
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Club Dumas",
-            "genre": "English 12",
-            "authors": """[
-                {
-                    "lastname": "Pérez-Reverte",
-                    "firstname": "Arturo"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": """[
-                {
-                    "lastname": "de Onís",
-                    "firstname": "Harriet"
-                }
-            ]""",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
-
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -158,12 +130,12 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
 
-        author = [Person(lastname="Eschenbach", firstname="Andreas")]
+        author = [Person(lastname="Eschbach", firstname="Andreas")]
         single_author = BookRecord(
             isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
             publisher="Scholastic", printer="UP Press", publish_year=2013
@@ -175,7 +147,7 @@ class ApiTests(AppTestCase):
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(Contributor, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
