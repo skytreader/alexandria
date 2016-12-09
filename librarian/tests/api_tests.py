@@ -199,15 +199,15 @@ class ApiTests(AppTestCase):
 
         def insert_bookpersons(persons):
             for p in persons:
-                bp = Contributor(firstname=p["firstname"],
-                  lastname=p["lastname"], creator=self.admin_user)
+                bp = Contributor(firstname=p.firstname,
+                  lastname=p.lastname, creator=self.admin_user)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
         
         def verify_bookperson(p):
-            self.verify_inserted(Contributor, firstname=p["firstname"],
-              lastname=p["lastname"])
+            self.verify_inserted(Contributor, firstname=p.firstname,
+              lastname=p.lastname)
 
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator
@@ -217,36 +217,29 @@ class ApiTests(AppTestCase):
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object() for _ in range(4)]
+        authors = [make_person_object() for _ in range(4)]
         insert_bookpersons(authors)
         map(verify_bookperson, authors)
       
-        illustrators = [make_name_object() for _ in range(4)]
+        illustrators = [make_person_object() for _ in range(4)]
         insert_bookpersons(illustrators)
         map(verify_bookperson, illustrators)
         
-        editors = [make_name_object() for _ in range(4)]
+        editors = [make_person_object() for _ in range(4)]
         insert_bookpersons(editors)
         map(verify_bookperson, editors)
         
-        translators = [make_name_object() for _ in range(4)]
+        translators = [make_person_object() for _ in range(4)]
         insert_bookpersons(translators)
         map(verify_bookperson, translators)
 
-        req_data = {
-            "isbn": isbn,
-            "title": title,
-            "genre": "Multinational",
-            "authors": json.dumps(authors),
-            "illustrators": json.dumps(illustrators),
-            "editors": json.dumps(editors),
-            "translators": json.dumps(translators),
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        req_data = BookRecord(
+            isbn=isbn, title=title, genre="Multinational", author=authors,
+            illustrator=illustrators, editor=editors, translator=translators,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        req_val = self.client.post("/api/add/books", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data.request_data())
         self.assertEqual(200, req_val.status_code)
 
     def test_no_printer(self):
@@ -255,25 +248,13 @@ class ApiTests(AppTestCase):
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
-        single_author = {
-            "isbn": "9780062330260",
-            "title": "Trigger Warning",
-            "genre": "Short Story Collection",
-            "authors": """[
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Wiliam Morrow",
-            "printer": "",
-            "year": "2015"
-        }
+        single_author = BookRecord(
+            isbn="9780062330260", title="Trigger Warning",
+            genre="Short Story Collection", author=[Person(lastname="Gaiman", firstname="Neil")],
+            publisher="William Morrow", publish_year=2015
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -283,29 +264,14 @@ class ApiTests(AppTestCase):
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
-        single_author = {
-            "isbn": "9780062330260",
-            "title": "Trigger Warning",
-            "genre": "Short Story Collection",
-            "authors": """[
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                },
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Wiliam Morrow",
-            "printer": "",
-            "year": "2015"
-        }
+        Neil_Gaiman = Person(lastname="Gaiman", firstname="Neil")
+        single_author = BookRecord(
+            isbn="9780062330260", title="Trigger Warning",
+            genre="Short Story Collection", author=[Neil_Gaiman, Neil_Gaiman],
+            publisher="William Morrow", publish_year=2015
+        )
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
         self.assertEquals(200, single_rv.status_code)
         
         gaimen = (librarian.db.session.query(Contributor)
@@ -379,7 +345,6 @@ class ApiTests(AppTestCase):
     def test_get_books(self):
         roles = librarian.db.session.query(Role).all()
 
-        print("Creating library")
         library = create_library(librarian.db.session, self.admin_user, roles,
           book_person_c=12, company_c=8, book_c=12, participant_c=32)
 
