@@ -290,6 +290,9 @@ class BookContribution(Base, UserTags):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.contributor), str(self.book), str(self.role))
 
+    def __repr__(self):
+        return str(self)
+
 class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",

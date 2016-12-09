@@ -4,6 +4,7 @@ from __future__ import division
 from datetime import datetime
 
 from librarian import app, db
+from librarian.errors import InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
 from librarian.utils import BookRecord, NUMERIC_REGEX, Person
 from flask import Blueprint, request
@@ -170,10 +171,17 @@ def edit_book():
         spam = [
             contrib for contrib in all_contribs if (
                 contrib.role_id == role_id and
-                contrib.contributor.firstname == person.firstname,
+                contrib.contributor.firstname == person.firstname and
                 contrib.contributor.lastname == person.lastname
             )]
-        return spam
+
+        if len(spam) > 1:
+            raise InvalidRecordState("Contribution role + person + book defined more than one record %s" % spam)
+
+        if spam:
+           return spam[0].contributor_id
+        else:
+           return False
 
     def edit_contrib(book, all_contribs, role, submitted_persons):
         """
@@ -190,10 +198,8 @@ def edit_book():
         existing_records = set()
 
         for p in parsons:
-            print "Checking person %s" % p
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
-                print "does not exist"
                 existing_records.add((role.id, ce))
             else:
                 contributor_record = get_or_create(
@@ -214,7 +220,6 @@ def edit_book():
         ])
 
         deletables = recorded_contribs - existing_records
-        print "deletables %s" % deletables
         
         for d in deletables:
             db.session.delete(

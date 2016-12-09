@@ -463,12 +463,10 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.role_id==author_role.id)
             .all()
         )
-        print "author len %s" % len(book_authors)
         author_persons = set([
             Person(firstname=a.firstname, lastname=a.lastname)
             for a in book_authors
         ])
-        print "all persons before edit %s" % author_persons
         self.assertEquals(set(authors), author_persons)
 
         additional_author = ContributorFactory().make_plain_person()
@@ -487,7 +485,6 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.role_id==author_role.id)
             .all()
         )
-        print "author count %s" % len(book_authors)
         author_persons = set([
             Person(firstname=a.firstname, lastname=a.lastname)
             for a in book_authors
