@@ -173,6 +173,7 @@ def edit_book():
                 contrib.contributor.firstname == person.firstname,
                 contrib.contributor.lastname == person.lastname
             )]
+        return spam
 
     def edit_contrib(book, all_contribs, role, submitted_persons):
         """
@@ -189,8 +190,10 @@ def edit_book():
         existing_records = set()
 
         for p in parsons:
+            print "Checking person %s" % p
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
+                print "does not exist"
                 existing_records.add((role.id, ce))
             else:
                 contributor_record = get_or_create(
@@ -211,6 +214,7 @@ def edit_book():
         ])
 
         deletables = recorded_contribs - existing_records
+        print "deletables %s" % deletables
         
         for d in deletables:
             db.session.delete(

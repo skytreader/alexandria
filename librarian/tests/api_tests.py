@@ -463,11 +463,13 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.role_id==author_role.id)
             .all()
         )
+        print "author len %s" % len(book_authors)
         author_persons = set([
             Person(firstname=a.firstname, lastname=a.lastname)
             for a in book_authors
         ])
-        self.assertEquals(set(authors), set(author_persons))
+        print "all persons before edit %s" % author_persons
+        self.assertEquals(set(authors), author_persons)
 
         additional_author = ContributorFactory().make_plain_person()
         _book_authors = copy.deepcopy(list(book.authors))
@@ -477,3 +479,17 @@ class ApiTests(AppTestCase):
           publish_year=book.publish_year, genre=book.genre, id=book_id)
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
+
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        print "author count %s" % len(book_authors)
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEqual(set(_book_authors), author_persons)
