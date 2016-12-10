@@ -47,8 +47,8 @@ def __create_bookperson(form_data):
 
         for parson in parse:
             persons_created.insert(0, get_or_create(Contributor, will_commit=True,
-              firstname=parson["firstname"], lastname=parson["lastname"],
-              creator=current_user))
+              firstname=parson["firstname"].strip(),
+              lastname=parson["lastname"].strip(), creator=current_user))
 
         return persons_created
     except ValueError:

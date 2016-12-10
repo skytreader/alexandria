@@ -259,7 +259,27 @@ class ApiTests(AppTestCase):
         self.assertEquals(single_rv._status_code, 200)
 
     def test_extra_whitespace(self):
-        pass
+        _creator = LibrarianFactory()
+        flask.ext.login.current_user = _creator
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        self.verify_does_not_exist(
+            Contributor, lastname="de Cervantes", firstname="Miguel"
+        )
+
+        spaced = BookRecord(
+            isbn="0812972104", title="Don Quixote", genre="Fiction",
+            author=[Person(lastname="  de Cervantes  ", firstname="Miguel")],
+            publisher="Modern Library", publish_year=2006
+        )
+
+        spaced_rv = self.client.post("/api/add/books", data=spaced.request_data())
+        self.assertEquals(200, spaced_rv.status_code)
+
+        self.verify_inserted(
+            Contributor, lastname="de Cervantes", firstname="Miguel"
+        )
 
     def test_multiple_same_names(self):
         _creator = LibrarianFactory()
