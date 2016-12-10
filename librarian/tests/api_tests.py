@@ -258,6 +258,9 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(single_rv._status_code, 200)
 
+    def test_extra_whitespace(self):
+        pass
+
     def test_multiple_same_names(self):
         _creator = LibrarianFactory()
         flask.ext.login.current_user = _creator

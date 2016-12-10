@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from librarian import app, cache, db
+from librarian import app, db
 
 import config
 import copy
@@ -57,7 +57,6 @@ class BookRecord(RequestData):
     LIST_TYPES = ["author", "translator", "illustrator", "editor"]
 
     @staticmethod
-    @cache.memoize(config.FOREVER_TIMEOUT)
     def base_assembler_query():
         """
         Use this when the results of your query is meant to be assembled via
