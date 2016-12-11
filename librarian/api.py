@@ -191,8 +191,6 @@ def edit_book():
         Where `submitted_persons` is the data straight out of the form (hence it
         is a JSON string).
         """
-        # Note: I feel that somewhere here is a good check for InvalidStateException
-        print submitted_persons
         parsons = json.loads(submitted_persons)
         # Set of tuples (role_id, person_id)
         existing_records = set()
