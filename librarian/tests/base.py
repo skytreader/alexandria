@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from librarian.models import get_or_create, Librarian, Role
 import librarian
 import logging

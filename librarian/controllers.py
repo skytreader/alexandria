@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask.ext.login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
 from librarian import api
 from librarian.utils import StatsDescriptor
@@ -14,7 +14,7 @@ librarian_bp = Blueprint('librarian', __name__)
 
 @librarian_bp.route("/")
 def index():
-    from flask.ext.login import current_user
+    from flask_login import current_user
     form = SearchForm(request.form)
     styles = ("index.css",)
     return render_template("home.jinja", search_form=form, stylesheets=styles,
@@ -22,7 +22,7 @@ def index():
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
-    from flask.ext.login import current_user
+    from flask_login import current_user
     from models import Librarian
     form = LoginForm()
 

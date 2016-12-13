@@ -3,7 +3,7 @@ from __future__ import division
 
 from base import AppTestCase
 from faker import Faker
-from flask.ext.login import login_user
+from flask_login import login_user
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, Role
 from librarian.utils import BookRecord, Person
 from librarian.tests.fakers import BookFieldsProvider
@@ -17,7 +17,7 @@ from librarian.tests.utils import (
 import copy
 import dateutil.parser
 import factory
-import flask.ext.login
+import flask_login
 import json
 import librarian
 import random
@@ -35,7 +35,7 @@ class ApiTests(AppTestCase):
     
     def test_book_adder_happy(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -85,7 +85,7 @@ class ApiTests(AppTestCase):
 
     def test_book_adder_utf8(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -121,7 +121,7 @@ class ApiTests(AppTestCase):
 
     def test_book_adder_duplicate_records(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -163,7 +163,7 @@ class ApiTests(AppTestCase):
         expected. We can assume that records are "fresh".
         """
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -210,7 +210,7 @@ class ApiTests(AppTestCase):
               lastname=p.lastname)
 
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -244,7 +244,7 @@ class ApiTests(AppTestCase):
 
     def test_no_printer(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -260,7 +260,7 @@ class ApiTests(AppTestCase):
 
     def test_extra_whitespace(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -283,7 +283,7 @@ class ApiTests(AppTestCase):
 
     def test_multiple_same_names(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -401,7 +401,7 @@ class ApiTests(AppTestCase):
 
     def test_title_edit_book(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
@@ -433,7 +433,7 @@ class ApiTests(AppTestCase):
 
     def test_edit_book_contrib_add(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
@@ -481,7 +481,7 @@ class ApiTests(AppTestCase):
 
     def test_edit_book_contrib_delete(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
+        flask_login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
