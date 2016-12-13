@@ -28,6 +28,11 @@ class AppTestCase(TestCase):
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
 
+    def set_current_user(self, user):
+        with self.client.session_transaction() as sesh:
+            sesh["user_id"] = user.id
+            sesh["_fresh"] = True
+
     def verify_inserted(self, model, **kwargs):
         """
         Verify that the record described by **kwargs is inserted into the table

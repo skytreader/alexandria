@@ -40,7 +40,7 @@ def login():
             return redirect(next_url or url_for("librarian.dash"), code=302)
         else:
             flash("Wrong user credentials")
-    elif not current_user.is_anonymous():
+    elif not current_user.is_anonymous:
         return redirect(url_for("librarian.dash", code=302))
 
     return render_template("login.jinja", form=form)

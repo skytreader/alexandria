@@ -35,7 +35,7 @@ load the URL helper.
     <body>
         {% block body %}
             <div class="main_box">
-                {% if current_user.is_authenticated() %}
+                {% if current_user.is_authenticated %}
                     <a href="/dashboard">
                         <img src="/static/images/librarian.png" class="logo">
                     </a>
@@ -46,7 +46,7 @@ load the URL helper.
                     <a class="navbox" href="/">Search</a>
                     <a class="navbox" href="/about">About</a>
                     <a class="navbox" href="/books">Browse Books</a>
-                    {% if current_user.is_authenticated() %}
+                    {% if current_user.is_authenticated %}
                         <a class="navbox" href="/librarians">Manage Librarians</a>
                         <a class="navbox" href="/books/add">Manage Books</a>
                         <a class="navbox" href="/logout">Log-out</a>
