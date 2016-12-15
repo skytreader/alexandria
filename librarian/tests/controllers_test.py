@@ -19,10 +19,6 @@ class ControllersTest(AppTestCase):
         self.assertEqual(200, fail_case.status_code)
     
     def test_logged_in_redirect(self):
-        successful_data = {"librarian_username": "admin", "librarian_password": "admin"}
-
-        success_case = self.client.post("/login/", data=successful_data)
-        self.assertEqual(302, success_case.status_code)
-
+        self.set_current_user(self.admin_user)
         visit_redirect = self.client.get("/login/")
         self.assertEqual(302, visit_redirect.status_code)
