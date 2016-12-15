@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask_wtf import Form
+from flask_wtf import FlaskForm as Form
 from librarian.custom.forms import JsonField
 from wtforms import HiddenField, PasswordField, TextField
 from wtforms.validators import Length, Required
