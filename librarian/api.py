@@ -8,7 +8,7 @@ from librarian.errors import InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
 from librarian.utils import BookRecord, NUMERIC_REGEX, Person
 from flask import Blueprint, request
-from flask.ext.login import login_required
+from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
 from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
@@ -40,7 +40,7 @@ def __create_bookperson(form_data):
     form_data is expected to be a JSON list of objects. Each object should have
     the fields `last_name` and `first_name`.
     """
-    from flask.ext.login import current_user
+    from flask_login import current_user
     try:
         parse = json.loads(form_data)
         persons_created = []
@@ -60,7 +60,7 @@ def __insert_contributions(book, form, session):
     Insert the contributions in the form to the session. No commits will take
     place.
     """
-    from flask.ext.login import current_user
+    from flask_login import current_user
 
     # Create the Contributors
     authors = __create_bookperson(form.authors.data)
@@ -117,7 +117,7 @@ def book_adder():
 
     if form.validate_on_submit():
         try:
-            from flask.ext.login import current_user
+            from flask_login import current_user
             # Genre first
             genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
               creator=current_user)
@@ -228,7 +228,7 @@ def edit_book():
                 .first()
             )
 
-    from flask.ext.login import current_user
+    from flask_login import current_user
 
     form = EditBookForm(request.form)
     app.logger.info(str(form))
@@ -398,10 +398,10 @@ def quick_stats():
     books = len(db.session.query(Book).all())
     contributors = len(db.session.query(BookContribution).all())
     top_author = get_top_contributors("Author", 1)
-    stats["participants_per_book"] = (contributors / books)
+    stats["participants_per_book"] = (contributors / books) if books else 0
     stats["recent_books"] = get_recent_books()
     stats["book_count"] = books
-    stats["top_author"] = top_author[0]
+    stats["top_author"] = top_author[0] if top_author else None
     return flask.jsonify(stats)
 
 def search(searchq):

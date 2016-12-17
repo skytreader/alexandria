@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask.ext.login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user
 from forms import AddBooksForm, LoginForm, SearchForm
 from librarian import api
 from librarian.utils import StatsDescriptor
@@ -14,7 +14,7 @@ librarian_bp = Blueprint('librarian', __name__)
 
 @librarian_bp.route("/")
 def index():
-    from flask.ext.login import current_user
+    from flask_login import current_user
     form = SearchForm(request.form)
     styles = ("index.css",)
     return render_template("home.jinja", search_form=form, stylesheets=styles,
@@ -22,7 +22,7 @@ def index():
 
 @librarian_bp.route("/login/", methods=["GET", "POST"])
 def login():
-    from flask.ext.login import current_user
+    from flask_login import current_user
     from models import Librarian
     form = LoginForm()
 
@@ -40,7 +40,7 @@ def login():
             return redirect(next_url or url_for("librarian.dash"), code=302)
         else:
             flash("Wrong user credentials")
-    elif not current_user.is_anonymous():
+    elif current_user.is_authenticated:
         return redirect(url_for("librarian.dash", code=302))
 
     return render_template("login.jinja", form=form)
@@ -57,9 +57,12 @@ def dash():
     book_count_stat = ("%d. Number of books currently in your library. %s." %
       (stats["book_count"], StatsDescriptor.book_count(stats["book_count"]).title()))
     
-    _top_author = {"name": " ".join((stats["top_author"][2], stats["top_author"][1])),
-      "count": stats["top_author"][3]}
-    top_author = "{count}. {name} has authored the most books in your collection. Favorite.".format(**_top_author)
+    if stats["top_author"]:
+        _top_author = {"name": " ".join((stats["top_author"][2], stats["top_author"][1])),
+          "count": stats["top_author"][3]}
+        top_author = "{count}. {name} has authored the most books in your collection. Favorite.".format(**_top_author)
+    else:
+        top_author = []
     
     recent_books = stats["recent_books"]
 
