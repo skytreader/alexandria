@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask.ext.login import current_user, UserMixin
+from flask_login import current_user, UserMixin
 from librarian import app, cache, db
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check, Person

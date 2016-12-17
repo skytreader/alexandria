@@ -3,7 +3,7 @@ from __future__ import division
 
 from base import AppTestCase
 from faker import Faker
-from flask.ext.login import login_user
+from flask_login import login_user
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, Role
 from librarian.utils import BookRecord, Person
 from librarian.tests.fakers import BookFieldsProvider
@@ -17,7 +17,7 @@ from librarian.tests.utils import (
 import copy
 import dateutil.parser
 import factory
-import flask.ext.login
+import flask_login
 import json
 import librarian
 import random
@@ -35,9 +35,9 @@ class ApiTests(AppTestCase):
     
     def test_book_adder_happy(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
 
@@ -85,9 +85,9 @@ class ApiTests(AppTestCase):
 
     def test_book_adder_utf8(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
 
@@ -121,7 +121,6 @@ class ApiTests(AppTestCase):
 
     def test_book_adder_duplicate_records(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -141,6 +140,7 @@ class ApiTests(AppTestCase):
             publisher="Scholastic", printer="UP Press", publish_year=2013
         )
 
+        self.set_current_user(_creator)
         single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
@@ -163,9 +163,9 @@ class ApiTests(AppTestCase):
         expected. We can assume that records are "fresh".
         """
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
         title = fake.title()
@@ -210,9 +210,9 @@ class ApiTests(AppTestCase):
               lastname=p.lastname)
 
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
         title = fake.title()
@@ -244,9 +244,9 @@ class ApiTests(AppTestCase):
 
     def test_no_printer(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         single_author = BookRecord(
             isbn="9780062330260", title="Trigger Warning",
@@ -260,9 +260,9 @@ class ApiTests(AppTestCase):
 
     def test_extra_whitespace(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         self.verify_does_not_exist(
             Contributor, lastname="de Cervantes", firstname="Miguel"
@@ -283,9 +283,9 @@ class ApiTests(AppTestCase):
 
     def test_multiple_same_names(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         Neil_Gaiman = Person(lastname="Gaiman", firstname="Neil")
         single_author = BookRecord(
@@ -401,9 +401,10 @@ class ApiTests(AppTestCase):
 
     def test_title_edit_book(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
+
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -433,9 +434,10 @@ class ApiTests(AppTestCase):
 
     def test_edit_book_contrib_add(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
+
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -481,9 +483,10 @@ class ApiTests(AppTestCase):
 
     def test_edit_book_contrib_delete(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
+
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,

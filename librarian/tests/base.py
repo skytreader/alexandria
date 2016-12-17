@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 from librarian.models import get_or_create, Librarian, Role
 import librarian
 import logging
@@ -27,6 +27,11 @@ class AppTestCase(TestCase):
               display_text="%s(s)" % r, creator_id=self.admin_user.id)
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.flush()
+
+    def set_current_user(self, user):
+        with self.client.session_transaction() as sesh:
+            sesh["user_id"] = user.id
+            sesh["_fresh"] = True
 
     def verify_inserted(self, model, **kwargs):
         """
