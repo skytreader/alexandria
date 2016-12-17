@@ -21,5 +21,8 @@ class ControllersTest(AppTestCase):
     def test_logged_in_redirect(self):
         self.set_current_user(self.admin_user)
         visit_redirect = self.client.get("/login/")
-        print visit_redirect
         self.assertEqual(302, visit_redirect.status_code)
+
+    def test_index(self):
+        visit = self.client.get("/")
+        self.assertEqual(200, visit.status_code)
