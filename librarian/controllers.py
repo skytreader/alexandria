@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
-from forms import AddBooksForm, LoginForm, SearchForm
+from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
 from librarian.utils import StatsDescriptor
 from utils import route_exists
@@ -88,6 +88,22 @@ def add_books():
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
       "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
     return render_template("add_books.jinja", form=form, scripts=scripts, stylesheets=styles)
+
+@librarian_bp.route("/books/edit")
+@login_required
+def edit_books():
+    form = EditBookForm()
+    scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
+      "add-books/main.js", "add-books/book-details.js", "add-books/types.js",
+      "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
+      "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
+
+    if config.DEVEL:
+        scripts.insert(0, "add-books/testdata.js")
+
+    styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
+      "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
+    return render_template("edit-book.jinja", form=form, scripts=scripts, stylesheets=styles)
 
 @librarian_bp.route("/books")
 def show_books():

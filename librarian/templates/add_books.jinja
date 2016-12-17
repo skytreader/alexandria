@@ -1,32 +1,6 @@
-{% extends "main.jinja" %}
+{% from "macros.jinja" import render_creator_listing %}
 
-{% macro render_creator_listing(creator_title) %}
-{% set listing_label = "".join((creator_title.capitalize(), "(s):")) %}
-<div class="grouped-input" id="{{ creator_title }}-block">
-    <div class="row">
-        <div class="col-md-11">
-            <h3>{{ listing_label }}</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="input-group">
-                <input type="text" class="auto-lastname form-control single-liner-halves" placeholder="Last name" id="{{creator_title}}-proxy-lastname">
-                <input type="text" class="auto-firstname form-control single-liner-halves" placeholder="First name" id="{{creator_title}}-proxy-firstname">
-            </div>
-        </div>
-        <div class="col-md-1">
-            <i class="fa fa-plus-circle fa-2x clickable" id="{{ creator_title }}-add"></i>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-11">
-            <ul id="{{ creator_title }}-list" class="creator-name-list">
-            </ul>
-        </div>
-    </div>
-</div>
-{% endmacro %}
+{% extends "main.jinja" %}
 
 {% block title %}Add Books{% endblock %}
 {% block content %}
