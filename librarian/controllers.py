@@ -57,9 +57,12 @@ def dash():
     book_count_stat = ("%d. Number of books currently in your library. %s." %
       (stats["book_count"], StatsDescriptor.book_count(stats["book_count"]).title()))
     
-    _top_author = {"name": " ".join((stats["top_author"][2], stats["top_author"][1])),
-      "count": stats["top_author"][3]}
-    top_author = "{count}. {name} has authored the most books in your collection. Favorite.".format(**_top_author)
+    if stats["top_author"]:
+        _top_author = {"name": " ".join((stats["top_author"][2], stats["top_author"][1])),
+          "count": stats["top_author"][3]}
+        top_author = "{count}. {name} has authored the most books in your collection. Favorite.".format(**_top_author)
+    else:
+        top_author = []
     
     recent_books = stats["recent_books"]
 

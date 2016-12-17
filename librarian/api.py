@@ -398,10 +398,10 @@ def quick_stats():
     books = len(db.session.query(Book).all())
     contributors = len(db.session.query(BookContribution).all())
     top_author = get_top_contributors("Author", 1)
-    stats["participants_per_book"] = (contributors / books)
+    stats["participants_per_book"] = (contributors / books) if books else 0
     stats["recent_books"] = get_recent_books()
     stats["book_count"] = books
-    stats["top_author"] = top_author[0]
+    stats["top_author"] = top_author[0] if top_author else None
     return flask.jsonify(stats)
 
 def search(searchq):
