@@ -1,3 +1,6 @@
-{% from "macros.jinja" import render_creator_listing %}
-
 {% extends "main.jinja" %}
+
+{% block title %}Edit Book{% endblock %}
+{% block content %}
+    {% include "_book-entry.jinja" %}
+{% endblock %}

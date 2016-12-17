@@ -94,7 +94,7 @@ def add_books():
 def edit_books():
     form = EditBookForm()
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
-      "add-books/main.js", "add-books/book-details.js", "add-books/types.js",
+      "edit-book/main.js", "edit-book/controller.js",
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
 
