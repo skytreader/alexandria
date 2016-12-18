@@ -29,3 +29,8 @@ class ControllersTest(AppTestCase):
     def test_index(self):
         visit = self.client.get("/")
         self.assertEqual(200, visit.status_code)
+
+    def test_edit_books(self):
+        self.set_current_user(self.admin_user)
+        visit = self.client.get("/books/edit")
+        self.assertEqual(200, visit.status_code)
