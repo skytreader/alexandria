@@ -12,6 +12,9 @@ class LoginForm(Form):
       [Required(message="Enter your username"), Length(max=50)])
     librarian_password = PasswordField("Password", [Required(message="Enter your password")])
 
+    def __str__(self):
+        return "username: %s/password: %s" % (self.librarian_username.data, self.librarian_password.data)
+
 class AddBooksForm(Form):
     isbn_message = "ISBN is a book's identifier and can often be found at the book's copyright page or near the barcode."
     isbn = HiddenField("ISBN", [Required(message=isbn_message), Length(max=13)])

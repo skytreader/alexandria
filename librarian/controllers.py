@@ -9,6 +9,7 @@ from utils import route_exists
 import config
 import flask
 import json
+import logging
 
 librarian_bp = Blueprint('librarian', __name__)
 
@@ -25,6 +26,7 @@ def login():
     from flask_login import current_user
     from models import Librarian
     form = LoginForm()
+    logging.info("Got login form %s" % form)
 
     if form.validate_on_submit():
         user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
