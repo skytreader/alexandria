@@ -25,3 +25,76 @@
     </div>
 </div>
 {% endmacro %}
+
+{% macro book_entry(form, form_action_url, book_record=None) %}
+<form method="POST" action="{{form_action_url}}" role="form" id="main-form">
+    {% if book_record %}
+        {{ form.book_id() }}
+    {% endif %}
+    {{ form.csrf_token }}
+    {{ form.isbn() }}
+    {{ form.title() }}
+    {{ form.genre() }}
+    {{ form.authors() }}
+    {{ form.illustrators() }}
+    {{ form.editors() }}
+    {{ form.translators() }}
+    {{ form.publisher() }}
+    {{ form.printer() }}
+    {{ form.year() }}
+</form>
+<form id="proxy-form">
+    <h2>Book Information</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="input-holder"><i class="fa fa-star"></i> ISBN:<br>
+            <input type="text" id="isbn-proxy" class="form-control" name="isbn-rule" value="{{book_record.isbn if book_record else ''}}">
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="input-holder"><i class="fa fa-star"></i> Title:<br>
+            <input type="text" id="title-proxy" class="form-control" name="title-rule">
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="input-holder"><i class="fa fa-star"></i> Genre:<br>
+            <input type="text" id="genre-proxy" class="form-control" name="genre-rule">
+            </label>
+        </div>
+    </div>
+    <div class="block">
+        <h2>Content Creators</h2>
+        {{ render_creator_listing("author") }}
+        <br> 
+        {{ render_creator_listing("illustrator") }}
+        <br>
+        {{ render_creator_listing("editor") }}
+        <br>
+        {{ render_creator_listing("translator") }}
+    </div>
+    <h2>Publishing Information</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="input-holder"><i class="fa fa-star"></i> Publisher:<br>
+            <input type="text" id="publisher-proxy" class="form-control" name="publisher-rule">
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="input-holder">Printer:<br>
+            <input type="text" id="printer-proxy" class="form-control">
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="input-holder"><i class="fa fa-star"></i> Year:<br>
+            <input type="text" id="year-proxy" class="form-control" name="year-rule">
+            </label>
+        </div>
+    </div>
+</form>
+<div style="clear: both"></div>
+<div class="block">
+    <br>
+    <input type="button" class="btn btn-primary" value="Save Book" id="queue-book">
+    <input type="button" class="btn btn-default" value="Clear Form" id="clear-proxy">
+</div>
+{% endmacro %}

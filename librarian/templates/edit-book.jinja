@@ -1,6 +1,7 @@
 {% extends "main.jinja" %}
+{% from "macros.jinja" import book_entry %}
 
 {% block title %}Edit Book{% endblock %}
 {% block content %}
-    {% include "_book-entry.jinja" %}
+    {{ book_entry(form, "/edit/book") }}
 {% endblock %}
