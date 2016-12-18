@@ -98,6 +98,11 @@ def add_books():
 @login_required
 def edit_books():
     form = EditBookForm()
+    book_id = request.args.get("bid")
+
+    if not book_id:
+        return flask.abort(400)
+
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",

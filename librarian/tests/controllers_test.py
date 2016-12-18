@@ -36,5 +36,10 @@ class ControllersTest(AppTestCase):
 
     def test_edit_books(self):
         self.set_current_user(self.admin_user)
-        visit = self.client.get("/books/edit")
+        visit = self.client.get("/books/edit?bid=1")
         self.assertEqual(200, visit.status_code)
+
+    def test_edit_books_badreq(self):
+        self.set_current_user(self.admin_user)
+        visit = self.client.get("/books/edit")
+        self.assertEqual(400, visit.status_code)
