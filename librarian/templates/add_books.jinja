@@ -4,22 +4,7 @@
 {% block title %}Add Books{% endblock %}
 {% block content %}
     <h1 class="form-title">Add Books</h1>
-    <!-- This is the hidden "buffer" form, the actual form mapped from back-end. -->
-    <form method="POST" action="/add/books" role="form" id="main-form">
-        {{ form.csrf_token }}
-        {{ form.isbn() }}
-        {{ form.title() }}
-        {{ form.genre() }}
-        {{ form.authors() }}
-        {{ form.illustrators() }}
-        {{ form.editors() }}
-        {{ form.translators() }}
-        {{ form.publisher() }}
-        {{ form.printer() }}
-        {{ form.year() }}
-    </form>
-    
-    {% include "_book-entry.jinja" %}
+    {{ book_entry(form, "/add/books") }}
     <hr>
     <h2>Books Entered</h2>
     <p>It may take some time to process all your books.</p>

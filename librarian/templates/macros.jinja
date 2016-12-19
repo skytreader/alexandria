@@ -27,6 +27,7 @@
 {% endmacro %}
 
 {% macro book_entry(form, form_action_url, book_record=None) %}
+{# This is the hidden "buffer" form, the actual form mapped from back-end. #}
 <form method="POST" action="{{form_action_url}}" role="form" id="main-form">
     {% if book_record %}
         {{ form.book_id() }}
