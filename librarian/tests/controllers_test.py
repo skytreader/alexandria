@@ -43,3 +43,8 @@ class ControllersTest(AppTestCase):
         self.set_current_user(self.admin_user)
         visit = self.client.get("/books/edit")
         self.assertEqual(400, visit.status_code)
+
+    def test_add_books(self):
+        self.set_current_user(self.admin_user)
+        visit = self.client.get("/books/add")
+        self.assertEqual(200, visit.status_code)
