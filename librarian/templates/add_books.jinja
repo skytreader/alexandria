@@ -1,9 +1,9 @@
 {% extends "main.jinja" %}
+{% from "macros.jinja" import book_entry %}
 
 {% block title %}Add Books{% endblock %}
 {% block content %}
-    <h1>Add Books</h1>
-    <p></p>
+    <h1 class="form-title">Add Books</h1>
     <!-- This is the hidden "buffer" form, the actual form mapped from back-end. -->
     <form method="POST" action="/add/books" role="form" id="main-form">
         {{ form.csrf_token }}
