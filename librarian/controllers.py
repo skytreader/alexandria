@@ -3,7 +3,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
-from librarian.utils import StatsDescriptor
+from librarian.utils import BookRecord, StatsDescriptor
 from utils import route_exists
 
 import config
@@ -102,6 +102,10 @@ def edit_books():
 
     if not book_id:
         return flask.abort(400)
+
+    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id)
+    query_results = book_query.all()
+    assembled = BookRecord.assembler(query_results)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",

@@ -201,9 +201,9 @@ class BookRecord(RequestData):
         5 - Role.name
         6 - BookCompany.name
     
-        And arranges them as an instance of this class.
+        And arranges them as an instance of this class. Returned as a ist.
 
-        Return type will vary depending on the `as_obj` parameter but will
+        Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`
         is True, return instances of this class. Otherwise, return maps.
         Note that maps are non-hashable but instances of this class is.
