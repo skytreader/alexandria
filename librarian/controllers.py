@@ -4,6 +4,7 @@ from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
 from librarian.utils import BookRecord, StatsDescriptor
+from librarian.models import Book
 from utils import route_exists
 
 import config

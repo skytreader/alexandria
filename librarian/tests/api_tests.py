@@ -303,6 +303,38 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(1, len(gaimen))
 
+    def test_same_person_diff_roles(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        jtamaki_exists = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.firstname == "Jillian")
+            .filter(Contributor.lastname == "Tamaki")
+            .first()
+        )
+        self.assertFalse(jtamaki_exists)
+        
+        jtamaki = Person(lastname="Tamaki", firstname="Jillian")
+        author_illus = BookRecord(
+            isbn="9781596437746", title="This One Summer", genre="Graphic Novel",
+            author=[jtamaki], illustrator=[jtamaki], publisher="First Second",
+            publish_year=2016
+        )
+        rv = self.client.post("/api/add/books", data=author_illus.request_data())
+
+        self.assertEquals(200, rv.status_code)
+
+        jtamakis = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.firstname == "Jillian")
+            .filter(Contributor.lastname == "Tamaki")
+            .all()
+        )
+        self.assertEqual(1, len(jtamakis))
+
     def test_servertime(self):
         servertime = self.client.get("/api/util/servertime")
         self.assertEquals(servertime._status_code, 200)
