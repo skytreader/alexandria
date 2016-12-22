@@ -22,8 +22,16 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    pass
+    op.alter_column(
+        "books", "genre_id", sa.ForeignKey(
+            "genres.id", name="book_genre_fk", ondelete="CASCADE"
+         ), existing_type=sa.Integer
+    )
 
 
 def downgrade():
-    pass
+    op.alter_column(
+        "books", "genre_id", sa.ForeignKey(
+            "genres.id", name="book_genre_fk"
+         ), existing_type=sa.Integer
+    )
