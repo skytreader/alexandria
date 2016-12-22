@@ -321,9 +321,9 @@ class Pseudonym(Base, UserTags):
     """
     __tablename__ = "pseudonyms"
     person_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
-      name="pseudonym_book_person_fk1"))
+      name="pseudonym_book_person_fk1"), primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="pseudonym_book_fk1"))
+      name="pseudonym_book_fk1"), primary_key=True)
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
