@@ -34,7 +34,7 @@ def login():
 
         if user and user.password == form.librarian_password.data:
             login_user(user)
-            # Should not matter becuase redirect is coming up but, oh well
+            # Should not matter because redirect is coming up but, oh well
             next_url = request.args.get("next")
 
             if next_url and not route_exists(next_url):
@@ -106,7 +106,9 @@ def edit_books():
 
     book_query = BookRecord.base_assembler_query().filter(Book.id == book_id)
     query_results = book_query.all()
+    print "query results %s" % query_results
     assembled = BookRecord.assembler(query_results)
+    print "assembled %s" % assembled
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",
