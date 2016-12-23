@@ -125,7 +125,7 @@ class Book(Base, UserTags):
     genre_id = db.Column(db.Integer, db.ForeignKey("genres.id",
       name="book_genre_fk"))
     publisher_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="book_book_company_fk1"))
+      name="book_book_company_fk1", ondelete="CASCADE"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
       server_default=str(ISBN_START))
     comments = db.Column(db.Text, nullable=True)
@@ -177,9 +177,9 @@ class BookCompany(Base, UserTags):
 class Imprint(Base, UserTags):
     __tablename__ = "imprints"
     mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprint_book_company_fk1"))
+      name="imprint_book_company_fk1", ondelete="CASCADE"))
     imprint_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprint_book_company_fk2"))
+      name="imprint_book_company_fk2", ondelete="CASCADE"))
     
     mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
     imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
@@ -262,11 +262,11 @@ class BookContribution(Base, UserTags):
     """
     __tablename__ = "book_contributions"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="book_participant_book_fk1"))
+      name="book_participant_book_fk1", ondelete="CASCADE"))
     contributor_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
-      name="book_participant_book_person_fk1"))
+      name="book_participant_book_person_fk1", ondelete="CASCADE"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
-      name="book_pariticipant_role_fk1"))
+      name="book_pariticipant_role_fk1", ondelete="CASCADE"))
 
     book = relationship("Book")
     contributor = relationship("Contributor")
@@ -296,9 +296,9 @@ class BookContribution(Base, UserTags):
 class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="printer_book_company_fk1"), primary_key = True)
+      name="printer_book_company_fk1", ondelete="CASCADE"), primary_key = True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="printer_book_fk1"), primary_key = True)
+      name="printer_book_fk1", ondelete="CASCADE"), primary_key = True)
 
     company = relationship("BookCompany")
     book = relationship("Book")
@@ -321,9 +321,9 @@ class Pseudonym(Base, UserTags):
     """
     __tablename__ = "pseudonyms"
     person_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
-      name="pseudonym_book_person_fk1"), primary_key=True)
+      name="pseudonym_book_person_fk1", ondelete="CASCADE"), primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="pseudonym_book_fk1"), primary_key=True)
+      name="pseudonym_book_fk1", ondelete="CASCADE"), primary_key=True)
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)
