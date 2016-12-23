@@ -296,9 +296,11 @@ class BookContribution(Base, UserTags):
 class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="printer_book_company_fk1", ondelete="CASCADE"), primary_key = True)
+      name="printer_book_company_fk1", ondelete="CASCADE"), primary_key=True,
+      nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="printer_book_fk1", ondelete="CASCADE"), primary_key = True)
+      name="printer_book_fk1", ondelete="CASCADE"), primary_key=True,
+      nullable=False)
 
     company = relationship("BookCompany")
     book = relationship("Book")

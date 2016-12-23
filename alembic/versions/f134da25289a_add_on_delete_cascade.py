@@ -62,24 +62,24 @@ def upgrade():
         "printers", "company_id", sa.ForeignKey(
             "book_companies.id", name="printer_book_company_fk1",
             ondelete="CASCADE"
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=False, primary_key=True
     )
     op.alter_column(
         "printers", "book_id", sa.ForeignKey(
             "books.id", name="printer_book_fk1", ondelete="CASCADE"
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=False, primary_key=True
     )
 
     op.alter_column(
         "pseudonyms", "person_id", sa.ForeignKey(
             "contributors.id", name="pseudonym_book_person_fk1",
             ondelete="CASCADE"
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=False, primary_key=True
     )
     op.alter_column(
         "pseudonyms", "book_id", sa.ForeignKey(
             "books.id", name="pseudonym_book_fk1", ondelete="CASCADE"
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=False, primary_key=True
     )
 
 def downgrade():
@@ -130,10 +130,10 @@ def downgrade():
     op.alter_column(
         "pseudonyms", "person_id", sa.ForeignKey(
             "contributors.id", name="pseudonym_book_person_fk1",
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=True, primary_key=True
     )
     op.alter_column(
         "pseudonyms", "book_id", sa.ForeignKey(
             "books.id", name="pseudonym_book_fk1"
-        ), existing_type=sa.Integer, primary_key=True
+        ), existing_type=sa.Integer, nullable=True, primary_key=True
     )
