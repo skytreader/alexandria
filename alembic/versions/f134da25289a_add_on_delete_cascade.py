@@ -27,6 +27,9 @@ def upgrade():
             "book_companies.id", name="book_book_company_fk1", ondelete="CASCADE"
         ), existing_type=sa.Integer
     )
+    op.drop_constraint("book_book_company_fk1", "books", type_="foreignkey")
+    op.create_foreign_key("book_book_company_fk1", "books", "publisher",
+        ["publisher_id"], ["id"], ondelete="CASCADE")
 
     op.alter_column(
         "imprints", "mother_company_id", sa.ForeignKey(
@@ -52,6 +55,7 @@ def upgrade():
             ondelete="CASCADE"
         ), existing_type=sa.Integer
     )
+    # TODO: Rewrite this specifically to correct the typo in the name
     op.alter_column(
         "book_contributions", "role_id", sa.ForeignKey(
             "roles.id", name="book_pariticipant_role_fk1", ondelete="CASCADE"
