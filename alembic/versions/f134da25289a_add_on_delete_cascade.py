@@ -21,74 +21,40 @@ from alembic import op
 import sqlalchemy as sa
 
 
+IDX_CONSTRAINT_NAME = 0
+IDX_TABLE = 1
+IDX_PARENT_TABLE = 2
+IDX_TABLE_COL = 3
+# constraint name, table, parent table, table col, parent table col
+COL_CONS = [
+    ("book_book_company_fk1", "books", "publisher", "publisher_id"),
+    ("imprint_book_company_fk1", "imprints", "book_companies", "mother_company_id"),
+    ("imprint_book_company_fk2", "imprints", "book_companies", "imprint_company_id"),
+    ("book_participant_book_fk1", "book_contributions", "books", "book_id"),
+    ("book_participant_book_person_fk1", "book_contributions", "contributors", "contributor_id"),
+    ("printer_book_company_fk1", "printers", "book_companies", "company_id"),
+    ("printer_book_fk1", "printers", "books", "book_id"),
+    ("pseudonym_book_person_fk1", "pseudonyms", "contributors", "person_id"),
+    ("pseudonym_book_fk1", "pseudonyms", "books", "book_id")
+]
+
 def upgrade():
-    op.alter_column(
-        "books", "publisher_id", sa.ForeignKey(
-            "book_companies.id", name="book_book_company_fk1", ondelete="CASCADE"
-        ), existing_type=sa.Integer
+    op.drop_constraint(
+        "book_pariticipant_role_fk1", "book_contributions", type_="foreignkey"
     )
-    op.drop_constraint("book_book_company_fk1", "books", type_="foreignkey")
-    op.create_foreign_key("book_book_company_fk1", "books", "publisher",
-        ["publisher_id"], ["id"], ondelete="CASCADE")
-
-    op.alter_column(
-        "imprints", "mother_company_id", sa.ForeignKey(
-            "book_companies.id", name="imprint_book_company_fk1",
-            ondelete="CASCADE"
-         ), existing_type=sa.Integer
-    )
-    op.alter_column(
-        "imprints", "imprint_company_id", sa.ForeignKey(
-            "book_companies.id", name="imprint_book_company_fk2",
-            ondelete="CASCADE"
-        ), existing_type=sa.Integer
-    ) 
-
-    op.alter_column(
-        "book_contributions", "book_id", sa.ForeignKey(
-            "books.id", name="book_participant_book_fk1", ondelete="CASCADE"
-        ), existing_type=sa.Integer
-    )
-    op.alter_column(
-        "book_contributions", "contributor_id", sa.ForeignKey(
-            "contributors.id", name="book_participant_book_person_fk1",
-            ondelete="CASCADE"
-        ), existing_type=sa.Integer
-    )
-    # TODO: Rewrite this specifically to correct the typo in the name
-    op.alter_column(
-        "book_contributions", "role_id", sa.ForeignKey(
-            "roles.id", name="book_pariticipant_role_fk1", ondelete="CASCADE"
-        ), existing_type=sa.Integer
+    op.create_foreign_key(
+        "book_participant_role_fk1", "book_contributions", "roles", ["role_id"],
+        ["id"], ondelete="CASCADE"
     )
 
-    op.alter_column(
-        "printers", "company_id", existing_type=sa.Integer, nullable=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "book_companies.id", name="printer_book_company_fk1",
-            ondelete="CASCADE"
+    for cc in COL_CONS:
+        op.drop_constraint(
+            cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], type_="foreignkey"
         )
-    )
-    op.alter_column(
-        "printers", "book_id", existing_type=sa.Integer, nullable=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "books.id", name="printer_book_fk1", ondelete="CASCADE"
+        op.create_foreign_key(
+            cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], cc[IDX_PARENT_TABLE],
+            [cc[IDX_TABLE_COL]], [cc[IDX_PARENT_TABLE_COL]], ondelete="CASCADE"
         )
-    )
-
-    op.alter_column(
-        "pseudonyms", "person_id", existing_type=sa.Integer, nullable=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "contributors.id", name="pseudonym_book_person_fk1",
-            ondelete="CASCADE"
-        )
-    )
-    op.alter_column(
-        "pseudonyms", "book_id", existing_type=sa.Integer, nullable=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "books.id", name="pseudonym_book_fk1", ondelete="CASCADE"
-        )
-    )
 
 def downgrade():
     op.alter_column(

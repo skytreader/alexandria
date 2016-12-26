@@ -266,7 +266,7 @@ class BookContribution(Base, UserTags):
     contributor_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
       name="book_participant_book_person_fk1", ondelete="CASCADE"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
-      name="book_pariticipant_role_fk1", ondelete="CASCADE"))
+      name="book_participant_role_fk1", ondelete="CASCADE"))
 
     book = relationship("Book")
     contributor = relationship("Contributor")
