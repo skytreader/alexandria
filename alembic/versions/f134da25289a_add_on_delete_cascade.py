@@ -40,7 +40,6 @@ COL_CONS = [
 ]
 
 def upgrade():
-
     for cc in COL_CONS:
         op.drop_constraint(
             cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], type_="foreignkey"
@@ -51,61 +50,11 @@ def upgrade():
         )
 
 def downgrade():
-    op.alter_column(
-        "books", "publisher_id", sa.ForeignKey(
-            "book_companies.id", name="book_book_company_fk1"
-        ), existing_type=sa.Integer
-    )
-
-    op.alter_column(
-        "imprints", "mother_company_id", sa.ForeignKey(
-            "book_companies.id", name="imprint_book_company_fk1",
-         ), existing_type=sa.Integer
-    )
-    op.alter_column(
-        "imprints", "imprint_company_id", sa.ForeignKey(
-            "book_companies.id", name="imprint_book_company_fk2",
-        ), existing_type=sa.Integer
-    ) 
-
-    op.alter_column(
-        "book_contributions", "book_id", sa.ForeignKey(
-            "books.id", name="book_participant_book_fk1"
-        ), existing_type=sa.Integer
-    )
-    op.alter_column(
-        "book_contributions", "contributor_id", sa.ForeignKey(
-            "contributors.id", name="book_participant_book_person_fk1",
-        ), existing_type=sa.Integer
-    )
-    op.alter_column(
-        "book_contributions", "role_id", sa.ForeignKey(
-            "roles.id", name="book_pariticipant_role_fk1"
-        ), existing_type=sa.Integer
-    )
-
-    op.alter_column(
-        "printers", "company_id", existing_type=sa.Integer, nullable=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "book_companies.id", name="printer_book_company_fk1",
+    for cc in COL_CONS:
+        op.drop_constraint(
+            cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], type_="foreignkey"
         )
-    )
-    op.alter_column(
-        "printers", "book_id", existing_type=sa.Integer, nullalbe=False,
-        primary_key=True, kw=sa.ForeignKey(
-            "books.id", name="printer_book_fk1"
+        op.create_foreign_key(
+            cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], cc[IDX_PARENT_TABLE],
+            [cc[IDX_TABLE_COL]], ["id"]
         )
-    )
-
-    op.alter_column(
-        "pseudonyms", "person_id", existing_type=sa.Integer, nullable=True,
-        primary_key=True, kw=sa.ForeignKey(
-            "contributors.id", name="pseudonym_book_person_fk1",
-        )
-    )
-    op.alter_column(
-        "pseudonyms", "book_id", existing_type=sa.Integer, nullable=True,
-        primary_key=True, kw=sa.ForeignKey(
-            "books.id", name="pseudonym_book_fk1"
-        )
-    )
