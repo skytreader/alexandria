@@ -25,27 +25,21 @@ IDX_CONSTRAINT_NAME = 0
 IDX_TABLE = 1
 IDX_PARENT_TABLE = 2
 IDX_TABLE_COL = 3
-# constraint name, table, parent table, table col, parent table col
+# constraint name, table, parent table, table col
 COL_CONS = [
-    ("book_book_company_fk1", "books", "publisher", "publisher_id"),
-    ("imprint_book_company_fk1", "imprints", "book_companies", "mother_company_id"),
-    ("imprint_book_company_fk2", "imprints", "book_companies", "imprint_company_id"),
-    ("book_participant_book_fk1", "book_contributions", "books", "book_id"),
-    ("book_participant_book_person_fk1", "book_contributions", "contributors", "contributor_id"),
-    ("printer_book_company_fk1", "printers", "book_companies", "company_id"),
-    ("printer_book_fk1", "printers", "books", "book_id"),
-    ("pseudonym_book_person_fk1", "pseudonyms", "contributors", "person_id"),
-    ("pseudonym_book_fk1", "pseudonyms", "books", "book_id")
+    ("book_company_fk1", "books", "book_companies", "publisher_id"),
+    ("imprint_company_fk1", "imprints", "book_companies", "mother_company_id"),
+    ("imprint_company_fk2", "imprints", "book_companies", "imprint_company_id"),
+    ("book_contributions_ibfk_1", "book_contributions", "books", "book_id"),
+    ("book_contributions_ibfk_2", "book_contributions", "contributors", "contributor_id"),
+    ("book_contributions_ibfk_3", "book_contributions", "roles", "role_id"),
+    ("printers_ibfk_1", "printers", "book_companies", "company_id"),
+    ("printers_ibfk_2", "printers", "books", "book_id"),
+    ("pseudonyms_ibfk_1", "pseudonyms", "contributors", "person_id"),
+    ("pseudonyms_ibfk_2", "pseudonyms", "books", "book_id")
 ]
 
 def upgrade():
-    op.drop_constraint(
-        "book_pariticipant_role_fk1", "book_contributions", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        "book_participant_role_fk1", "book_contributions", "roles", ["role_id"],
-        ["id"], ondelete="CASCADE"
-    )
 
     for cc in COL_CONS:
         op.drop_constraint(
@@ -53,7 +47,7 @@ def upgrade():
         )
         op.create_foreign_key(
             cc[IDX_CONSTRAINT_NAME], cc[IDX_TABLE], cc[IDX_PARENT_TABLE],
-            [cc[IDX_TABLE_COL]], [cc[IDX_PARENT_TABLE_COL]], ondelete="CASCADE"
+            [cc[IDX_TABLE_COL]], ["id"], ondelete="CASCADE"
         )
 
 def downgrade():
