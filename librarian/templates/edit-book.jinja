@@ -3,6 +3,9 @@
 
 {% block title %}Edit Book{% endblock %}
 {% block content %}
+    <script type="text/javascript">
+        var book = {{ book_json }};
+    </script>
     <h1 class="form-title">Edit Book</h1>
     {{ book_entry(form, "/edit/book") }}
 {% endblock %}
