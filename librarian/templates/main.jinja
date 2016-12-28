@@ -1,17 +1,15 @@
 {#
-This view requires the following variables to be defined:
+Users of this template may set the following context variables:
+
   title - displayed at the title bar of the browser
   stylesheets - list of css filenames, to customize look, if applicable. bootstrap
     themes and the librarian theme is included by default.
   scripts - list of javascript filenames for custom behavior, if applicable. jquery
     is included by default.
+  misc_js - WARNING: USE PRUDENTLY. For server-side generated scripts.
   
 For both stylesheets and scripts, it is assumed that the resource is in the
 default resource directory (/static/scripts and static/styles).
-
-Additionally, if the $content contains text to be echoed, users of this
-view must set a variable $echo_content to TRUE. You should also, ALWAYS,
-load the URL helper.
 #}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -31,6 +29,9 @@ load the URL helper.
         {% for script in scripts: %}
             <script type="text/javascript" src="/static/scripts/{{ script }}"></script>
         {% endfor %}
+        <script type="text/javascript" language="javascript">
+        {% block misc_js %}{% endblock %}
+        </script>
     </head>
     <body>
         {% block body %}

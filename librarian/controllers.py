@@ -108,7 +108,7 @@ def edit_books():
     query_results = book_query.all()
     assembled = BookRecord.assembler(query_results)
     assembled_dicts = [a.__dict__ for a in assembled]
-    print "assembled %s" % json.dumps(assembled_dicts)
+    book_js = "var editBook = JSON.parse('%s')" % json.dumps(assembled_dicts)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",
@@ -122,7 +122,7 @@ def edit_books():
       "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
     return render_template(
         "edit-book.jinja", form=form, scripts=scripts, stylesheets=styles,
-        book_json=json.dumps(assembled_dicts)
+        misc_js = book_js
     )
 
 @librarian_bp.route("/books")
