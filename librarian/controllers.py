@@ -104,11 +104,10 @@ def edit_books():
     if not book_id:
         return flask.abort(400)
 
-    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id)
+    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id).limit(1)
     query_results = book_query.all()
-    assembled = BookRecord.assembler(query_results)
-    assembled_dicts = [a.__dict__ for a in assembled]
-    book_js = "var editBook = JSON.parse('%s')" % json.dumps(assembled_dicts)
+    assembled = BookRecord.assembler(query_results)[0]
+    book_js = "var editBook = JSON.parse('%s')" % json.dumps(assembled.__dict__)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",
@@ -122,7 +121,7 @@ def edit_books():
       "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
     return render_template(
         "edit-book.jinja", form=form, scripts=scripts, stylesheets=styles,
-        misc_js = book_js
+        misc_js = book_js, book_title=assembled.title
     )
 
 @librarian_bp.route("/books")
