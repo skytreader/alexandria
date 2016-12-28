@@ -1,7 +1,7 @@
 /**
 Contains the types needed for adding books.
 
-@module addbooks.types
+@module addBooks.types
 */
 
 /**
