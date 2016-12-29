@@ -41,8 +41,11 @@ var CREATOR_ADD_HANDLERS = {};
 
 /**
 @constructor
+@param {addBooks.bookDetails.BookDetailsCtrl} bookDetailsCtrl
+    Expected to be initialized and all.
 */
-function BookSenderCtrl(){
+function BookSenderCtrl(bookDetailsCtrl){
+    this.bookDetailsCtrl = bookDetailsCtrl;
     /**
     The interval of time, in milliseconds, in which we process books.
 
@@ -248,7 +251,7 @@ Generates the delete button to be added at the end of every row record.
 @return {HTMLElement}
 @private
 */
-BookSenderCtrl.prototype.enderDeleteButton = function(){
+BookSenderCtrl.prototype.renderDeleteButton = function(){
     var container = document.createElement("input");
     container.onclick = removeRow;
     container.type = "button";
@@ -256,6 +259,98 @@ BookSenderCtrl.prototype.enderDeleteButton = function(){
     container.value = "X";
     
     return container;
+}
+
+/**
+Send the actual, hidden form to the server via AJAX so that the data may be
+saved.
+
+@param {HTMLElement} domElement - the book spine representing the book to be
+  sent, as a DOM element.
+*/
+BookSenderCtrl.prototype.sendSaveform = function(domElement){
+    var authors = JSON.parse(document.getElementById("authors").value);
+    var illustrators = JSON.parse(document.getElementById("illustrators").value);
+    var editors = JSON.parse(document.getElementById("editors").value);
+    var translators = JSON.parse(document.getElementById("translators").value);
+    var possibleNewNames = [authors, illustrators, editors, translators];
+
+    var publisher = document.getElementById("publisher").value;
+    var printer = document.getElementById("printer").value;
+    var possibleNewCompanies = [publisher, printer];
+
+    var possibleNewGenre = document.getElementById("genre").value;
+
+    function success(){
+        $(domElement).removeClass("unsaved_book").addClass("saved_book");
+
+        _.forEach(possibleNewNames, function(newNames){
+            _.forEach(newNames, function(person){
+                if(!this.bookDetailsCtrl.BOOK_PERSONS_SET.has(person)){
+                    this.bookDetailsCtrl.BOOK_PERSONS_SET.add(person);
+                    if(this.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
+                        this.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
+                    }
+                    if(this.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
+                        this.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                    }
+                }
+            });
+        });
+        this.bookDetailsCtrl.BOOK_PERSONS = [...this.bookDetailsCtrl.BOOK_PERSONS_SET]
+        this.bookDetailsCtrl.resetAutocomplete();
+
+        _.forEach(possibleNewCompanies, function(company){
+            if(this.bookDetailsCtrl.COMPANIES.indexOf(company) < 0){
+                this.bookDetailsCtrl.COMPANIES.push(company);
+            }
+        });
+
+        _.forEach(possibleNewGenre, function(genre){
+            if(this.bookDetailsCtrl.GENRES.indexOf(genre) < 0){
+                this.bookDetailsCtrl.GENRES.push(genre);
+            }
+        });
+        this.booksSaved++;
+    }
+
+    function fail(jqxhr){
+        alertify.error(jqxhr.responseText);
+        $(domElement).removeClass("unsaved_book").addClass("error_book");
+        this.booksErrorNoRetry++;
+    }
+
+    function failRecover(jqxhr){
+        alertify.warning("Failed to save a book. Please wait as we automatically retry.");
+        $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
+        this.reprocessQueue.enqueue(domElement);
+        this.booksReprocessable++;
+    }
+
+    var data = {
+        "csrf_token": document.getElementById("csrf_token").value,
+        "isbn": document.getElementById("isbn").value,
+        "title": document.getElementById("title").value,
+        "genre": document.getElementById("genre").value,
+        "authors": document.getElementById("authors").value,
+        "illustrators": document.getElementById("illustrators").value,
+        "editors": document.getElementById("editors").value,
+        "translators": document.getElementById("translators").value,
+        "publisher": document.getElementById("publisher").value,
+        "printer": document.getElementById("printer").value,
+        "year": document.getElementById("year").value
+    }
+    $.ajax("/api/add/books", {
+        "type": "POST",
+        "data": data,
+        "success": success,
+        "statusCode":{
+            400: fail,
+            409: fail,
+            500: failRecover
+        },
+        "complete": updateStatCounts
+    });
 }
 
 /**
@@ -502,6 +597,9 @@ $(document).ready(function(){
     function clearActualForm(){
         $("#main-form input").not("#csrf_token").val("");
     }
+
+    var bookDetailsCtrl = new BookDetailsCtrl();
+    var bookSenderCtrl = new BookSenderCtrl(bookDetailsCtrl);
 
     /**
     Load from the given queue to the actual form. The queue object is expected to 

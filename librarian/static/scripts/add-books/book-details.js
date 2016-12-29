@@ -88,12 +88,12 @@ BookDetailsCtrl.prototype.setUp = function(){
               "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
         } else if($("#proxy-form").valid()){
             var spine = renderSpine();
-            internalizeBook(spine);
+            this.internalizeBook(spine);
             window.visualQueue.prepend(spine);
-            updateStatCounts();
-            clearProxyForm();
-            clearLists();
-            resetAutocomplete();
+            this.updateStatCounts();
+            this.clearProxyForm();
+            this.clearLists();
+            this.resetAutocomplete();
         } else{
             alertify.alert("Oh no!",
               "There is a problem with this book's details. Check the fields for specifics.");
