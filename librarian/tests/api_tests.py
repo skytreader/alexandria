@@ -3,18 +3,21 @@ from __future__ import division
 
 from base import AppTestCase
 from faker import Faker
-from flask.ext.login import login_user
+from flask_login import login_user
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, Role
-from librarian.utils import BookRecord as LibraryEntry, Person
+from librarian.utils import BookRecord, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
-from librarian.tests.utils import make_name_object, create_library
+from librarian.tests.utils import (
+    make_name_object, make_person_object, create_library, create_book
+)
 
+import copy
 import dateutil.parser
 import factory
-import flask.ext.login
+import flask_login
 import json
 import librarian
 import random
@@ -32,61 +35,59 @@ class ApiTests(AppTestCase):
     
     def test_book_adder_happy(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="Eschbach", firstname="Andreas")]
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Carpet Makers",
-            "genre": "io9",
-            "authors": """[
-                {
-                    "lastname": "Eschenbach",
-                    "firstname": "Andreas"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(Contributor, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
     def verify_bookperson_inserted(self, persons, role, bookid):
+        """
+        Will be deprected in favor of `verify_persons_inserted` below. Soon.
+        """
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p["firstname"],
               lastname=p["lastname"])
             self.verify_inserted(BookContribution, contributor_id=_p.id,
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
+    def verify_persons_inserted(self, persons, role, bookid):
+        for p in persons:
+            _p = self.verify_inserted(Contributor, firstname=p.firstname,
+              lastname=p.lastname)
+            self.verify_inserted(BookContribution, contributor_id=_p.id,
+              role_id=self.ROLE_IDS[role], book_id=bookid)
+
     def test_book_adder_utf8(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
 
@@ -99,31 +100,15 @@ class ApiTests(AppTestCase):
           firstname="Harriet")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="Pérez-Reverte", firstname="Arturo")]
+        translator = [Person(lastname="de Onís", firstname="Harriet")]
+        single_author = BookRecord(
+            isbn=isbn, title="The Club Dumas", genre="English 12", author=author,
+            translator=translator, publisher="Scholastic", printer="UP Press",
+            publish_year=2013
+        )
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Club Dumas",
-            "genre": "English 12",
-            "authors": """[
-                {
-                    "lastname": "Pérez-Reverte",
-                    "firstname": "Arturo"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": """[
-                {
-                    "lastname": "de Onís",
-                    "firstname": "Harriet"
-                }
-            ]""",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
-
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
@@ -136,7 +121,6 @@ class ApiTests(AppTestCase):
 
     def test_book_adder_duplicate_records(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
 
@@ -145,41 +129,30 @@ class ApiTests(AppTestCase):
         # Check that the relevant records do not exist yet
         self.verify_does_not_exist(Book, isbn=isbn)
         self.verify_does_not_exist(Genre, name="io9")
-        self.verify_does_not_exist(Contributor, lastname="Eschenbach",
+        self.verify_does_not_exist(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_does_not_exist(BookCompany, name="Scholastic")
         self.verify_does_not_exist(BookCompany, name="UP Press")
 
-        single_author = {
-            "isbn": isbn,
-            "title": "The Carpet Makers",
-            "genre": "io9",
-            "authors": """[
-                {
-                    "lastname": "Eschenbach",
-                    "firstname": "Andreas"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        author = [Person(lastname="Eschbach", firstname="Andreas")]
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        self.set_current_user(_creator)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
         self.verify_inserted(Book, isbn=isbn)
         self.verify_inserted(Genre, name="io9")
-        self.verify_inserted(Contributor, lastname="Eschenbach",
+        self.verify_inserted(Contributor, lastname="Eschbach",
           firstname="Andreas")
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
-        duplicate = self.client.post("/api/add/books", data=single_author)
+        duplicate = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(duplicate._status_code, 409)
         
@@ -190,40 +163,33 @@ class ApiTests(AppTestCase):
         expected. We can assume that records are "fresh".
         """
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object() for _ in range(4)]
-        illustrators = [make_name_object() for _ in range(4)]
-        editors = [make_name_object() for _ in range(4)]
-        translators = [make_name_object() for _ in range(4)]
+        authors = [make_person_object() for _ in range(4)]
+        illustrators = [make_person_object() for _ in range(4)]
+        editors = [make_person_object() for _ in range(4)]
+        translators = [make_person_object() for _ in range(4)]
 
-        req_data = {
-            "isbn": isbn,
-            "title": title,
-            "genre": "Multinational",
-            "authors": json.dumps(authors),
-            "illustrators": json.dumps(illustrators),
-            "editors": json.dumps(editors),
-            "translators": json.dumps(translators),
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        req_data = BookRecord(
+            isbn=isbn, title=title, genre="Multinational", author=authors,
+            illustrator=illustrators, editor=editors, translator=translators,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        req_val = self.client.post("/api/add/books", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data.request_data())
         self.assertEqual(200, req_val.status_code)
         created_book = (librarian.db.session.query(Book)
           .filter(Book.isbn==isbn).first())
         
-        self.verify_bookperson_inserted(authors, "Author", created_book.id)
-        self.verify_bookperson_inserted(illustrators, "Illustrator", created_book.id)
-        self.verify_bookperson_inserted(editors, "Editor", created_book.id)
-        self.verify_bookperson_inserted(translators, "Translator", created_book.id)
+        self.verify_persons_inserted(authors, "Author", created_book.id)
+        self.verify_persons_inserted(illustrators, "Illustrator", created_book.id)
+        self.verify_persons_inserted(editors, "Editor", created_book.id)
+        self.verify_persons_inserted(translators, "Translator", created_book.id)
 
     def test_repeat_people(self):
         """
@@ -233,113 +199,102 @@ class ApiTests(AppTestCase):
 
         def insert_bookpersons(persons):
             for p in persons:
-                bp = Contributor(firstname=p["firstname"],
-                  lastname=p["lastname"], creator=self.admin_user)
+                bp = Contributor(firstname=p.firstname,
+                  lastname=p.lastname, creator=self.admin_user)
                 librarian.db.session.add(bp)
 
             librarian.db.session.flush()
         
         def verify_bookperson(p):
-            self.verify_inserted(Contributor, firstname=p["firstname"],
-              lastname=p["lastname"])
+            self.verify_inserted(Contributor, firstname=p.firstname,
+              lastname=p.lastname)
 
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
         isbn = fake.isbn()
         title = fake.title()
 
-        authors = [make_name_object() for _ in range(4)]
+        authors = [make_person_object() for _ in range(4)]
         insert_bookpersons(authors)
         map(verify_bookperson, authors)
       
-        illustrators = [make_name_object() for _ in range(4)]
+        illustrators = [make_person_object() for _ in range(4)]
         insert_bookpersons(illustrators)
         map(verify_bookperson, illustrators)
         
-        editors = [make_name_object() for _ in range(4)]
+        editors = [make_person_object() for _ in range(4)]
         insert_bookpersons(editors)
         map(verify_bookperson, editors)
         
-        translators = [make_name_object() for _ in range(4)]
+        translators = [make_person_object() for _ in range(4)]
         insert_bookpersons(translators)
         map(verify_bookperson, translators)
 
-        req_data = {
-            "isbn": isbn,
-            "title": title,
-            "genre": "Multinational",
-            "authors": json.dumps(authors),
-            "illustrators": json.dumps(illustrators),
-            "editors": json.dumps(editors),
-            "translators": json.dumps(translators),
-            "publisher": "Scholastic",
-            "printer": "UP Press",
-            "year": "2013"
-        }
+        req_data = BookRecord(
+            isbn=isbn, title=title, genre="Multinational", author=authors,
+            illustrator=illustrators, editor=editors, translator=translators,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
 
-        req_val = self.client.post("/api/add/books", data=req_data)
+        req_val = self.client.post("/api/add/books", data=req_data.request_data())
         self.assertEqual(200, req_val.status_code)
 
     def test_no_printer(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
-        single_author = {
-            "isbn": "9780062330260",
-            "title": "Trigger Warning",
-            "genre": "Short Story Collection",
-            "authors": """[
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Wiliam Morrow",
-            "printer": "",
-            "year": "2015"
-        }
+        single_author = BookRecord(
+            isbn="9780062330260", title="Trigger Warning",
+            genre="Short Story Collection", author=[Person(lastname="Gaiman", firstname="Neil")],
+            publisher="William Morrow", publish_year=2015
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
 
-    def test_multiple_same_names(self):
+    def test_extra_whitespace(self):
         _creator = LibrarianFactory()
-        flask.ext.login.current_user = _creator
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
+        self.set_current_user(_creator)
 
-        single_author = {
-            "isbn": "9780062330260",
-            "title": "Trigger Warning",
-            "genre": "Short Story Collection",
-            "authors": """[
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                },
-                {
-                    "lastname": "Gaiman",
-                    "firstname": "Neil"
-                }
-            ]""",
-            "illustrators": "[]",
-            "editors": "[]",
-            "translators": "[]",
-            "publisher": "Wiliam Morrow",
-            "printer": "",
-            "year": "2015"
-        }
+        self.verify_does_not_exist(
+            Contributor, lastname="de Cervantes", firstname="Miguel"
+        )
 
-        single_rv = self.client.post("/api/add/books", data=single_author)
+        spaced = BookRecord(
+            isbn="0812972104", title="Don Quixote", genre="Fiction",
+            author=[Person(lastname="  de Cervantes  ", firstname="Miguel")],
+            publisher="Modern Library", publish_year=2006
+        )
+
+        spaced_rv = self.client.post("/api/add/books", data=spaced.request_data())
+        self.assertEquals(200, spaced_rv.status_code)
+
+        self.verify_inserted(
+            Contributor, lastname="de Cervantes", firstname="Miguel"
+        )
+
+    def test_multiple_same_names(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        Neil_Gaiman = Person(lastname="Gaiman", firstname="Neil")
+        single_author = BookRecord(
+            isbn="9780062330260", title="Trigger Warning",
+            genre="Short Story Collection", author=[Neil_Gaiman, Neil_Gaiman],
+            publisher="William Morrow", publish_year=2015
+        )
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
+
         self.assertEquals(200, single_rv.status_code)
         
         gaimen = (librarian.db.session.query(Contributor)
@@ -347,6 +302,38 @@ class ApiTests(AppTestCase):
           .filter(Contributor.lastname == 'Gaiman').all())
 
         self.assertEquals(1, len(gaimen))
+
+    def test_same_person_diff_roles(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        jtamaki_exists = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.firstname == "Jillian")
+            .filter(Contributor.lastname == "Tamaki")
+            .first()
+        )
+        self.assertFalse(jtamaki_exists)
+        
+        jtamaki = Person(lastname="Tamaki", firstname="Jillian")
+        author_illus = BookRecord(
+            isbn="9781596437746", title="This One Summer", genre="Graphic Novel",
+            author=[jtamaki], illustrator=[jtamaki], publisher="First Second",
+            publish_year=2016
+        )
+        rv = self.client.post("/api/add/books", data=author_illus.request_data())
+
+        self.assertEquals(200, rv.status_code)
+
+        jtamakis = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.firstname == "Jillian")
+            .filter(Contributor.lastname == "Tamaki")
+            .all()
+        )
+        self.assertEqual(1, len(jtamakis))
 
     def test_servertime(self):
         servertime = self.client.get("/api/util/servertime")
@@ -411,28 +398,10 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
-        contribs = librarian.db.session.query(Contributor).all()
-        self.assertEquals(0, len(contribs))
-        companies = librarian.db.session.query(BookCompany).all()
-        self.assertEquals(0, len(companies))
-        books = librarian.db.session.query(Book).all()
-        self.assertEquals(0, len(books))
-        a_contribs = librarian.db.session.query(BookContribution).all()
-        self.assertEquals(0, len(a_contribs))
-
         roles = librarian.db.session.query(Role).all()
 
         library = create_library(librarian.db.session, self.admin_user, roles,
           book_person_c=12, company_c=8, book_c=12, participant_c=32)
-
-        contribs = librarian.db.session.query(Contributor).all()
-        self.assertEquals(12, len(contribs))
-        companies = librarian.db.session.query(BookCompany).all()
-        self.assertEquals(8, len(companies))
-        books = librarian.db.session.query(Book).all()
-        self.assertEquals(12, len(books))
-        a_contribs = librarian.db.session.query(BookContribution).all()
-        self.assertEquals(32, len(a_contribs))
 
         get_books = self.client.get("/api/read/books")
         self.assertEquals(200, get_books._status_code)
@@ -440,7 +409,7 @@ class ApiTests(AppTestCase):
         return_set = set()
         
         for book in ret_data:
-            return_set.add(LibraryEntry.make_hashable(book))
+            return_set.add(BookRecord.make_hashable(book))
 
         self.assertEquals(set(library), return_set)
 
@@ -461,3 +430,132 @@ class ApiTests(AppTestCase):
         
         participants_per_book = participant_count / book_count
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
+
+    def test_title_edit_book(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
+          publisher="Mumford and Sons", author=authors, publish_year=2016,
+          genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        existing = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==book.isbn)
+            .first()
+        )
+        self.assertEquals(book.title, existing.title)
+
+        edit_data = BookRecord(isbn=book.isbn, title="This is a Ret Con",
+          publisher=book.publisher, author=book.authors,
+          publish_year=book.publish_year, genre=book.genre, id=book_id)
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
+
+        edited = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==book.isbn)
+            .first()
+        )
+        self.assertEquals(edit_data.title, edited.title)
+
+    def test_edit_book_contrib_add(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
+          publisher="Mumford and Sons", author=authors, publish_year=2016,
+          genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        author_role = Role.get_preset_role("Author")
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEquals(set(authors), author_persons)
+
+        additional_author = ContributorFactory().make_plain_person()
+        _book_authors = copy.deepcopy(list(book.authors))
+        _book_authors.append(additional_author)
+        edit_data = BookRecord(isbn=book.isbn, title=book.title,
+          publisher=book.publisher, author=_book_authors,
+          publish_year=book.publish_year, genre=book.genre, id=book_id)
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
+
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEqual(set(_book_authors), author_persons)
+
+    def test_edit_book_contrib_delete(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
+          publisher="Mumford and Sons", author=authors, publish_year=2016,
+          genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        author_role = Role.get_preset_role("Author")
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEquals(set(authors), author_persons)
+
+        _book_authors = list(book.authors)[0:-1]
+        edit_data = BookRecord(isbn=book.isbn, title=book.title,
+          publisher=book.publisher, author=_book_authors,
+          publish_year=book.publish_year, genre=book.genre, id=book_id)
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
+
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEqual(set(_book_authors), author_persons)

@@ -1,12 +1,26 @@
 # -*- coding: utf-8 -*-
-import librarian
+
+from librarian import app, db
+
+import config
+import copy
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
  
-class Person(object):
+class RequestData(object):
+    
+    def request_data(self):
+        pass
+
+class Person(RequestData):
+    """
+    Sometimes, you don't need a full Contributor object---i.e., you don't need
+    the creation date for the record, just the first name and last name. This
+    class is for that.
+    """
     def __init__(self, lastname, firstname):
         self.lastname = lastname
         self.firstname = firstname
@@ -22,21 +36,54 @@ class Person(object):
 
     def __repr__(self):
         return str(self)
+
+    def request_data(self):
+        return '{"lastname": "%s", "firstname": "%s"}' % (self.lastname, self.firstname)
+
+    def __deepcopy__(self, memo):
+        return Person(lastname=self.lastname, firstname=self.firstname)
         
 
-class BookRecord(object):
+class BookRecord(RequestData):
     """
     Class to consolidate DB records for easier listing. Each BookRecord instance
     consolidates the records of a single book.
     """
+
+    """
+    When an instance of this class is converted to a dictionary, the following
+    fields will hold lists.
+    """
+    LIST_TYPES = ["author", "translator", "illustrator", "editor"]
+
+    @staticmethod
+    def base_assembler_query():
+        """
+        Use this when the results of your query is meant to be assembled via
+        BookRecord.assembler. This is just a query that enumerates the result set
+        as expected by BookRecord.assembler. Filter as necessary.
+        """
+        from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
+        return (
+            db.session.query(
+                Book.id, Book.isbn, Book.title, Contributor.lastname,
+                Contributor.firstname, Role.name, BookCompany.name
+            ).filter(Book.id == BookContribution.book_id)
+            .filter(BookContribution.contributor_id == Contributor.id)
+            .filter(BookContribution.role_id == Role.id)
+            .filter(Book.publisher_id == BookCompany.id)
+        )
     
-    def __init__(self, isbn, title, publisher, author=None, translator=None,
-      illustrator=None, editor=None):
+    def __init__(self, isbn, title, publisher, publish_year=None, author=None,
+      translator=None, illustrator=None, editor=None, genre=None, id=None,
+      printer=None):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
         whatever you gave for `author` is accessible via `self.author`).
 
+        id: integer
+            The book id.
         isbn: string
         title: string
         publisher: string
@@ -45,14 +92,33 @@ class BookRecord(object):
         translator: list of Person objects
         illustrator: list of Person objects
         editor: list of Person objects
+        genre: string
         """
+        self.id = id
         self.isbn = isbn
         self.title = title
+        self.printer = printer
         self.publisher = publisher
+        self.publish_year = publish_year
         self.authors = frozenset(author if author else [])
         self.translators = frozenset(translator if translator else [])
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
+        self.genre = genre
+
+    def __deepcopy__(self, memo):
+        # Create record first then set authors later because constructors expect
+        # lists while actual fields are frozensets.
+        record = BookRecord(isbn=self.isbn, title=self.title,
+          publisher=self.publisher, publish_year=self.publish_year,
+          genre=self.genre, id=self.id, printer=self.printer)
+
+        record.authors = copy.deepcopy(self.authors)
+        record.translators = copy.deepcopy(self.translators)
+        record.illustrators = copy.deepcopy(self.illustrators)
+        record.editors = copy.deepcopy(self.editors)
+
+        return record
 
     @staticmethod
     def make_hashable(dict_struct):
@@ -76,13 +142,15 @@ class BookRecord(object):
         return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
           publisher=dict_struct["publisher"], author=person_authors,
           translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors)
+          editor=person_editors, id=dict_struct["id"],
+          printer=dict_struct["printer"])
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
-          self.illustrators == br.illustrators and self.editors == br.editors)
+          self.illustrators == br.illustrators and self.editors == br.editors
+          and self.id == br.id and self.printer == br.printer)
 
     def __hash__(self):
         return hash((self.isbn, self.title, self.publisher, self.authors,
@@ -91,7 +159,31 @@ class BookRecord(object):
     def __str__(self):
         return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
           "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher)})
+          "translator": str(self.translators), "publisher": str(self.publisher),
+          "printer": str(self.printer), "id": self.id})
+
+    def request_data(self):
+        def create_person_request_data(persons):
+            return "[%s]" % ", ".join([p.request_data() for p in persons])
+
+        authors = create_person_request_data(self.authors)
+        illustrators = create_person_request_data(self.illustrators)
+        editors = create_person_request_data(self.editors)
+        translators = create_person_request_data(self.translators)
+
+        return {
+            "book_id": self.id,
+            "isbn": self.isbn,
+            "title": self.title,
+            "authors": authors,
+            "illustrators": illustrators,
+            "editors": editors,
+            "translators": translators,
+            "printer": self.printer,
+            "publisher": self.publisher,
+            "year": str(self.publish_year),
+            "genre": self.genre
+        }
 
     def __repr__(self):
         return str(self)
@@ -101,39 +193,40 @@ class BookRecord(object):
         """
         Takes in rows from a SQL query with the columns in the following order:
     
-        0 - Book.isbn
-        1 - Book.title
-        2 - Contributor.lastname
-        3 - Contributor.firstname
-        4 - Role.name
-        5 - BookCompany.name
+        0 - Book.id
+        1 - Book.isbn
+        2 - Book.title
+        3 - Contributor.lastname
+        4 - Contributor.firstname
+        5 - Role.name
+        6 - BookCompany.name
     
-        And arranges them as an instance of this class.
+        And arranges them as an instance of this class. Returned as a ist.
 
-        Return type will vary depending on the `as_obj` parameter but will
+        Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`
         is True, return instances of this class. Otherwise, return maps.
         Note that maps are non-hashable but instances of this class is.
         """
         structured_catalog = {}
         
-        for book in book_rows:
-            record_exists = structured_catalog.get(book[0])
-            role = book[4].lower()
+        for id, isbn, title, contrib_lastname, contrib_firstname, role, publisher in book_rows:
+            record_exists = structured_catalog.get(isbn)
+            role = role.lower()
 
             if record_exists:
-                if structured_catalog[book[0]].get(role):
-                    structured_catalog[book[0]][role].append(Person(lastname= book[2],
-                      firstname=book[3]))
+                if structured_catalog[isbn].get(role):
+                    structured_catalog[isbn][role].append(Person(
+                      lastname=contrib_lastname, firstname=contrib_firstname))
                 else:
-                    structured_catalog[book[0]][role] = [Person(lastname=book[2],
-                      firstname=book[3])]
+                    structured_catalog[isbn][role] = [Person(
+                      lastname=contrib_lastname, firstname=contrib_firstname)]
             else:
-                fmt = {"title": book[1],
-                  role: [Person(lastname=book[2], firstname=book[3])],
-                  "publisher": book[5]}
+                fmt = {"title": title, "id": id,
+                  role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
+                  "publisher": publisher}
 
-                structured_catalog[book[0]] = fmt
+                structured_catalog[isbn] = fmt
 
         book_listing = []
 
@@ -150,7 +243,8 @@ class BookRecord(object):
 
     @property
     def __dict__(self):
-        base = {"isbn": self.isbn, "title": self.title, "publisher": self.publisher}
+        base = {"isbn": self.isbn, "title": self.title,
+          "publisher": self.publisher, "id": self.id, "printer": self.printer}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]

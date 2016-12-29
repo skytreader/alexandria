@@ -39,6 +39,7 @@ CACHE_CONFIG = {
 }
 
 CACHE_TIMEOUT = 88
+FOREVER_TIMEOUT = 88888888
 
 # Application threads. A common general assumption is
 # using 2 per available processor cores - to handle

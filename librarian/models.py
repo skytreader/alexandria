@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask.ext.login import current_user, UserMixin
+from flask_login import current_user, UserMixin
 from librarian import app, cache, db
 from librarian.errors import ConstraintError
 from librarian.utils import isbn_check, Person
@@ -19,7 +19,7 @@ When the world ends according to the Long Now Foundation.
 LONG_NOW_WORLD_END = 99999
 
 
-def get_or_create(model, will_commit=False, **kwargs):
+def get_or_create(model, session=None, will_commit=False, **kwargs):
     """
     Get the record from the table represented by the given model which
     corresponds to **kwargs.
@@ -33,8 +33,9 @@ def get_or_create(model, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
+    session = session if session else db.session
     given_creator = kwargs.pop("creator", None)
-    instance = db.session.query(model).filter_by(**kwargs).first()
+    instance = session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance
     else:
@@ -47,19 +48,14 @@ def get_or_create(model, will_commit=False, **kwargs):
 
         instance = model(**kwargs)
         if will_commit:
-            db.session.add(instance)
-            db.session.commit()
+            session.add(instance)
+            session.commit()
         return instance
 
 
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
-      server_default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-      server_default=db.func.current_timestamp(),
-      onupdate=db.func.current_timestamp())
 
 class Librarian(Base, UserMixin):
     __tablename__ = "librarians"
@@ -89,12 +85,17 @@ class Librarian(Base, UserMixin):
         return self.id
 
 
-class UserTaggedBase(Base):
+class UserTags(db.Model):
     """
     Those that will extend this class may take the convention that, upon creation,
     the last_modifier is the same as the creator.
     """
     __abstract__ = True
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+      server_default=db.func.current_timestamp(),
+      onupdate=db.func.current_timestamp())
 
     @declared_attr
     def creator_id(self):
@@ -104,7 +105,7 @@ class UserTaggedBase(Base):
     def last_modifier_id(self):
         return db.Column(db.Integer, db.ForeignKey("librarians.id"))
 
-class Genre(UserTaggedBase):
+class Genre(Base, UserTags):
     __tablename__ = "genres"
     name = db.Column(db.String(40), nullable=False, unique=True)
     creator = relationship("Librarian", foreign_keys="Genre.creator_id")
@@ -117,16 +118,17 @@ class Genre(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Book(UserTaggedBase):
+class Book(Base, UserTags):
     __tablename__ = "books"
     isbn = db.Column(db.String(13), nullable=False, unique=True, index=True)
     title = db.Column(db.String(255), nullable=False, index=True)
     genre_id = db.Column(db.Integer, db.ForeignKey("genres.id",
       name="book_genre_fk"))
     publisher_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="book_book_company_fk1"))
+      name="book_book_company_fk1", ondelete="CASCADE"))
     publish_year = db.Column(db.Integer, nullable=False, default=ISBN_START,
       server_default=str(ISBN_START))
+    comments = db.Column(db.Text, nullable=True)
 
     genre = relationship("Genre")
     publisher = relationship("BookCompany")
@@ -153,7 +155,7 @@ class Book(UserTaggedBase):
     def __repr__(self):
         return self.title + "/" + self.isbn + "/" + str(self.id)
 
-class BookCompany(UserTaggedBase):
+class BookCompany(Base, UserTags):
     """
     List?! List?! This is better off in NoSQL form!
     """
@@ -172,12 +174,12 @@ class BookCompany(UserTaggedBase):
     def __str__(self):
         return self.name
 
-class Imprint(UserTaggedBase):
+class Imprint(Base, UserTags):
     __tablename__ = "imprints"
     mother_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprint_book_company_fk1"))
+      name="imprint_book_company_fk1", ondelete="CASCADE"))
     imprint_company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="imprint_book_company_fk2"))
+      name="imprint_book_company_fk2", ondelete="CASCADE"))
     
     mother_company = relationship("BookCompany", foreign_keys="Imprint.mother_company_id")
     imprint_company = relationship("BookCompany", foreign_keys="Imprint.imprint_company_id")
@@ -192,7 +194,7 @@ class Imprint(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Contributor(UserTaggedBase):
+class Contributor(Base, UserTags):
     __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
@@ -219,7 +221,7 @@ class Contributor(UserTaggedBase):
     def make_plain_person(self):
         return Person(lastname=self.lastname, firstname=self.firstname)
 
-class Role(UserTaggedBase):
+class Role(Base, UserTags):
     """
     The purpose of this table is to enumerate the contributions we are interested
     in for the books.
@@ -243,7 +245,7 @@ class Role(UserTaggedBase):
         self.last_modifier_id = self.creator.id
 
     @staticmethod
-    @cache.memoize(config.CACHE_TIMEOUT)
+    @cache.memoize(config.FOREVER_TIMEOUT)
     def get_preset_role(role_name):
         role = Role.query.filter_by(name=role_name).first()
         return role
@@ -254,17 +256,17 @@ class Role(UserTaggedBase):
     def __repr__(self):
         return self.name + "#" + str(self.id)
 
-class BookContribution(UserTaggedBase):
+class BookContribution(Base, UserTags):
     """
     Consider that 99% of books will need the same roles over and over. 
     """
     __tablename__ = "book_contributions"
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="book_participant_book_fk1"))
+      name="book_participant_book_fk1", ondelete="CASCADE"))
     contributor_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
-      name="book_participant_book_person_fk1"))
+      name="book_participant_book_person_fk1", ondelete="CASCADE"))
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id",
-      name="book_pariticipant_role_fk1"))
+      name="book_participant_role_fk1", ondelete="CASCADE"))
 
     book = relationship("Book")
     contributor = relationship("Contributor")
@@ -288,12 +290,17 @@ class BookContribution(UserTaggedBase):
         return "Person %s worked on book %s as the role %s" % \
           (str(self.contributor), str(self.book), str(self.role))
 
-class Printer(UserTaggedBase):
+    def __repr__(self):
+        return str(self)
+
+class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
-      name="printer_book_company_fk1"), primary_key = True)
+      name="printer_book_company_fk1", ondelete="CASCADE"), primary_key=True,
+      nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="printer_book_fk1"), primary_key = True)
+      name="printer_book_fk1", ondelete="CASCADE"), primary_key=True,
+      nullable=False)
 
     company = relationship("BookCompany")
     book = relationship("Book")
@@ -308,7 +315,7 @@ class Printer(UserTaggedBase):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
-class Pseudonym(UserTaggedBase):
+class Pseudonym(Base, UserTags):
     """
     Copied from original schema:
 
@@ -316,9 +323,9 @@ class Pseudonym(UserTaggedBase):
     """
     __tablename__ = "pseudonyms"
     person_id = db.Column(db.Integer, db.ForeignKey("contributors.id",
-      name="pseudonym_book_person_fk1"))
+      name="pseudonym_book_person_fk1", ondelete="CASCADE"), primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
-      name="pseudonym_book_fk1"))
+      name="pseudonym_book_fk1", ondelete="CASCADE"), primary_key=True)
     # Pseudonyms are weird so only require the last!
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=True)

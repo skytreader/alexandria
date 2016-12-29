@@ -421,12 +421,14 @@ function sendSaveForm(domElement){
         window.booksSaved++;
     }
 
-    function fail(){
+    function fail(jqxhr){
+        alertify.error(jqxhr.responseText);
         $(domElement).removeClass("unsaved_book").addClass("error_book");
         window.booksErrorNoRetry++;
     }
 
-    function failRecover(){
+    function failRecover(jqxhr){
+        alertify.warning("Failed to save a book. Please wait as we automatically retry.");
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
         reprocessQueue.enqueue(domElement);
         window.booksReprocessable++;

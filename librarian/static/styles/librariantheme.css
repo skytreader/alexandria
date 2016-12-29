@@ -41,9 +41,7 @@ hr {
 p, .text {
     font-size: 18px;
     font-family: 'Droid Serif', serif;
-    text-align: justify;
     padding-bottom: 8px;
-    padding-right: 10px;
     color: #000000;
 }
 

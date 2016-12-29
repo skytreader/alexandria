@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, BookCompany, Contributor, BookContribution
-from librarian.utils import BookRecord as LibraryEntry, Person
+from librarian.models import Book, BookCompany, BookContribution, Contributor, get_or_create, Role
+from librarian.utils import BookRecord, Person
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, ContributorFactory
+  BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
 )
 
 import random
@@ -14,14 +14,64 @@ PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
 fuzzy_text = FuzzyText()
 
 def make_name_object():
+    """
+    This will soon be deprecated in favor of `make_person_object`.
+    """
     return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
+
+def make_person_object():
+    return Person(fuzzy_text.fuzz(), fuzzy_text.fuzz())
+
+def create_book(session, book_record, creator):
+    """
+    Insert the given book_record into the database. Returns the id of the
+    inserted Book record.
+
+    book_record: librarian.utils.BookRecord
+    """
+    # IMPORTANT: Do not remove the following all query line. Else tests will
+    # mysteriously fail about records that don't exist but, when added, will
+    # raise an IntegrityError. Effing MySQL Heisenbug.
+    spam = session.query(Contributor).all()
+    
+    def create_contribution(role_name, persons):
+        with session.no_autoflush:
+            role = Role.get_preset_role(role_name)
+            
+            for p in persons:
+                contributor = get_or_create(Contributor, session=session, will_commit=True,
+                  lastname=p.lastname, firstname=p.firstname, creator=creator)
+                #contributor = Contributor(lastname=p.lastname, firstname=p.firstname,
+                #  creator=creator)
+                try:
+                    session.add(contributor)
+                except IntegrityError:
+                    pass
+                contribution = BookContribution(book=book, contributor=contributor,
+                  role=role, creator=creator)
+                session.add(contribution)
+
+    genre = GenreFactory(name="Test")
+    publisher = BookCompanyFactory(name=book_record.publisher)
+    _book = {"isbn": book_record.isbn, "title": book_record.title,
+      "genre": genre, "publisher": publisher, "creator": creator,
+      "publish_year": book_record.publish_year}
+    book = Book(**_book)
+    session.add(book)
+    create_contribution("Author", book_record.authors)
+    create_contribution("Illustrator", book_record.illustrators)
+    create_contribution("Translator", book_record.translators)
+    create_contribution("Editor", book_record.editors)
+    session.flush()
+
+    return book.id
 
 def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8,
   participant_c=8):
     """
     Create a library in the database with the given counts.
 
-    Returns a list of `LibraryEntry` objects.
+    Returns a list of `BookRecord` objects.
     """
     book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
@@ -46,6 +96,12 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
         session.add(b)
 
     session.commit()
+
+    # Query books for their ids. Note that this bit assumes that the only books
+    # in the DB right now are those just-created.
+    books = session.query(Book.id, Book.isbn).all()
+    isbn_id_map = {isbn: book_id for book_id, isbn in books}
+
     library = {}
     # Randomly assign persons to books as roles
 
@@ -89,6 +145,7 @@ def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
-        library_list.insert(0, LibraryEntry(**book))
+        book["id"] = isbn_id_map[isbn]
+        library_list.insert(0, BookRecord(**book))
 
     return library_list

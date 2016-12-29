@@ -4,10 +4,11 @@ from __future__ import division
 from datetime import datetime
 
 from librarian import app, db
+from librarian.errors import InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
-from librarian.utils import BookRecord, NUMERIC_REGEX
+from librarian.utils import BookRecord, NUMERIC_REGEX, Person
 from flask import Blueprint, request
-from flask.ext.login import login_required
+from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
 from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
@@ -39,21 +40,63 @@ def __create_bookperson(form_data):
     form_data is expected to be a JSON list of objects. Each object should have
     the fields `last_name` and `first_name`.
     """
-    from flask.ext.login import current_user
+    from flask_login import current_user
     try:
         parse = json.loads(form_data)
         persons_created = []
 
         for parson in parse:
             persons_created.insert(0, get_or_create(Contributor, will_commit=True,
-              firstname=parson["firstname"], lastname=parson["lastname"],
-              creator=current_user))
+              firstname=parson["firstname"].strip(),
+              lastname=parson["lastname"].strip(), creator=current_user))
 
         return persons_created
     except ValueError:
         # For errors in pasing JSON
-        return None
+        return []
 
+def __insert_contributions(book, form, session):
+    """
+    Insert the contributions in the form to the session. No commits will take
+    place.
+    """
+    from flask_login import current_user
+
+    # Create the Contributors
+    authors = __create_bookperson(form.authors.data)
+    illustrators = __create_bookperson(form.illustrators.data)
+    editors = __create_bookperson(form.editors.data)
+    translators = __create_bookperson(form.translators.data)
+
+    author_role = Role.get_preset_role("Author")
+    illus_role = Role.get_preset_role("Illustrator")
+    editor_role = Role.get_preset_role("Editor")
+    trans_role = Role.get_preset_role("Translator")
+
+    # Assign participation
+    for author in authors:
+        author_part = BookContribution(book=book, contributor=author,
+          role=author_role, creator=current_user)
+        session.add(author)
+        session.add(author_part)
+
+    for illustrator in illustrators:
+        illus_part = BookContribution(book=book, contributor=illustrator,
+          role=illus_role, creator=current_user)
+        session.add(illustrator)
+        session.add(illus_part)
+
+    for editor in editors:
+        editor_part = BookContribution(book=book, contributor=editor,
+          role=editor_role, creator=current_user)
+        session.add(editor)
+        session.add(editor_part)
+
+    for translator in translators:
+        translator_part = BookContribution(book=book, 
+          contributor=translator, role=trans_role, creator=current_user)
+        session.add(translator)
+        session.add(translator_part)
 
 @librarian_api.route("/api/add/books", methods=["POST"])
 @login_required
@@ -74,16 +117,16 @@ def book_adder():
 
     if form.validate_on_submit():
         try:
-            from flask.ext.login import current_user
+            from flask_login import current_user
             # Genre first
             genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
               creator=current_user)
 
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,
-              name=form.publisher.data, creator_id=current_user.get_id())
+              name=form.publisher.data, creator=current_user)
             printer = get_or_create(BookCompany, will_commit=True,
-              name=form.printer.data, creator_id=current_user.get_id())
+              name=form.printer.data, creator=current_user)
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
@@ -97,80 +140,151 @@ def book_adder():
               creator=current_user)
             db.session.add(printer_record)
 
-            # Create the Contributors
-            authors = __create_bookperson(form.authors.data)
-            illustrators = __create_bookperson(form.illustrators.data)
-            editors = __create_bookperson(form.editors.data)
-            translators = __create_bookperson(form.translators.data)
-
-            author_role = Role.get_preset_role("Author")
-            illus_role = Role.get_preset_role("Illustrator")
-            editor_role = Role.get_preset_role("Editor")
-            trans_role = Role.get_preset_role("Translator")
-
-            # Assign participation
-            for author in authors:
-                author_part = BookContribution(book=book, contributor=author,
-                  role=author_role, creator=current_user)
-                db.session.add(author)
-                db.session.add(author_part)
-                db.session.commit()
-
-            for illustrator in illustrators:
-                illus_part = BookContribution(book=book, contributor=illustrator,
-                  role=illus_role, creator=current_user)
-                db.session.add(illustrator)
-                db.session.add(illus_part)
-            db.session.commit()
-
-            for editor in editors:
-                editor_part = BookContribution(book=book, contributor=editor,
-                  role=editor_role, creator=current_user)
-                db.session.add(editor)
-                db.session.add(editor_part)
-            db.session.commit()
-
-            for translator in translators:
-                translator_part = BookContribution(book=book, 
-                  contributor=translator, role=trans_role, creator=current_user)
-                db.session.add(translator)
-                db.session.add(translator_part)
+            __insert_contributions(book, form, db.session)
 
             db.session.commit()
 
             return "Accepted", 200
         except IntegrityError, ierr:
             app.logger.error(traceback.format_exc())
-            return "IntegrityError", 409
+            err_str = '"%s" has been catalogued before. Ignoring.' % (form.title.data)
+            return err_str, 409
     
-    return "Error", 400
+    err_str = "Did not validate for %s. Please re-enter book to try again." % (form.title.data)
+    return err_str, 400
 
 @librarian_api.route("/api/edit/books", methods=["POST"])
 @login_required
 def edit_book():
-    from flask.ext.login import current_user
+    def contribution_exists(all_contribs, role_id, person):
+        """
+        Where
+        
+        `all_contribs` is all the BookContribution records for the book being
+        edited.
+
+        person is an instance of librarian.utils.Person.
+
+        Returns the person_id if the described BookContribution exists, else
+        False.
+        """
+        spam = [
+            contrib for contrib in all_contribs if (
+                contrib.role_id == role_id and
+                contrib.contributor.firstname == person.firstname and
+                contrib.contributor.lastname == person.lastname
+            )]
+
+        if len(spam) > 1:
+            raise InvalidRecordState("Contribution role + person + book defined more than one record %s" % spam)
+
+        if spam:
+           return spam[0].contributor_id
+        else:
+           return False
+
+    def edit_contrib(book, all_contribs, role, submitted_persons):
+        """
+        Adds all new contributors to the session and deletes all removed
+        contributors to the session. This does not commit.
+
+        Where `submitted_persons` is the data straight out of the form (hence it
+        is a JSON string).
+        """
+        parsons = json.loads(submitted_persons)
+        # Set of tuples (role_id, person_id)
+        existing_records = set()
+
+        for p in parsons:
+            ce = contribution_exists(all_contribs, role.id, Person(**p))
+            if ce is not False:
+                existing_records.add((role.id, ce))
+            else:
+                contributor_record = get_or_create(
+                    Contributor, will_commit=False, firstname=p["firstname"],
+                    lastname=p["lastname"], creator=current_user
+                )
+
+                contribution = BookContribution(
+                    book=book, contributor=contributor_record, role=role,
+                    creator=current_user
+                )
+                db.session.add(contribution)
+                existing_records.add((role.id, contributor_record.id))
+
+        recorded_contribs = set([
+            (contrib.role.id, contrib.contributor.id) for contrib in all_contribs
+            if contrib.role.id == role.id
+        ])
+
+        deletables = recorded_contribs - existing_records
+        
+        for d in deletables:
+            db.session.delete(
+                BookContribution.query
+                .filter(BookContribution.role_id == d[0])
+                .filter(BookContribution.book_id == book.id)
+                .filter(BookContribution.contributor_id == d[1])
+                .first()
+            )
+
+    from flask_login import current_user
 
     form = EditBookForm(request.form)
-    app.logger.infp(str(form))
+    app.logger.info(str(form))
     app.logger.debug(form.debug_validate())
 
-    # TODO Testme especially integrating foreign keys with db-standardization branch
     if form.validate_on_submit():
-        book_id = int(form.book_id)
+        book_id = int(form.book_id.data)
         try:
             # Update records in books table
-            publisher = get_or_create(BookCompany, will_commit=True, 
-              name=form.publisher.data, creator=current_user.get_id())
-            book = Book.query.get(book_id)
+            genre = get_or_create(Genre, will_commit=False, session=db.session,
+             name=form.genre.data, creator=current_user)
+            publisher = get_or_create(BookCompany, will_commit=False, 
+              name=form.publisher.data, creator=current_user)
+            book = db.session.query(Book).filter(Book.id==book_id).first()
             book.isbn = form.isbn.data
             book.title = form.title.data
             book.publish_year = form.year.data
+            book.genre_id = genre.id
+            book.publisher_id = publisher.id
 
-            # Delete the book_participants involved
-            BookParticipant.query.filter(BookParticipant.book_id == book_id).delete()
+            # Get all the contributions for this book
+            all_contribs = (
+                BookContribution.query
+                .filter(BookContribution.book_id == book_id)
+                .all()
+            )
+
+            if form.authors.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
+                  form.authors.data)
+
+            if form.illustrators.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
+                  form.illustrators.data)
+
+            if form.editors.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
+                  form.editors.data)
+
+            if form.translators.data:
+                edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
+                  form.editors.data)
+
+            db.session.commit()
+            return "Accepted", 200
         except IntegrityError, ierr:
-            app.logger.error(traceback.format_exc())
+            app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
+        except Exception as ex:
+            import traceback
+            traceback.print_exc()
+            app.logger.error("error except")
+            return "Unknown error", 500
+    else:
+        app.logger.error("error else")
+        return "Unknown error", 500
 
 @librarian_api.route("/api/util/servertime")
 def servertime():
@@ -215,12 +329,7 @@ def get_books():
     elif limit and not offset:
         offset = "0"
 
-    bookq = (db.session.query(Book.isbn, Book.title, Contributor.lastname,
-      Contributor.firstname, Role.name, BookCompany.name)
-      .filter(Book.id == BookContribution.book_id)
-      .filter(BookContribution.contributor_id == Contributor.id)
-      .filter(BookContribution.role_id == Role.id)
-      .filter(Book.publisher_id == BookCompany.id))
+    bookq = BookRecord.base_assembler_query()
 
     if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
         bookq = bookq.limit(limit).offset(offset)
@@ -289,20 +398,16 @@ def quick_stats():
     books = len(db.session.query(Book).all())
     contributors = len(db.session.query(BookContribution).all())
     top_author = get_top_contributors("Author", 1)
-    stats["participants_per_book"] = (contributors / books)
+    stats["participants_per_book"] = (contributors / books) if books else 0
     stats["recent_books"] = get_recent_books()
     stats["book_count"] = books
-    stats["top_author"] = top_author[0]
+    stats["top_author"] = top_author[0] if top_author else None
     return flask.jsonify(stats)
 
 def search(searchq):
-    results = (db.session.query(Book.isbn, Book.title, Contributor.lastname,
-      Contributor.firstname, Role.name, BookCompany.name)
+    results = (
+      BookRecord.base_assembler_query()
       .filter(Book.title.like("".join(("%", searchq, "%"))))
-      .filter(Book.id == BookContribution.book_id)
-      .filter(BookContribution.contributor_id == Contributor.id)
-      .filter(BookContribution.role_id == Role.id)
-      .filter(Book.publisher_id == BookCompany.id)
       .all())
 
     book_listing = BookRecord.assembler(results, as_obj=False)

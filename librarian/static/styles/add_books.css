@@ -19,3 +19,7 @@ div.legend{
 .del-col .fa-times-circle{
     cursor: pointer;
 }
+
+h1.form-title{
+    margin-bottom: 1em;
+}

@@ -1,4 +1,5 @@
 #! /bin/bash
 
 export alexandria_TESTING=True
-nosetests $1
+
+nosetests $1 $2
