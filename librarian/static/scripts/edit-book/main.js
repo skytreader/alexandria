@@ -16,4 +16,5 @@ $(document).ready(function(){
     $("#title-proxy").val(editBook.title);
     $("#publisher-proxy").val(editBook.publisher);
     $("#printer-proxy").val(editBook.printer);
+    $("#genre-proxy").val(editBook.genre);
 });
