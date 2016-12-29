@@ -3,6 +3,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
+from librarian.errors import InvalidRecordState
 from librarian.utils import BookRecord, StatsDescriptor
 from librarian.models import Book
 from utils import route_exists
@@ -106,8 +107,15 @@ def edit_books():
 
     book_query = BookRecord.base_assembler_query().filter(Book.id == book_id).limit(1)
     query_results = book_query.all()
-    assembled = BookRecord.assembler(query_results)[0]
-    book_js = "var editBook = JSON.parse('%s')" % json.dumps(assembled.__dict__)
+    assembled = BookRecord.assembler(query_results)
+
+    if not assembled:
+        return flask.abort(400)
+    elif len(assembled) > 1:
+        raise InvalidRecordState("Wow. More than one book from a single id.")
+
+    book = assembled[0]
+    book_js = "var editBook = JSON.parse('%s')" % json.dumps(book.__dict__)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js",
@@ -121,7 +129,7 @@ def edit_books():
       "jquery-ui.theme.min.css", "alertify.css", "alertify-default-theme.css")
     return render_template(
         "edit-book.jinja", form=form, scripts=scripts, stylesheets=styles,
-        misc_js = book_js, book_title=assembled.title
+        misc_js = book_js, book_title=book.title
     )
 
 @librarian_bp.route("/books")

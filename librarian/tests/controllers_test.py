@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 from base import AppTestCase
+from faker import Faker
+from librarian.utils import BookRecord
+from librarian.tests.factories import ContributorFactory
+from librarian.tests.fakers import BookFieldsProvider
+from librarian.tests.utils import create_book
+
+import librarian
+
+fake = Faker()
+fake.add_provider(BookFieldsProvider)
 
 class ControllersTest(AppTestCase):
     
@@ -36,12 +46,24 @@ class ControllersTest(AppTestCase):
 
     def test_edit_books(self):
         self.set_current_user(self.admin_user)
-        visit = self.client.get("/books/edit?bid=1")
+
+        authors = [ContributorFactory().make_plain_person()]
+        book = BookRecord(isbn=fake.isbn(), title=fake.title(), publisher="p",
+          author=authors, publish_year=2016, genre="Fiction")
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        visit = self.client.get("/books/edit?bid=%d" % book_id)
         self.assertEqual(200, visit.status_code)
 
     def test_edit_books_badreq(self):
         self.set_current_user(self.admin_user)
         visit = self.client.get("/books/edit")
+        self.assertEqual(400, visit.status_code)
+
+    def test_edit_book_nonexistent_book(self):
+        self.set_current_user(self.admin_user)
+        visit = self.client.get("/books/edit?bid=0")
         self.assertEqual(400, visit.status_code)
 
     def test_add_books(self):
