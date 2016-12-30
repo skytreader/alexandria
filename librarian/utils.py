@@ -67,7 +67,8 @@ class BookRecord(RequestData):
         return (
             db.session.query(
                 Book.id, Book.isbn, Book.title, Contributor.lastname,
-                Contributor.firstname, Role.name, BookCompany.name, Genre.name
+                Contributor.firstname, Role.name, BookCompany.name, Genre.name,
+                Book.publish_year
             ).filter(Book.id == BookContribution.book_id)
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
@@ -203,6 +204,7 @@ class BookRecord(RequestData):
         5 - Role.name
         6 - BookCompany.name
         7 - Genre.name
+        8 - Book.publish_year
     
         And arranges them as an instance of this class. Returned as a ist.
 
@@ -213,7 +215,10 @@ class BookRecord(RequestData):
         """
         structured_catalog = {}
         
-        for id, isbn, title, contrib_lastname, contrib_firstname, role, publisher, genre in book_rows:
+        for (
+            id, isbn, title, contrib_lastname, contrib_firstname, role,
+            publisher, genre, publish_year
+        ) in book_rows:
             record_exists = structured_catalog.get(isbn)
             role = role.lower()
 
@@ -227,7 +232,7 @@ class BookRecord(RequestData):
             else:
                 fmt = {"title": title, "id": id, "genre": genre,
                   role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
-                  "publisher": publisher}
+                  "publisher": publisher, "publish_year": publish_year}
 
                 structured_catalog[isbn] = fmt
 
@@ -247,7 +252,8 @@ class BookRecord(RequestData):
     @property
     def __dict__(self):
         base = {"isbn": self.isbn, "title": self.title, "genre": self.genre,
-          "publisher": self.publisher, "id": self.id, "printer": self.printer}
+          "publisher": self.publisher, "id": self.id, "printer": self.printer,
+          "year": self.publish_year}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]

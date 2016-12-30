@@ -22,4 +22,5 @@ EditBookCtrl.prototype.initialize = function(){
     $("#publisher-proxy").val(editBook.publisher);
     $("#printer-proxy").val(editBook.printer);
     $("#genre-proxy").val(editBook.genre);
+    $("#year-proxy").val(editBook.year);
 }
