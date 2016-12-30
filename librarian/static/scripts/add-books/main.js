@@ -268,7 +268,7 @@ saved.
 @param {HTMLElement} domElement - the book spine representing the book to be
   sent, as a DOM element.
 */
-BookSenderCtrl.prototype.sendSaveform = function(domElement){
+BookSenderCtrl.prototype.sendSaveForm = function(domElement){
     var authors = JSON.parse(document.getElementById("authors").value);
     var illustrators = JSON.parse(document.getElementById("illustrators").value);
     var editors = JSON.parse(document.getElementById("editors").value);
@@ -464,98 +464,6 @@ function removeBlock(e){
 }
 
 /**
-Send the actual, hidden form to the server via AJAX so that the data may be
-saved.
-
-@param {HTMLElement} domElement - the book spine representing the book to be
-  sent, as a DOM element.
-*/
-function sendSaveForm(domElement){
-    var authors = JSON.parse(document.getElementById("authors").value);
-    var illustrators = JSON.parse(document.getElementById("illustrators").value);
-    var editors = JSON.parse(document.getElementById("editors").value);
-    var translators = JSON.parse(document.getElementById("translators").value);
-    var possibleNewNames = [authors, illustrators, editors, translators];
-
-    var publisher = document.getElementById("publisher").value;
-    var printer = document.getElementById("printer").value;
-    var possibleNewCompanies = [publisher, printer];
-
-    var possibleNewGenre = document.getElementById("genre").value;
-
-    function success(){
-        $(domElement).removeClass("unsaved_book").addClass("saved_book");
-
-        _.forEach(possibleNewNames, function(newNames){
-            _.forEach(newNames, function(person){
-                if(!BOOK_PERSONS_SET.has(person)){
-                    BOOK_PERSONS_SET.add(person);
-                    if(BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
-                        BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
-                    }
-                    if(BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
-                        BOOK_PERSONS_LASTNAME.push(person["lastname"]);
-                    }
-                }
-            });
-        });
-        BOOK_PERSONS = [...BOOK_PERSONS_SET]
-        resetAutocomplete();
-
-        _.forEach(possibleNewCompanies, function(company){
-            if(COMPANIES.indexOf(company) < 0){
-                COMPANIES.push(company);
-            }
-        });
-
-        _.forEach(possibleNewGenre, function(genre){
-            if(GENRES.indexOf(genre) < 0){
-                GENRES.push(genre);
-            }
-        });
-        window.booksSaved++;
-    }
-
-    function fail(jqxhr){
-        alertify.error(jqxhr.responseText);
-        $(domElement).removeClass("unsaved_book").addClass("error_book");
-        window.booksErrorNoRetry++;
-    }
-
-    function failRecover(jqxhr){
-        alertify.warning("Failed to save a book. Please wait as we automatically retry.");
-        $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
-        reprocessQueue.enqueue(domElement);
-        window.booksReprocessable++;
-    }
-
-    var data = {
-        "csrf_token": document.getElementById("csrf_token").value,
-        "isbn": document.getElementById("isbn").value,
-        "title": document.getElementById("title").value,
-        "genre": document.getElementById("genre").value,
-        "authors": document.getElementById("authors").value,
-        "illustrators": document.getElementById("illustrators").value,
-        "editors": document.getElementById("editors").value,
-        "translators": document.getElementById("translators").value,
-        "publisher": document.getElementById("publisher").value,
-        "printer": document.getElementById("printer").value,
-        "year": document.getElementById("year").value
-    }
-    $.ajax("/api/add/books", {
-        "type": "POST",
-        "data": data,
-        "success": success,
-        "statusCode":{
-            400: fail,
-            409: fail,
-            500: failRecover
-        },
-        "complete": updateStatCounts
-    });
-}
-
-/**
 TODO I thought of this method to automate my testing but I realized this could
 also be useful for a "reprocess" feature. If saving a book fails, you can reload
 the book's record into the form and redo what you think failed.
@@ -671,20 +579,20 @@ $(document).ready(function(){
       "defaultLocation": document.getElementById("qContainer")};
     window.visualQueue = new VisualQueue(qContainer, defs);
     window.visualQueue.render();
-    updateStatCounts();
+    bookSenderCtrl.updateStatCounts();
 
     // Start the polling interval timers.
     setInterval(function(){
         var foo = loadFromQueueToForm(window.bookQueue);
         if(foo){
-            sendSaveForm(foo.domElement);
+            bookSenderCtrl.sendSaveForm(foo.domElement);
         }
     }, PROCESS_INTERVAL);
     
     setInterval(function(){
         var foo = loadFromQueueToForm(window.reprocessQueue);
         if(foo){
-            sendSaveForm(foo.domElement);
+            bookSenderCtrl.sendSaveForm(foo.domElement);
         }
     }, REPROCESS_INTERVAL);
 });
