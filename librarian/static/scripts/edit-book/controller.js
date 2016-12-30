@@ -6,6 +6,20 @@
 
 /**
 @constructor
+@param {addBooks.types} editBook
 */
-function EditBookCtrl(){
+function EditBookCtrl(editBook){
+    this.editBook = editBook;
+    this.initialize();
+}
+
+/**
+@private
+*/
+EditBookCtrl.prototype.initialize = function(){
+    $("#isbn-proxy").val(editBook.isbn);
+    $("#title-proxy").val(editBook.title);
+    $("#publisher-proxy").val(editBook.publisher);
+    $("#printer-proxy").val(editBook.printer);
+    $("#genre-proxy").val(editBook.genre);
 }
