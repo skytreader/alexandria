@@ -89,15 +89,7 @@ class BookRecordTests(AppTestCase):
 
         expected_records = [booka_record, bookb_record]
 
-        bookq = (librarian.db.session.query(Book.id, Book.isbn, Book.title,
-          Contributor.lastname, Contributor.firstname, Role.name,
-          BookCompany.name)
-          .filter(Book.id == BookContribution.book_id)
-          .filter(BookContribution.contributor_id == Contributor.id)
-          .filter(BookContribution.role_id == Role.id)
-          .filter(Book.publisher_id == BookCompany.id))
-
-        books = bookq.all()
+        books = BookRecord.base_assembler_query().all()
         
         set(expected_records)
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
