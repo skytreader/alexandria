@@ -99,3 +99,65 @@
     <input type="button" class="btn btn-default" value="Clear Form" id="clear-proxy">
 </div>
 {% endmacro %}
+
+{% macro render_card_catalog(book) %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-6 book-title">
+                <i class="fa fa-book"></i>
+                <a href="/books/edit?bid={{book.id}}">{{ book.title }}</a>
+            </div>
+            <div class="col-md-6 isbn">
+                ISBN: {{ book.isbn }}
+            </div>
+        </div>
+    </div>
+    <div class="panel-body book-info">
+        {% if book.author %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-pencil-square-o"></i> <strong>Authors:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for author in book.author %}
+                        {{ author.lastname }}, {{ author.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if book.translator %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-globe"></i> <strong>Translators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for translator in book.translator %}
+                        {{ translator.lastname }}, {{ translator.firstname }}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if book.illustrator %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-picture-o"></i> <strong>Illustrators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for illustrator in book.illustrator %}
+                        {{ illustrator.lastname }}, {{ illustrator.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-2 creator-label">
+                <i class="fa fa-building"></i> <strong>Publisher:</strong>
+            </div>
+            <div class="col-md-9">
+                {{book.publisher}}
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
