@@ -73,6 +73,7 @@ class BookRecord(RequestData):
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
             .filter(Book.publisher_id == BookCompany.id)
+            .filter(Book.genre_id == Genre.id)
         )
     
     def __init__(
