@@ -100,13 +100,17 @@
 </div>
 {% endmacro %}
 
-{% macro render_card_catalog(book) %}
+{% macro render_card_catalog(book, user=None) %}
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
             <div class="col-md-6 book-title">
                 <i class="fa fa-book"></i>
-                <a href="/books/edit?bid={{book.id}}">{{ book.title }}</a>
+                {% if user %}
+                    <a href="/books/edit?bid={{book.id}}">{{ book.title }}</a>
+                {% else %}
+                    {{ book.title }}
+                {% endif %}
             </div>
             <div class="col-md-6 isbn">
                 ISBN: {{ book.isbn }}

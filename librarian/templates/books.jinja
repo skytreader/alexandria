@@ -19,6 +19,6 @@
     {% endif %}
 
     {% for book in books %}
-        {{ render_card_catalog(book) }}
+        {{ render_card_catalog(book, user=user) }}
     {% endfor %}
 {% endblock %}

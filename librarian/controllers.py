@@ -134,11 +134,15 @@ def edit_books():
 
 @librarian_bp.route("/books")
 def show_books():
+    from flask_login import current_user
     books = json.loads(api.get_books().data)["data"]
     scripts = ("show-books/main.js",)
     styles = ("books.css",)
+
+    user = current_user if current_user.is_authenticated else None
+
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
-      books=books)
+      books=books, user=user)
 
 @librarian_bp.route("/search")
 def search():
