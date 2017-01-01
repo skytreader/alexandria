@@ -13,12 +13,6 @@ import string
 PROLLY_ROMAN_NUM = re.compile("^[%s]$" % (string.uppercase))
 fuzzy_text = FuzzyText()
 
-def make_name_object():
-    """
-    This will soon be deprecated in favor of `make_person_object`.
-    """
-    return {"firstname": fuzzy_text.fuzz(), "lastname": fuzzy_text.fuzz()}
-
 def make_person_object():
     return Person(fuzzy_text.fuzz(), fuzzy_text.fuzz())
 

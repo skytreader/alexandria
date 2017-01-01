@@ -11,7 +11,7 @@ from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
 from librarian.tests.utils import (
-    make_name_object, make_person_object, create_library, create_book
+    make_person_object, create_library, create_book
 )
 
 import copy
@@ -302,6 +302,14 @@ class ApiTests(AppTestCase):
           .filter(Contributor.lastname == 'Gaiman').all())
 
         self.assertEquals(1, len(gaimen))
+
+    def test_genre_adding(self):
+        g1 = GenreFactory(name="B Genre")
+        g2 = GenreFactory(name="A Genre")
+        librarian.db.session.add(g1)
+        librarian.db.session.add(g2)
+        librarian.db.session.flush()
+        self.set_current_user(self.admin_user)
 
     def test_same_person_diff_roles(self):
         _creator = LibrarianFactory()
