@@ -7,6 +7,8 @@ Javascript code related to the book details form.
 */
 
 /**
+Concerned with handling the book data in the proxy form.
+
 @constructor
 */
 function BookDetailsCtrl(){
@@ -58,8 +60,45 @@ function BookDetailsCtrl(){
     @type Array.String
     */
     this.CREATORS = ["author", "illustrator", "editor", "translator"]
+    
+    /**
+    This is needed by the loadToForm method.
+    
+    Maps the creator type to the event handler used to add an entry to the
+    creator list.
+
+    @member
+    */
+    this.CREATOR_ADD_HANDLERS = {};
 
     this.setUp();
+}
+
+/**
+TODO I thought of this method to automate my testing but I realized this could
+also be useful for a "reprocess" feature. If saving a book fails, you can reload
+the book's record into the form and redo what you think failed.
+*/
+BookDetailsCtrl.prototype.loadToForm = function(reqData){
+    
+    function insertAllCreators(all, type){
+        for(var i = 0; i < all.length; i++){
+            $("#" + type + "-proxy-firstname").val(all[i].firstname);
+            $("#" + type + "-proxy-lastname").val(all[i].lastname);
+            this.CREATOR_ADD_HANDLERS[type]();
+        }
+    }
+
+    $("#isbn-proxy").val(reqData.isbn);
+    $("#title-proxy").val(reqData.title);
+    $("#genre-proxy").val(reqData.genre);
+    $("#publisher-proxy").val(reqData.publisher);
+    $("#printer-proxy").val(reqData.printer);
+    $("#year-proxy").val(reqData.year);
+    insertAllCreators(reqData.authors, "author");
+    insertAllCreators(reqData.illustrators, "illustrator");
+    insertAllCreators(reqData.editors, "editor");
+    insertAllCreators(reqData.translators, "translator");
 }
 
 /**

@@ -40,6 +40,10 @@ Maps the creator type to the event handler used to add an entry to the creator l
 var CREATOR_ADD_HANDLERS = {};
 
 /**
+This class is concerned with the interaction of the proxy form and the actual
+form via queues. Sending the data to the server is also part of its
+responsibilites.
+
 @constructor
 @param {addBooks.bookDetails.BookDetailsCtrl} bookDetailsCtrl
     Expected to be initialized and all.
@@ -117,16 +121,6 @@ function BookSenderCtrl(bookDetailsCtrl){
     @member
     */
     this.booksReprocessable = 0;
-    
-    /**
-    This is needed by the loadToForm method.
-    
-    Maps the creator type to the event handler used to add an entry to the
-    creator list.
-
-    @member
-    */
-    this.CREATOR_ADD_HANDLERS = {};
 }
 
 /**
@@ -463,32 +457,6 @@ function removeBlock(e){
     // TODO
 }
 
-/**
-TODO I thought of this method to automate my testing but I realized this could
-also be useful for a "reprocess" feature. If saving a book fails, you can reload
-the book's record into the form and redo what you think failed.
-*/
-function loadToForm(reqData){
-    
-    function insertAllCreators(all, type){
-        for(var i = 0; i < all.length; i++){
-            $("#" + type + "-proxy-firstname").val(all[i].firstname);
-            $("#" + type + "-proxy-lastname").val(all[i].lastname);
-            CREATOR_ADD_HANDLERS[type]();
-        }
-    }
-
-    $("#isbn-proxy").val(reqData.isbn);
-    $("#title-proxy").val(reqData.title);
-    $("#genre-proxy").val(reqData.genre);
-    $("#publisher-proxy").val(reqData.publisher);
-    $("#printer-proxy").val(reqData.printer);
-    $("#year-proxy").val(reqData.year);
-    insertAllCreators(reqData.authors, "author");
-    insertAllCreators(reqData.illustrators, "illustrator");
-    insertAllCreators(reqData.editors, "editor");
-    insertAllCreators(reqData.translators, "translator");
-}
 
 /**
 TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
