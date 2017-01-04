@@ -12,8 +12,5 @@ any given time.
 Assumes that the book to be edited is in a global variable `editBook`.
 */
 $(document).ready(function(){
-    $("#isbn-proxy").val(editBook.isbn);
-    $("#title-proxy").val(editBook.title);
-    $("#publisher-proxy").val(editBook.publisher);
-    $("#printer-proxy").val(editBook.printer);
+    var editBookCtrl = new EditBookCtrl();
 });

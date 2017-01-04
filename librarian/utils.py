@@ -63,20 +63,24 @@ class BookRecord(RequestData):
         BookRecord.assembler. This is just a query that enumerates the result set
         as expected by BookRecord.assembler. Filter as necessary.
         """
-        from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
+        from librarian.models import Book, BookCompany, BookContribution, Contributor, Role, Genre
         return (
             db.session.query(
                 Book.id, Book.isbn, Book.title, Contributor.lastname,
-                Contributor.firstname, Role.name, BookCompany.name
+                Contributor.firstname, Role.name, BookCompany.name, Genre.name,
+                Book.publish_year
             ).filter(Book.id == BookContribution.book_id)
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
             .filter(Book.publisher_id == BookCompany.id)
+            .filter(Book.genre_id == Genre.id)
         )
     
-    def __init__(self, isbn, title, publisher, publish_year=None, author=None,
-      translator=None, illustrator=None, editor=None, genre=None, id=None,
-      printer=None):
+    def __init__(
+        self, isbn, title, publisher, publish_year=None, author=None,
+        translator=None, illustrator=None, editor=None, genre=None, id=None,
+        printer=None
+     ):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
@@ -200,6 +204,8 @@ class BookRecord(RequestData):
         4 - Contributor.firstname
         5 - Role.name
         6 - BookCompany.name
+        7 - Genre.name
+        8 - Book.publish_year
     
         And arranges them as an instance of this class. Returned as a ist.
 
@@ -210,7 +216,10 @@ class BookRecord(RequestData):
         """
         structured_catalog = {}
         
-        for id, isbn, title, contrib_lastname, contrib_firstname, role, publisher in book_rows:
+        for (
+            id, isbn, title, contrib_lastname, contrib_firstname, role,
+            publisher, genre, publish_year
+        ) in book_rows:
             record_exists = structured_catalog.get(isbn)
             role = role.lower()
 
@@ -222,9 +231,9 @@ class BookRecord(RequestData):
                     structured_catalog[isbn][role] = [Person(
                       lastname=contrib_lastname, firstname=contrib_firstname)]
             else:
-                fmt = {"title": title, "id": id,
+                fmt = {"title": title, "id": id, "genre": genre,
                   role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
-                  "publisher": publisher}
+                  "publisher": publisher, "publish_year": publish_year}
 
                 structured_catalog[isbn] = fmt
 
@@ -243,8 +252,9 @@ class BookRecord(RequestData):
 
     @property
     def __dict__(self):
-        base = {"isbn": self.isbn, "title": self.title,
-          "publisher": self.publisher, "id": self.id, "printer": self.printer}
+        base = {"isbn": self.isbn, "title": self.title, "genre": self.genre,
+          "publisher": self.publisher, "id": self.id, "printer": self.printer,
+          "year": self.publish_year}
         base["author"] = [p.__dict__ for p in self.authors]
         base["translator"] = [p.__dict__ for p in self.translators]
         base["illustrator"] = [p.__dict__ for p in self.illustrators]

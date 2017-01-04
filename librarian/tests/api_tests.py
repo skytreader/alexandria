@@ -11,7 +11,7 @@ from librarian.tests.factories import (
   BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
 from librarian.tests.utils import (
-    make_name_object, make_person_object, create_library, create_book
+    make_person_object, create_library, create_book
 )
 
 import copy
@@ -302,6 +302,46 @@ class ApiTests(AppTestCase):
           .filter(Contributor.lastname == 'Gaiman').all())
 
         self.assertEquals(1, len(gaimen))
+
+    def test_genre_adding(self):
+        g1 = GenreFactory(name="B Genre")
+        g2 = GenreFactory(name="A Genre")
+        librarian.db.session.add(g1)
+        librarian.db.session.add(g2)
+        librarian.db.session.flush()
+        self.set_current_user(self.admin_user)
+
+        bgenre_book = BookRecord(
+            isbn=fake.isbn(), title=fake.title(), genre=g1.name,
+            author=[make_person_object()], publisher="random",
+            publish_year=2017
+        )
+        bgenre_rv = self.client.post("/api/add/books", data=bgenre_book.request_data())
+        self.assertEquals(200, bgenre_rv.status_code)
+
+        agenre_book = BookRecord(
+            isbn=fake.isbn(), title=fake.title(), genre=g2.name,
+            author=[make_person_object()], publisher="random",
+            publish_year=2017
+        )
+        agenre_rv = self.client.post("/api/add/books", data=agenre_book.request_data())
+        self.assertEquals(200, agenre_rv.status_code)
+
+        bgenre_orm = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==bgenre_book.isbn)
+            .first()
+        )
+
+        agenre_orm = (
+            librarian.db.session.query(Book)
+            .filter(Book.isbn==agenre_book.isbn)
+            .first()
+        )
+
+        self.assertNotEquals(bgenre_orm.genre, agenre_orm.genre)
+        self.assertEquals(bgenre_orm.genre.name, g1.name)
+        self.assertEquals(agenre_orm.genre.name, g2.name)
 
     def test_same_person_diff_roles(self):
         _creator = LibrarianFactory()

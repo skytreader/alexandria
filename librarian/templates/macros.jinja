@@ -49,7 +49,7 @@
     <div class="row">
         <div class="col-md-4">
             <label class="input-holder"><i class="fa fa-star"></i> ISBN:<br>
-            <input type="text" id="isbn-proxy" class="form-control" name="isbn-rule" value="{{book_record.isbn if book_record else ''}}">
+            <input type="text" id="isbn-proxy" class="form-control" name="isbn-rule">
             </label>
         </div>
         <div class="col-md-4">
@@ -97,5 +97,71 @@
     <br>
     <input type="button" class="btn btn-primary" value="Save Book" id="queue-book">
     <input type="button" class="btn btn-default" value="Clear Form" id="clear-proxy">
+</div>
+{% endmacro %}
+
+{% macro render_card_catalog(book, user=None) %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-6 book-title">
+                <i class="fa fa-book"></i>
+                {% if user %}
+                    <a class="edit-prompt" href="/books/edit?bid={{book.id}}">{{ book.title }}</a>
+                {% else %}
+                    {{ book.title }}
+                {% endif %}
+            </div>
+            <div class="col-md-6 isbn">
+                ISBN: {{ book.isbn }}
+            </div>
+        </div>
+    </div>
+    <div class="panel-body book-info">
+        {% if book.author %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-pencil-square-o"></i> <strong>Authors:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for author in book.author %}
+                        {{ author.lastname }}, {{ author.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if book.translator %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-globe"></i> <strong>Translators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for translator in book.translator %}
+                        {{ translator.lastname }}, {{ translator.firstname }}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if book.illustrator %}
+            <div class="row">
+                <div class="col-md-2 creator-label">
+                    <i class="fa fa-picture-o"></i> <strong>Illustrators:</strong>
+                </div>
+                <div class="col-md-9">
+                    {% for illustrator in book.illustrator %}
+                        {{ illustrator.lastname }}, {{ illustrator.firstname }}.
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-2 creator-label">
+                <i class="fa fa-building"></i> <strong>Publisher:</strong>
+            </div>
+            <div class="col-md-9">
+                {{book.publisher}}
+            </div>
+        </div>
+    </div>
 </div>
 {% endmacro %}
