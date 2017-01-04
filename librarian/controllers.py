@@ -85,7 +85,7 @@ def logout():
 def add_books():
     form = AddBooksForm()
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
-      "add-books/main.js", "add-books/book-details.js", "add-books/types.js",
+      "add-books/main.js", "types/book-details.js", "add-books/types.js",
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
 
