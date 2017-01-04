@@ -119,6 +119,10 @@ BookDetailsCtrl.prototype.setUp = function(){
         }
     }
 
+    function clearProxyForm(){
+        $("#proxy-form input").val("")
+    }
+
     // Event handlers
     $("#clear-proxy").click(clearProxyForm);
     $("#queue-book").click(function(){
@@ -168,13 +172,14 @@ BookDetailsCtrl.prototype.setUp = function(){
         this.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 
+    var me = this;
     this.CREATORS.forEach(function(creatorTitle){
-        CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
-        $("#" + creatorTitle + "-add").click(CREATOR_ADD_HANDLERS[creatorTitle]);
+        me.CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
+        $("#" + creatorTitle + "-add").click(me.CREATOR_ADD_HANDLERS[creatorTitle]);
         $("#" + creatorTitle + "-proxy-firstname")
           .keypress(function(e){
               if(e.keyCode == 13){
-                  CREATOR_ADD_HANDLERS[creatorTitle]();
+                  me.CREATOR_ADD_HANDLERS[creatorTitle]();
                   $("#" + creatorTitle + "-proxy-lastname").focus();
               }
           });
@@ -187,31 +192,32 @@ Initialize the autocomplete for names.
 @private
 */
 BookDetailsCtrl.prototype.fillNames = function(){
+    var me = this;
     $.ajax("/api/read/persons", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
             BOOK_PERSONS = allNames;
-            BOOK_PERSONS_SET.addAll(allNames);
+            me.BOOK_PERSONS_SET.addAll(allNames);
             var allLastnames = _.map(allNames, function(x){return x["lastname"]});
             var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
 
             var lastnameSet = new Set(allLastnames);
             var firstnameSet = new Set(allFirstnames);
 
-            this.BOOK_PERSONS_LASTNAME = [...lastnameSet];
-            this.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
+            me.BOOK_PERSONS_LASTNAME = [...lastnameSet];
+            me.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
 
             $(".auto-lastname").autocomplete({
-                source: this.BOOK_PERSONS_LASTNAME
+                source: me.BOOK_PERSONS_LASTNAME
             });
 
             $(".auto-firstname").autocomplete({
-                source: this.BOOK_PERSONS_FIRSTNAME
+                source: me.BOOK_PERSONS_FIRSTNAME
             });
         },
         "error": function(jqXHR, textStatus, error){
-            setTimeout(this.fillNames, 8000);
+            setTimeout(me.fillNames, 8000);
         }
     });
 }
