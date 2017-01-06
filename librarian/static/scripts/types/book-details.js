@@ -1,8 +1,8 @@
 /**
 Javascript code related to the book details form.
 
-@module addBooks.bookDetails
-@namespace addBooks.bookDetails
+@module types.bookDetails
+@namespace types.bookDetails
 @author Chad Estioco
 */
 
@@ -82,10 +82,14 @@ the book's record into the form and redo what you think failed.
 BookDetailsCtrl.prototype.loadToForm = function(reqData){
     
     function insertAllCreators(all, type){
-        for(var i = 0; i < all.length; i++){
-            $("#" + type + "-proxy-firstname").val(all[i].firstname);
-            $("#" + type + "-proxy-lastname").val(all[i].lastname);
-            this.CREATOR_ADD_HANDLERS[type]();
+        console.log("insert creators for type", type, all);
+        if(all != null){
+            for(var i = 0; i < all.length; i++){
+                console.log("adding entry", all[i]);
+                $("#" + type + "-proxy-firstname").val(all[i].firstname);
+                $("#" + type + "-proxy-lastname").val(all[i].lastname);
+                this.CREATOR_ADD_HANDLERS[type]();
+            }
         }
     }
 
@@ -95,10 +99,10 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
     $("#publisher-proxy").val(reqData.publisher);
     $("#printer-proxy").val(reqData.printer);
     $("#year-proxy").val(reqData.year);
-    insertAllCreators(reqData.authors, "author");
-    insertAllCreators(reqData.illustrators, "illustrator");
-    insertAllCreators(reqData.editors, "editor");
-    insertAllCreators(reqData.translators, "translator");
+    insertAllCreators(reqData.author, "author");
+    insertAllCreators(reqData.illustrator, "illustrator");
+    insertAllCreators(reqData.editor, "editor");
+    insertAllCreators(reqData.translator, "translator");
 }
 
 /**

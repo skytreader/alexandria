@@ -12,5 +12,5 @@ any given time.
 Assumes that the book to be edited is in a global variable `bookForEditing`.
 */
 $(document).ready(function(){
-    var editBookCtrl = new EditBookCtrl(bookForEditing);
+    var editBookCtrl = new EditBookCtrl(bookForEditing, new BookDetailsCtrl());
 });
