@@ -9,8 +9,8 @@ any given time.
 */
 
 /**
-Assumes that the book to be edited is in a global variable `editBook`.
+Assumes that the book to be edited is in a global variable `bookForEditing`.
 */
 $(document).ready(function(){
-    var editBookCtrl = new EditBookCtrl();
+    var editBookCtrl = new EditBookCtrl(bookForEditing);
 });

@@ -17,10 +17,10 @@ function EditBookCtrl(editBook){
 @private
 */
 EditBookCtrl.prototype.initialize = function(){
-    $("#isbn-proxy").val(editBook.isbn);
-    $("#title-proxy").val(editBook.title);
-    $("#publisher-proxy").val(editBook.publisher);
-    $("#printer-proxy").val(editBook.printer);
-    $("#genre-proxy").val(editBook.genre);
-    $("#year-proxy").val(editBook.year);
+    $("#isbn-proxy").val(this.editBook.isbn);
+    $("#title-proxy").val(this.editBook.title);
+    $("#publisher-proxy").val(this.editBook.publisher);
+    $("#printer-proxy").val(this.editBook.printer);
+    $("#genre-proxy").val(this.editBook.genre);
+    $("#year-proxy").val(this.editBook.year);
 }

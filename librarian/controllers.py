@@ -115,7 +115,7 @@ def edit_books():
         raise InvalidRecordState("Wow. More than one book from a single id.")
 
     book = assembled[0]
-    book_js = "var editBook = JSON.parse('%s')" % json.dumps(book.__dict__)
+    book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "edit-book/main.js", "edit-book/controller.js", "types/book-details.js",
