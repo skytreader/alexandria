@@ -146,9 +146,11 @@ def show_books():
 
 @librarian_bp.route("/search")
 def search():
+    from flask_login import current_user
+    user = current_user if current_user.is_authenticated else None
     search_form = SearchForm(request.form)
     searchq = request.args.get("q")
     books = api.search(searchq)
     styles = ("books.css",)
     return render_template("books.jinja", stylesheets=styles, books=books,
-      query=searchq, search_form=search_form)
+      query=searchq, search_form=search_form, user=user)
