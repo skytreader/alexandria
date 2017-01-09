@@ -106,6 +106,15 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
 }
 
 /**
+TODO Mark this class as "abstract" and make subclasses implement this method.
+
+@public
+*/
+BookDetailsCtrl.prototype.clearProxyForm = function(){
+    $("#proxy-form input").val("")
+}
+
+/**
 @private
 */
 BookDetailsCtrl.prototype.setUp = function(){
@@ -193,12 +202,8 @@ BookDetailsCtrl.prototype.setUp = function(){
         }
     }
 
-    function clearProxyForm(){
-        $("#proxy-form input").val("")
-    }
-
     // Event handlers
-    $("#clear-proxy").click(clearProxyForm);
+    $("#clear-proxy").click(this.clearProxyForm);
     $("#queue-book").click(function(){
         if(this.isCreatorPending()){
             alertify.alert("Forgot something?",
