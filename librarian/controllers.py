@@ -118,7 +118,7 @@ def edit_books():
     book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
-      "edit-book/main.js", "edit-book/controller.js", "types/book-details.js",
+      "types/book-details.js", "edit-book/main.js", "edit-book/controller.js", 
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
 

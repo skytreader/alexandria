@@ -111,7 +111,6 @@ TODO Mark this class as "abstract" and make subclasses implement this method.
 @public
 */
 BookDetailsCtrl.prototype.clearProxyForm = function(){
-    $("#proxy-form input").val("")
 }
 
 /**
