@@ -18,7 +18,13 @@ function EditBookDetailsCtrl(){
 EditBookDetailsCtrl.prototype = Object.create(BookDetailsCtrl.prototype);
 
 EditBookDetailsCtrl.prototype.clearProxyForm = function(){
-    window.history.go(-1);
+    // WARNING: This may not be very standard behavior. Observed in Chrome and
+    // firefox Ubuntu.
+    if (window.history.length > 1){
+        window.history.back();
+    } else{
+        window.close();
+    }
 }
 
 /**
