@@ -82,10 +82,8 @@ the book's record into the form and redo what you think failed.
 BookDetailsCtrl.prototype.loadToForm = function(reqData){
     
     function insertAllCreators(me, all, type){
-        console.log("insert creators for type", type, all);
         if(all != null){
             for(var i = 0; i < all.length; i++){
-                console.log("adding entry", all[i]);
                 $("#" + type + "-proxy-firstname").val(all[i].firstname);
                 $("#" + type + "-proxy-lastname").val(all[i].lastname);
                 me.CREATOR_ADD_HANDLERS[type]();
