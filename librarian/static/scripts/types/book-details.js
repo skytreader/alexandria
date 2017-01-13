@@ -115,6 +115,8 @@ BookDetailsCtrl.prototype.clearProxyForm = function(){
 @private
 */
 BookDetailsCtrl.prototype.setUp = function(){
+    var me = this;
+
     /**
     Create a list element for displaying a creator's name. The name displayed is
     dependent on what is currently entered in the procy fields for this creator.
@@ -181,7 +183,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     */
     function recordDeleterFactory(creatorType){
         return function() {
-            $(this.parentNode.parentNode).remove();
+            $(me.parentNode.parentNode).remove();
         }
     };
 
@@ -200,19 +202,19 @@ BookDetailsCtrl.prototype.setUp = function(){
     }
 
     // Event handlers
-    $("#clear-proxy").click(this.clearProxyForm);
+    $("#clear-proxy").click(me.clearProxyForm);
     $("#queue-book").click(function(){
-        if(this.isCreatorPending()){
+        if(me.isCreatorPending()){
             alertify.alert("Forgot something?",
               "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
         } else if($("#proxy-form").valid()){
             var spine = renderSpine();
-            this.internalizeBook(spine);
+            me.internalizeBook(spine);
             window.visualQueue.prepend(spine);
-            this.updateStatCounts();
-            this.clearProxyForm();
-            this.clearLists();
-            this.resetAutocomplete();
+            me.updateStatCounts();
+            me.clearProxyForm();
+            me.clearLists();
+            me.resetAutocomplete();
         } else{
             alertify.alert("Oh no!",
               "There is a problem with this book's details. Check the fields for specifics.");
