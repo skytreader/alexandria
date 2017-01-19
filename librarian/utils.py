@@ -309,7 +309,9 @@ class StatsDescriptor(object):
 
     @staticmethod
     def contrib_density(val):
-        if 1 <= val < 2:
+        if val < 1:
+            return "low"
+        elif 1 <= val < 2:
             return "focused"
         elif 2 <= val < 3:
             return "collaborative"
