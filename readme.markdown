@@ -14,10 +14,6 @@ Assuming you are in Ubuntu/Debian:
     sudo apt-get install -y mysql-server-5.7
     sudo apt-get install -y mysql-client-core-5.7
     sudo apt-get install -y mysql-client-5.7
-
-Experimental MySQL set-ups (e.g., testing an upgrade to a new version) may also
-need to install
-
     sudo apt-get install libmysqlclient-dev
 
 ## Python set-up
