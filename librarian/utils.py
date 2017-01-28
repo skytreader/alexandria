@@ -4,6 +4,7 @@ from librarian import app, db
 
 import config
 import copy
+import librarian.tests.factories as AppFactories
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
@@ -42,7 +43,6 @@ class Person(RequestData):
 
     def __deepcopy__(self, memo):
         return Person(lastname=self.lastname, firstname=self.firstname)
-        
 
 class BookRecord(RequestData):
     """
@@ -109,6 +109,32 @@ class BookRecord(RequestData):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
+
+    @classmethod
+    def factory(
+        cls, isbn, title, publisher, publish_year=None, author=None,
+        translator=None, illustrator=None, editor=None, genre=None,
+        printer=None
+    ):
+        """
+        This method adds all created models to the session.
+        """
+        def contributor_factory(self, person_list):
+            contribs = []
+            if person_list:
+                for person in person_list:
+                    contrib = AppFactory.ContributorFactory(
+                        lastname=person.lastname, firstname=person.firstname
+                    )
+                    contribs.insert(0, contrib)
+                    db.session.add(contrib)
+
+            return contribs
+
+        db.session.add(AppFactory.BookFactory(
+            isbn=isbn, title=title, genre=genre, publisher=publisher,
+            publish_year=publish_year
+        ))
 
     def __deepcopy__(self, memo):
         # Create record first then set authors later because constructors expect
