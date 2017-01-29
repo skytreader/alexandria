@@ -4,7 +4,6 @@ from librarian import app, db
 
 import config
 import copy
-import librarian.tests.factories as AppFactories
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
@@ -116,6 +115,7 @@ class BookRecord(RequestData):
         translator=None, illustrator=None, editor=None, genre=None,
         printer=None
     ):
+        import librarian.tests.factories as AppFactories
         """
         This method adds all created models to the session.
         """
