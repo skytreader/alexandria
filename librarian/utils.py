@@ -115,11 +115,17 @@ class BookRecord(RequestData):
         translator=None, illustrator=None, editor=None, genre=None,
         printer=None
     ):
+        """
+        This method adds all created models to the session and returns an
+        instance of this class collating the models created.
+        """
+
         import librarian.tests.factories as AppFactories
-        """
-        This method adds all created models to the session.
-        """
         def contributor_factory(self, person_list):
+            """
+            Adds all Persons to the session as Contributors. Returns a list of
+            the Contributors created.
+            """
             contribs = []
             if person_list:
                 for person in person_list:
@@ -131,10 +137,25 @@ class BookRecord(RequestData):
 
             return contribs
 
-        db.session.add(AppFactory.BookFactory(
+        def book_contribution_factory(self, book, contributors, role):
+            for contrib in contributors:
+                db.session.add(AppFactory.BookContributionFactory(book, contrib, role))
+
+        book = AppFactory.BookFactory(
             isbn=isbn, title=title, genre=genre, publisher=publisher,
             publish_year=publish_year
-        ))
+        )
+        db.session.add(book)
+
+        book_contribution_factory(book, contributor_factory(author), Role.get_preset_role("Author"))
+        book_contribution_factory(book, contributor_factory(translator), Role.get_preset_role("Translator"))
+        book_contribution_factory(book, contributor_factory(illustrator), Role.get_preset_role("Illustrator"))
+        book_contribution_factory(book, contributor_factory(editors), Role.get_preset_role("Editor"))
+
+        return cls(
+            isbn, title, publisher, publish_year, author, translator,
+            illustrator, editor, genre, printer
+        )
 
     def __deepcopy__(self, memo):
         # Create record first then set authors later because constructors expect
