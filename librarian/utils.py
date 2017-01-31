@@ -121,7 +121,8 @@ class BookRecord(RequestData):
         """
 
         import librarian.tests.factories as AppFactories
-        def contributor_factory(self, person_list):
+        from librarian.models import Role
+        def contributor_factory(person_list):
             """
             Adds all Persons to the session as Contributors. Returns a list of
             the Contributors created.
@@ -129,7 +130,7 @@ class BookRecord(RequestData):
             contribs = []
             if person_list:
                 for person in person_list:
-                    contrib = AppFactory.ContributorFactory(
+                    contrib = AppFactories.ContributorFactory(
                         lastname=person.lastname, firstname=person.firstname
                     )
                     contribs.insert(0, contrib)
@@ -137,20 +138,22 @@ class BookRecord(RequestData):
 
             return contribs
 
-        def book_contribution_factory(self, book, contributors, role):
+        def book_contribution_factory(book, contributors, role):
             for contrib in contributors:
-                db.session.add(AppFactory.BookContributionFactory(book, contrib, role))
+                db.session.add(AppFactories.BookContributionFactory(
+                    book=book, contributor=contrib, role=role
+                ))
 
-        book = AppFactory.BookFactory(
-            isbn=isbn, title=title, genre=genre, publisher=publisher,
-            publish_year=publish_year
+        book = AppFactories.BookFactory(
+            isbn=isbn, title=title, genre=AppFactories.GenreFactory(name=genre),
+            publisher=AppFactories.BookCompanyFactory(name=publisher), publish_year=publish_year
         )
         db.session.add(book)
 
         book_contribution_factory(book, contributor_factory(author), Role.get_preset_role("Author"))
         book_contribution_factory(book, contributor_factory(translator), Role.get_preset_role("Translator"))
         book_contribution_factory(book, contributor_factory(illustrator), Role.get_preset_role("Illustrator"))
-        book_contribution_factory(book, contributor_factory(editors), Role.get_preset_role("Editor"))
+        book_contribution_factory(book, contributor_factory(editor), Role.get_preset_role("Editor"))
 
         return cls(
             isbn, title, publisher, publish_year, author, translator,
