@@ -472,9 +472,10 @@ class ApiTests(AppTestCase):
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
 
     def test_search_exact(self):
-        roles = librarian.db.session.query(Role).all()
-        library = create_library(librarian.db.session, self.admin_user, roles)
-        lucky_book = random.choice(library)
+        search_book = BookRecord.factory(
+            isbn=fake.isbn(), title="Find XYZ Inside", publisher="Creative Awesome",
+            publish_year=2017, author=[Person("Munroe", "Randall")], genre="Test"
+        )
 
     def test_title_edit_book(self):
         _creator = LibrarianFactory()

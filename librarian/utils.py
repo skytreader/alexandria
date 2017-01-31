@@ -155,9 +155,11 @@ class BookRecord(RequestData):
         book_contribution_factory(book, contributor_factory(illustrator), Role.get_preset_role("Illustrator"))
         book_contribution_factory(book, contributor_factory(editor), Role.get_preset_role("Editor"))
 
+        db.session.flush()
+
         return cls(
             isbn, title, publisher, publish_year, author, translator,
-            illustrator, editor, genre, printer
+            illustrator, editor, genre, book.id, printer
         )
 
     def __deepcopy__(self, memo):

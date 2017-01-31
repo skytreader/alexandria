@@ -141,6 +141,7 @@ class BookRecordTests(AppTestCase):
         self.verify_inserted(BookCompany, name=publisher_name)
 
         self.assertTrue(factory_made is not None)
+        self.assertTrue(factory_made.id is not None)
 
 class PersonTests(AppTestCase):
     
