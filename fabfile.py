@@ -145,6 +145,6 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_TEST_DB_NAME)
+        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_TEST_DB_NAME)
     else:
-        local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_DB_NAME)
+        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_DB_NAME)
