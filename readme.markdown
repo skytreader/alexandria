@@ -9,17 +9,19 @@ Citing related repos compels me to mention [this one](https://github.com/skytrea
 
 ## System packages
 
-Assuming you are in Ubuntu/Debian:
+Install Docker and Docker Compose. Then, assuming you are in Ubuntu/Debian:
 
-    sudo apt-get install -y mysql-server-5.7
-    sudo apt-get install -y mysql-client-core-5.7
     sudo apt-get install -y mysql-client-5.7
     sudo apt-get install libmysqlclient-dev
 
+You only need the MySQL client for some fabric commands. Otherwise just do,
+
+    sudo docker-compose up
+
 ## Python set-up
 
-Assuming you have a local mysql server accessbile by passwordless account
-account `root`, create the relevant virtualenv and then,
+Assuming you have successfully ran the Docker container, create a virtualenv and
+do
 
     pip install -r requirements.txt
     fab create_database
@@ -34,8 +36,7 @@ Note that, `run.py` must have ran _at least once_ before you load the fixture da
 
 # Testing Set-up
 
-Assuming you have a local mysql database `alexandria_test` accessible by
-passwordless account `root`, in the relevant virtualenv invoke `runtests`.
+Assuming the Docker container is up, in the relevant virtualenv invoke `runtests`.
 
 The test suite runner is ultimately, nose, but there are some envionment
 variables that need to be set in order for tests to be successful. The script
