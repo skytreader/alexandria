@@ -1,5 +1,11 @@
 version: '2'
 services:
+  web:
+    build: .
+    ports:
+      - "80:7070"
+    volumes:
+      - .:/librarian
   db:
     image: "mysql:5.7"
     environment:
