@@ -12,3 +12,5 @@ services:
       - "80:7070"
     volumes:
       - .:/librarian
+    depends_on:
+      - db

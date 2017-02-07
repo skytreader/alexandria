@@ -18,7 +18,7 @@ SUDO = bool(os.environ.get("_".join((APP_NAME, "SUDO"))))
 import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
-SQL_HOST = "127.0.0.1"
+SQL_HOST = "db"
 SQL_PORT = 3306
 SQL_USERNAME = "root"
 SQL_PASSWORD = ""
