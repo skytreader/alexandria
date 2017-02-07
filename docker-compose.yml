@@ -1,14 +1,14 @@
 version: '2'
 services:
-  web:
-    build: .
-    ports:
-      - "80:7070"
-    volumes:
-      - .:/librarian
   db:
     image: "mysql:5.7"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "3306:3306"
+  web:
+    build: .
+    ports:
+      - "80:7070"
+    volumes:
+      - .:/librarian
