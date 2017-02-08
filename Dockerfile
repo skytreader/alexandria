@@ -1,20 +1,15 @@
 FROM ubuntu:16.04
 
-#ADD . ./librarian
-#WORKDIR ./librarian
-ADD . ./forever.py
-RUN ls -l .
+ADD . ./librarian
+ADD . run.py
+WORKDIR ./librarian
 
 RUN apt-get update
-RUN apt-get install -y python
-RUN which python
-CMD ["python", "forever.py"]
-#RUN apt-get -y install python python-pip
-#RUN apt-get -y install mysql-client-core-5.7
-#RUN apt-get -y install mysql-client-5.7
-#RUN apt-get -y install libmysqlclient-dev
-#RUN pip install -r requirements.txt
-#RUN which mysql
+RUN apt-get -y install python python-pip
+RUN apt-get -y install mysql-client-core-5.7
+RUN apt-get -y install mysql-client-5.7
+RUN apt-get -y install libmysqlclient-dev
+RUN pip install -r requirements.txt
 #RUN mysql -u root -e "exit;"
 
 #CMD ["python", "run.py"]
