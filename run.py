@@ -4,7 +4,7 @@ from config import APP_HOST, APP_PORT, DEVEL
 import time
 
 if __name__ == "__main__":
-    for i in range(8):
+    while True:
         try:
             librarian.init_blueprints()
             librarian.init_db()

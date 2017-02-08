@@ -1,17 +1,18 @@
 version: '2'
 services:
-  db:
-    image: "mysql:5.7"
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - "3306:3306"
+  #db:
+  #  image: "mysql:5.7"
+  #  environment:
+  #    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+  #  ports:
+  #    - "3306:3306"
   web:
     build: .
-    command: python run.py
+    # command: python run.py
+    command: echo "Running"
     ports:
       - "80:7070"
     volumes:
       - .:/librarian
-    depends_on:
-      - db
+    #depends_on:
+    #  - db
