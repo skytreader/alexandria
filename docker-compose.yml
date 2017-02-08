@@ -9,7 +9,7 @@ services:
   web:
     build: .
     # command: python run.py
-    command: echo "Running"
+    command: python forever.py
     ports:
       - "80:7070"
     volumes:
