@@ -9,6 +9,7 @@ services:
       - "3306:3306"
   web:
     build: .
+    command: python run.py
     ports:
       - "80:7070"
     volumes:
