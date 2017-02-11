@@ -5,7 +5,7 @@ services:
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - "3306:3306"
+      - "3388:3306"
     volumes:
       - "./docker-setup/init.sql:/docker-entrypoint-initdb.d/init.sql"
   web:
