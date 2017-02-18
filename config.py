@@ -19,7 +19,7 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
 SQL_HOST = "db"
-SQL_PORT = 3388
+SQL_PORT = 3306
 SQL_USERNAME = "root"
 SQL_PASSWORD = ""
 SQL_ENGINE = "mysql"
