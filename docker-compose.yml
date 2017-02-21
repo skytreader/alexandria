@@ -4,10 +4,9 @@ services:
     image: "mysql:5.7"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=alexandria
     ports:
       - "3308:3306"
-    volumes:
-      - "./docker-setup/init.sql:/docker-entrypoint-initdb.d/init.sql"
   web:
     build: .
     command: python run.py
