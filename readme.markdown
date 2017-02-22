@@ -7,21 +7,23 @@ Citing related repos compels me to mention [this one](https://github.com/skytrea
 
 # Dev Set-up
 
+If, for some reason, the following installs cannot be done (you might not have
+sudo permissions, or maybe mysql is messing around), you may attempt to set-up
+with Docker as shown in a section below.
+
 ## System packages
 
-Install Docker and Docker Compose. Then, assuming you are in Ubuntu/Debian:
+Assuming you are in Ubuntu/Debian:
 
+    sudo apt-get install -y mysql-server-5.7
+    sudo apt-get install -y mysql-client-core-5.7
     sudo apt-get install -y mysql-client-5.7
     sudo apt-get install libmysqlclient-dev
 
-You only need the MySQL client for some fabric commands. Otherwise just do,
-
-    sudo docker-compose up
-
 ## Python set-up
 
-Assuming you have successfully ran the Docker container, create a virtualenv and
-do
+Assuming you have a local mysql server accessbile by passwordless account
+account `root`, create the relevant virtualenv and then,
 
     pip install -r requirements.txt
     fab create_database
@@ -34,9 +36,17 @@ To load the fixture data,
 
 Note that, `run.py` must have ran _at least once_ before you load the fixture data.
 
+## Docker set-up
+
+**Note:** Docker will not always be maintained. Maybe, at most officially, for
+Travis CI builds. But other than that, there will be no guarantees.
+
+Simply install `docker` and `docker-compose` and do `docker-compose up --build`.
+
 # Testing Set-up
 
-Assuming the Docker container is up, in the relevant virtualenv invoke `runtests`.
+Assuming you have a local mysql database `alexandria_test` accessible by
+passwordless account `root`, in the relevant virtualenv invoke `runtests`.
 
 The test suite runner is ultimately, nose, but there are some envionment
 variables that need to be set in order for tests to be successful. The script
