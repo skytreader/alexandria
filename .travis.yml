@@ -14,7 +14,6 @@ before_install:
 install: "pip install -r requirements.txt"
 before_script:
     - pip install -r test-requirements.txt
-    - export ALEXANDRIA_CONFIG='../docker_config.py'
-script: "sudo docker-compose run web ./runtests --with-xcoverage && ./run_js_tests"
+script: "export ALEXANDRIA_CONFIG='../docker_config.py'; sudo docker-compose run web ./runtests --with-xcoverage && ./run_js_tests"
 after_success: "COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
 after_failure: "COVERALS_REPO_TOKEN=$coveralls_token coveralls"
