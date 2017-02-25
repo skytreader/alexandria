@@ -8,7 +8,7 @@ import config
 
 app = Flask(__name__)
 cache = Cache(app, config=config.CACHE_CONFIG)
-app.config.from_object("config")
+app.config.from_envvar("ALEXANDRIA_CONFIG")
 
 db = SQLAlchemy(app)
 

@@ -28,6 +28,7 @@ account `root`, create the relevant virtualenv and then,
     pip install -r requirements.txt
     fab create_database
     fab create_database:is_test=True
+    export ALEXANDRIA_CONFIG='../config.py'
     python run.py
 
 To load the fixture data,
@@ -42,6 +43,10 @@ Note that, `run.py` must have ran _at least once_ before you load the fixture da
 Travis CI builds. But other than that, there will be no guarantees.
 
 Simply install `docker` and `docker-compose` and do `docker-compose up --build`.
+When running the app from a docker set-up, set the `ALEXANDRIA_CONFIG` env var
+to `../docker_config.py`. That is,
+
+    export ALEXANDRIA_CONFIG='../docker_config.py'
 
 # Testing Set-up
 
