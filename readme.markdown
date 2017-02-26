@@ -40,7 +40,8 @@ Note that, `run.py` must have ran _at least once_ before you load the fixture da
 ## Docker set-up
 
 **Note:** Docker will not always be maintained. Maybe, at most officially, for
-Travis CI builds. But other than that, there will be no guarantees.
+Travis CI builds. But other than that, there will be no guarantees. Almost
+certainly, some, if not most, Fabric commands will not work with Docker.
 
 Simply install `docker` and `docker-compose` and do `docker-compose up --build`.
 When running the app from a docker set-up, set the `ALEXANDRIA_CONFIG` env var
