@@ -11,6 +11,9 @@ import copy
 import unittest
 import librarian
 
+fake = Faker()
+fake.add_provider(BookFieldsProvider)
+
 class IsbnTests(unittest.TestCase):
     
     def test_specified(self):
@@ -29,8 +32,6 @@ class IsbnTests(unittest.TestCase):
         self.assertFalse(isbn_check("123456789"))
 
     def test_faker(self):
-        fake = Faker()
-        fake.add_provider(BookFieldsProvider)
         # dual-validation
         for i in range(100):
             self.assertTrue(isbn_check(fake.isbn()))
@@ -124,6 +125,23 @@ class BookRecordTests(AppTestCase):
         authors.append(Person(firstname="Sid", lastname="Meier"))
         _book.authors = frozenset(authors)
         self.assertNotEquals(book.authors, _book.authors)
+
+    def test_factory(self):
+        title = "World Taekwondo Federation Welterweight"
+        publisher_name="International Olympic Committee"
+        self.verify_does_not_exist(Book, title=title)
+        self.verify_does_not_exist(Contributor, lastname="Tazegul", firstname="Servet")
+        self.verify_does_not_exist(BookCompany, name=publisher_name)
+        factory_made = BookRecord.factory(
+            isbn=fake.isbn(), title=title, publisher=publisher_name,
+            author=[Person("Tazegul", "Servet")], genre="Sports", publish_year=2017
+        )
+        self.verify_inserted(Book, title=title)
+        self.verify_inserted(Contributor, lastname="Tazegul", firstname="Servet")
+        self.verify_inserted(BookCompany, name=publisher_name)
+
+        self.assertTrue(factory_made is not None)
+        self.assertTrue(factory_made.id is not None)
 
 class PersonTests(AppTestCase):
     

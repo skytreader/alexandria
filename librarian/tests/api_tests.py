@@ -8,7 +8,7 @@ from librarian.models import Book, BookCompany, BookContribution, Contributor, G
 from librarian.utils import BookRecord, Person
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
+  BookCompanyFactory, ContributorFactory, GenreFactory, LibrarianFactory
 )
 from librarian.tests.utils import (
     make_person_object, create_library, create_book
@@ -470,6 +470,12 @@ class ApiTests(AppTestCase):
         
         participants_per_book = participant_count / book_count
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
+
+    def test_search_exact(self):
+        search_book = BookRecord.factory(
+            isbn=fake.isbn(), title="Find XYZ Inside", publisher="Creative Awesome",
+            publish_year=2017, author=[Person("Munroe", "Randall")], genre="Test"
+        )
 
     def test_title_edit_book(self):
         _creator = LibrarianFactory()

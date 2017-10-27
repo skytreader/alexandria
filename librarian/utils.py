@@ -42,7 +42,6 @@ class Person(RequestData):
 
     def __deepcopy__(self, memo):
         return Person(lastname=self.lastname, firstname=self.firstname)
-        
 
 class BookRecord(RequestData):
     """
@@ -109,6 +108,59 @@ class BookRecord(RequestData):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
+
+    @classmethod
+    def factory(
+        cls, isbn, title, publisher, publish_year=None, author=None,
+        translator=None, illustrator=None, editor=None, genre=None,
+        printer=None
+    ):
+        """
+        This method adds all created models to the session and returns an
+        instance of this class collating the models created.
+        """
+
+        import librarian.tests.factories as AppFactories
+        from librarian.models import Role
+        def contributor_factory(person_list):
+            """
+            Adds all Persons to the session as Contributors. Returns a list of
+            the Contributors created.
+            """
+            contribs = []
+            if person_list:
+                for person in person_list:
+                    contrib = AppFactories.ContributorFactory(
+                        lastname=person.lastname, firstname=person.firstname
+                    )
+                    contribs.insert(0, contrib)
+                    db.session.add(contrib)
+
+            return contribs
+
+        def book_contribution_factory(book, contributors, role):
+            for contrib in contributors:
+                db.session.add(AppFactories.BookContributionFactory(
+                    book=book, contributor=contrib, role=role
+                ))
+
+        book = AppFactories.BookFactory(
+            isbn=isbn, title=title, genre=AppFactories.GenreFactory(name=genre),
+            publisher=AppFactories.BookCompanyFactory(name=publisher), publish_year=publish_year
+        )
+        db.session.add(book)
+
+        book_contribution_factory(book, contributor_factory(author), Role.get_preset_role("Author"))
+        book_contribution_factory(book, contributor_factory(translator), Role.get_preset_role("Translator"))
+        book_contribution_factory(book, contributor_factory(illustrator), Role.get_preset_role("Illustrator"))
+        book_contribution_factory(book, contributor_factory(editor), Role.get_preset_role("Editor"))
+
+        db.session.flush()
+
+        return cls(
+            isbn, title, publisher, publish_year, author, translator,
+            illustrator, editor, genre, book.id, printer
+        )
 
     def __deepcopy__(self, memo):
         # Create record first then set authors later because constructors expect
@@ -309,7 +361,9 @@ class StatsDescriptor(object):
 
     @staticmethod
     def contrib_density(val):
-        if 1 <= val < 2:
+        if val < 1:
+            return "low"
+        elif 1 <= val < 2:
             return "focused"
         elif 2 <= val < 3:
             return "collaborative"

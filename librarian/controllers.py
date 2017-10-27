@@ -54,14 +54,20 @@ def login():
 def dash():
     stats = json.loads(api.quick_stats().data)
     contribs_per_book = StatsDescriptor.contrib_density(stats["participants_per_book"])
-    cpb_stat = ("%.2f. Your library features %.2f contributors per book. %s." %
-      (stats["participants_per_book"], stats["participants_per_book"],
-      contribs_per_book.title()))
+
+    if stats.get("pariticipants_per_book") > 0.0001:
+        cpb_stat = (
+            "%.2f. Your library features %.2f contributors per book. %s." %
+            (stats["participants_per_book"], stats["participants_per_book"],
+            contribs_per_book.title())
+        )
+    else:
+        cpb_stat = None
     
     book_count_stat = ("%d. Number of books currently in your library. %s." %
       (stats["book_count"], StatsDescriptor.book_count(stats["book_count"]).title()))
     
-    if stats["top_author"]:
+    if stats.get("top_author"):
         _top_author = {"name": " ".join((stats["top_author"][2], stats["top_author"][1])),
           "count": stats["top_author"][3]}
         top_author = "{count}. {name} has authored the most books in your collection. Favorite.".format(**_top_author)
@@ -115,10 +121,10 @@ def edit_books():
         raise InvalidRecordState("Wow. More than one book from a single id.")
 
     book = assembled[0]
-    book_js = "var editBook = JSON.parse('%s')" % json.dumps(book.__dict__)
+    book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
-      "edit-book/main.js", "edit-book/controller.js", "types/book-details.js",
+      "types/book-details.js", "edit-book/main.js", "edit-book/controller.js", 
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
 
@@ -146,9 +152,11 @@ def show_books():
 
 @librarian_bp.route("/search")
 def search():
+    from flask_login import current_user
+    user = current_user if current_user.is_authenticated else None
     search_form = SearchForm(request.form)
     searchq = request.args.get("q")
     books = api.search(searchq)
     styles = ("books.css",)
     return render_template("books.jinja", stylesheets=styles, books=books,
-      query=searchq, search_form=search_form)
+      query=searchq, search_form=search_form, user=user)

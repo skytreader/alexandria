@@ -7,9 +7,11 @@
 /**
 @constructor
 @param {addBooks.types} editBook
+@param {types.bookDetails.BookDetailsCtrl} bookDetailsCtrl
 */
-function EditBookCtrl(editBook){
+function EditBookCtrl(editBook, bookDetailsCtrl){
     this.editBook = editBook;
+    this.bookDetailsCtrl = bookDetailsCtrl;
     this.initialize();
 }
 
@@ -17,10 +19,5 @@ function EditBookCtrl(editBook){
 @private
 */
 EditBookCtrl.prototype.initialize = function(){
-    $("#isbn-proxy").val(editBook.isbn);
-    $("#title-proxy").val(editBook.title);
-    $("#publisher-proxy").val(editBook.publisher);
-    $("#printer-proxy").val(editBook.printer);
-    $("#genre-proxy").val(editBook.genre);
-    $("#year-proxy").val(editBook.year);
+    this.bookDetailsCtrl.loadToForm(this.editBook);
 }

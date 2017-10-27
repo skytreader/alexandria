@@ -19,29 +19,35 @@
         </div>
     </div>
     <div class="row">
+        {% if recent_books %}
+            <div class="col-md-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p><i class="fa fa-book"></i> Newest books:</p>
+                        <ol class="text">
+                            {% for title in recent_books %}
+                                <li>{{ title }} </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <p><i class="fa fa-book"></i> Newest books:</p>
-                    <ol class="text">
-                        {% for title in recent_books %}
-                            <li>{{ title }} </li>
-                        {% endfor %}
-                    </ol>
+            {% if contrib_stat %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p><i class="fa fa-pie-chart"></i> {{ contrib_stat }}</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <p><i class="fa fa-pie-chart"></i> {{ contrib_stat }}</p>
+            {% endif %}
+            {% if top_author %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p><i class="fa fa-pie-chart"></i> {{ top_author}}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <p><i class="fa fa-pie-chart"></i> {{ top_author}}</p>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

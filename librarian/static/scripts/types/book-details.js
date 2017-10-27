@@ -1,8 +1,8 @@
 /**
 Javascript code related to the book details form.
 
-@module addBooks.bookDetails
-@namespace addBooks.bookDetails
+@module types.bookDetails
+@namespace types.bookDetails
 @author Chad Estioco
 */
 
@@ -81,11 +81,13 @@ the book's record into the form and redo what you think failed.
 */
 BookDetailsCtrl.prototype.loadToForm = function(reqData){
     
-    function insertAllCreators(all, type){
-        for(var i = 0; i < all.length; i++){
-            $("#" + type + "-proxy-firstname").val(all[i].firstname);
-            $("#" + type + "-proxy-lastname").val(all[i].lastname);
-            this.CREATOR_ADD_HANDLERS[type]();
+    function insertAllCreators(me, all, type){
+        if(all != null){
+            for(var i = 0; i < all.length; i++){
+                $("#" + type + "-proxy-firstname").val(all[i].firstname);
+                $("#" + type + "-proxy-lastname").val(all[i].lastname);
+                me.CREATOR_ADD_HANDLERS[type]();
+            }
         }
     }
 
@@ -95,16 +97,96 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
     $("#publisher-proxy").val(reqData.publisher);
     $("#printer-proxy").val(reqData.printer);
     $("#year-proxy").val(reqData.year);
-    insertAllCreators(reqData.authors, "author");
-    insertAllCreators(reqData.illustrators, "illustrator");
-    insertAllCreators(reqData.editors, "editor");
-    insertAllCreators(reqData.translators, "translator");
+    insertAllCreators(this, reqData.author, "author");
+    insertAllCreators(this, reqData.illustrator, "illustrator");
+    insertAllCreators(this, reqData.editor, "editor");
+    insertAllCreators(this, reqData.translator, "translator");
+}
+
+/**
+TODO Mark this class as "abstract" and make subclasses implement this method.
+
+@public
+*/
+BookDetailsCtrl.prototype.clearProxyForm = function(){
 }
 
 /**
 @private
 */
 BookDetailsCtrl.prototype.setUp = function(){
+    var me = this;
+
+    /**
+    Create a list element for displaying a creator's name. The name displayed is
+    dependent on what is currently entered in the procy fields for this creator.
+    
+    TODO Test me
+    
+    @param {string} creatorType
+    */
+    function renderContentCreatorListing(creatorType){
+        var hiddenLastnameProxy = document.createElement("input");
+        hiddenLastnameProxy.type = "hidden";
+        hiddenLastnameProxy.name = creatorType + "-proxy-lastname";
+    
+        var hiddenFirstnameProxy = document.createElement("input");
+        hiddenFirstnameProxy.type = "hidden";
+        hiddenFirstnameProxy.name = creatorType + "-proxy-firstname";
+    
+        var divRow = document.createElement("div");
+        $(divRow).addClass("row");
+    
+        var delCol = document.createElement("div");
+        $(delCol).addClass("col-xs-1 del-col");
+    
+        var nameCol = document.createElement("div");
+        $(nameCol).addClass("col-xs-11");
+    
+        divRow.appendChild(delCol);
+        divRow.appendChild(nameCol);
+    
+        var lastName = $("#" + creatorType + "-proxy-lastname").val().trim();
+        var firstName = $("#" + creatorType + "-proxy-firstname").val().trim();
+        hiddenLastnameProxy.value = lastName;
+        hiddenFirstnameProxy.value = firstName;
+        clearCreatorInput(creatorType);
+        var nameElement = document.createElement("span");
+        nameElement.innerHTML = lastName + ", " + firstName;
+    
+        nameCol.appendChild(nameElement);
+    
+        var deleteButton = document.createElement("i");
+        $(deleteButton).addClass("fa fa-times-circle")
+          .click(recordDeleterFactory(creatorType));
+    
+        delCol.appendChild(deleteButton);
+    
+        var listing = document.createElement("li");
+        listing.appendChild(divRow);
+        listing.appendChild(hiddenLastnameProxy);
+        listing.appendChild(hiddenFirstnameProxy);
+    
+        return listing;
+    }
+
+    /**
+    @param {string} creatorType
+    */
+    function clearCreatorInput(creatorType){
+        $("#" + creatorType + "-proxy-lastname").val("");
+        $("#" + creatorType + "-proxy-firstname").val("");
+    }
+
+    /**
+    @param {string} creatorType
+    */
+    function recordDeleterFactory(creatorType){
+        return function() {
+            $(me.parentNode.parentNode).remove();
+        }
+    };
+
     /**
     Return a function that generates an input row for a given creatorType. The
     generated function was meant to be called for the click event on the add
@@ -119,24 +201,20 @@ BookDetailsCtrl.prototype.setUp = function(){
         }
     }
 
-    function clearProxyForm(){
-        $("#proxy-form input").val("")
-    }
-
     // Event handlers
-    $("#clear-proxy").click(clearProxyForm);
+    $("#clear-proxy").click(me.clearProxyForm);
     $("#queue-book").click(function(){
-        if(this.isCreatorPending()){
+        if(me.isCreatorPending()){
             alertify.alert("Forgot something?",
               "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
         } else if($("#proxy-form").valid()){
             var spine = renderSpine();
-            this.internalizeBook(spine);
+            me.internalizeBook(spine);
             window.visualQueue.prepend(spine);
-            this.updateStatCounts();
-            this.clearProxyForm();
-            this.clearLists();
-            this.resetAutocomplete();
+            me.updateStatCounts();
+            me.clearProxyForm();
+            me.clearLists();
+            me.resetAutocomplete();
         } else{
             alertify.alert("Oh no!",
               "There is a problem with this book's details. Check the fields for specifics.");
