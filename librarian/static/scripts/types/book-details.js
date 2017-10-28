@@ -227,32 +227,32 @@ BookDetailsCtrl.prototype.setUp = function(){
     this.fillNames();
     this.addValidationMethods();
 
+    var me = this;
     $("#author-proxy-lastname").blur(function(){
-        this.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+        me.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
     });
     $("#author-proxy-firstname").blur(function(){
-        this.setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+        me.setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
     });
     $("#illustrator-proxy-lastname").blur(function(){
-        this.setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+        me.setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
     });
     $("#illustrator-proxy-firstname").blur(function(){
-        this.setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+        me.setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
     });
     $("#editor-proxy-lastname").blur(function(){
-        this.setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+        me.setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
     });
     $("#editor-proxy-firstname").blur(function(){
-        this.setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+        me.setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
     });
     $("#translator-proxy-lastname").blur(function(){
-        this.setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+        me.setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
     });
     $("#translator-proxy-firstname").blur(function(){
-        this.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
+        me.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 
-    var me = this;
     this.CREATORS.forEach(function(creatorTitle){
         me.CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
         $("#" + creatorTitle + "-add").click(me.CREATOR_ADD_HANDLERS[creatorTitle]);
@@ -359,8 +359,9 @@ stucture.
 */
 BookDetailsCtrl.prototype.setAutoComplete = function(targetId, partnerId){
     "use strict";
+    var me = this;
     function mapAndSet(partner, target){
-        var acSource = _.map(_.filter(this.BOOK_PERSONS, function(person){
+        var acSource = _.map(_.filter(me.BOOK_PERSONS, function(person){
             return person[partner] == partnerElement.val();
           }), function(person){
             return person[target];
