@@ -204,6 +204,7 @@ BookDetailsCtrl.prototype.setUp = function(){
 
     // Event handlers
     $("#clear-proxy").click(me.clearProxyForm);
+    // TODO rename the ID to something more generic for editing books.
     $("#queue-book").click(function(){
         if(me.isCreatorPending()){
             alertify.alert("Forgot something?",
@@ -444,4 +445,28 @@ BookDetailsCtrl.prototype.addValidationMethods = function(){
     $.validator.addMethod("yearVal", function(value, element, param){
         return /^\d{4}$/.test(value);
     }, "Please enter a valid year.");
+
+    $("#proxy-form").validate({
+        rules:{
+            "isbn-rule":{
+                isbnVal: true,
+                required: true,
+                maxlength: 13
+            },
+            "year-rule":{
+                yearVal: true,
+                required: true
+            },
+            "genre-rule":{
+                required: true,
+                maxlength: 40
+            },
+            "title-rule":{
+                required: true
+            },
+            "publisher-rule":{
+                required: true
+            }
+        }
+    });
 }

@@ -509,30 +509,6 @@ $(document).ready(function(){
         }
     });
 
-    $("#proxy-form").validate({
-        rules:{
-            "isbn-rule":{
-                isbnVal: true,
-                required: true,
-                maxlength: 13
-            },
-            "year-rule":{
-                yearVal: true,
-                required: true
-            },
-            "genre-rule":{
-                required: true,
-                maxlength: 40
-            },
-            "title-rule":{
-                required: true
-            },
-            "publisher-rule":{
-                required: true
-            }
-        }
-    });
-
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
