@@ -304,16 +304,18 @@ BookDetailsCtrl.prototype.fillNames = function(){
 @private
 */
 BookDetailsCtrl.prototype.fillGenres = function(){
+    console.debug("filling genres..");
+    var me = this;
     $.ajax("/api/read/genres", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
-            window.GENRES = data["data"];
+            me.GENRES = data["data"];
             $("#genre-proxy").autocomplete({
-                source: this.GENRES
+                source: me.GENRES
             });
         },
         "error": function(jqXHR, textStatus, error){
-            setTimeout(this.fillGenres, 8000);
+            setTimeout(me.fillGenres, 8000);
         }
     });
 }

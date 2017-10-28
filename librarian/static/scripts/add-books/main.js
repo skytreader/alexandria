@@ -107,7 +107,7 @@ function BookSenderCtrl(bookDetailsCtrl){
 
     @member
     */
-    this.visualQueue;
+    this.visualQueue = new Queue();
     
     /**
     @member
@@ -349,7 +349,7 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
 
 /**
 Create a list element for displaying a creator's name. The name displayed is
-dependent on what is currently entered in the procy fields for this creator.
+dependent on what is currently entered in the proxy fields for this creator.
 
 TODO Test me
 
