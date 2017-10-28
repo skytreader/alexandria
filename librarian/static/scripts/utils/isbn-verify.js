@@ -6,6 +6,8 @@ for more details on how to verify ISBN codes.
 
 All inputs assume that it has been stripped of any extraneous
 characters like dashes or whitespace.
+
+@module utils.isbnVerify
 */
 
 //TODO: Abstract ISBN verification.

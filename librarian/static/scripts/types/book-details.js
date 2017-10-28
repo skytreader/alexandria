@@ -2,6 +2,7 @@
 Javascript code related to the book details form.
 
 @module types.bookDetails
+@requires utils.isbnVerify
 @namespace types.bookDetails
 @author Chad Estioco
 */
@@ -224,6 +225,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     this.fillGenres();
     this.fillCompanies();
     this.fillNames();
+    this.addValidationMethods();
 
     $("#author-proxy-lastname").blur(function(){
         this.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
@@ -429,6 +431,16 @@ BookDetailsCtrl.prototype.isCreatorPending = function(){
     return false;
 }
 
-$(document).ready(function() {
-    var bookDetailsCtrl = new BookDetailsCtrl();
-})
+/**
+@private
+*/
+BookDetailsCtrl.prototype.addValidationMethods = function(){
+    $.validator.addMethod("isbnVal", function(value, element, param){
+        var stripped = value.trim();
+        return verifyISBN10(stripped) || verifyISBN13(stripped);
+    }, "Invalid ISBN input.");
+
+    $.validator.addMethod("yearVal", function(value, element, param){
+        return /^\d{4}$/.test(value);
+    }, "Please enter a valid year.");
+}
