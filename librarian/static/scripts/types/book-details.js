@@ -3,6 +3,7 @@ Javascript code related to the book details form.
 
 @module types.bookDetails
 @requires utils.isbnVerify
+@requires alertify
 @namespace types.bookDetails
 @author Chad Estioco
 */
@@ -205,23 +206,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     // Event handlers
     $("#clear-proxy").click(me.clearProxyForm);
     // TODO rename the ID to something more generic for editing books.
-    $("#queue-book").click(function(){
-        if(me.isCreatorPending()){
-            alertify.alert("Forgot something?",
-              "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
-        } else if($("#proxy-form").valid()){
-            var spine = renderSpine();
-            me.internalizeBook(spine);
-            window.visualQueue.prepend(spine);
-            me.updateStatCounts();
-            me.clearProxyForm();
-            me.clearLists();
-            me.resetAutocomplete();
-        } else{
-            alertify.alert("Oh no!",
-              "There is a problem with this book's details. Check the fields for specifics.");
-        }
-    });
+    $("#queue-book").click(this.saveBook);
 
     this.fillGenres();
     this.fillCompanies();
@@ -301,6 +286,33 @@ BookDetailsCtrl.prototype.fillNames = function(){
             setTimeout(me.fillNames, 8000);
         }
     });
+}
+
+/**
+Event handler for clicking on the "Save Book" button.
+
+@private
+*/
+BookDetailsCtrl.prototype.saveBook = function(){
+    if(me.isCreatorPending()){
+        alertify.alert("Forgot something?",
+          "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
+    } else if($("#proxy-form").valid()){
+        this.validBookAction();
+    } else{
+        alertify.alert("Oh no!",
+          "There is a problem with this book's details. Check the fields for specifics.");
+    }
+}
+
+/**
+Encapsulates what happens when the entered book data is valid.
+
+@public
+*/
+BookDetailsCtrl.prototype.validBookAction = function(){
+    console.error("BookDetailsCtrl.validBookAction must be implemented!");
+    alert("BookDetailsCtrl.validBookAction must be implemented!");
 }
 
 /**

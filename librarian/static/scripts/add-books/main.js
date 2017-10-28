@@ -134,38 +134,6 @@ BookSenderCtrl.prototype.updateStatCounts = function(){
 }
 
 /**
-Renders the "spine" display of the book list. Takes data from the proxy form
-directly.
-
-@return {HTMLElement} A div element which displays like a spine of a book. The
-div element has the isbn for its id.
-@public
-*/
-BookSenderCtrl.prototype.renderSpine = function(){
-    var spine = document.createElement("div");
-    spine.className = "unsaved_book queued_block";
-    var allInputs = $("#proxy-form input");
-    var isbn = $(allInputs).filter("#isbn-proxy");
-    spine.id = isbn.val();
-    var title = $(allInputs).filter("#title-proxy");
-
-    var isbnText = document.createElement("h3");
-    isbnText.innerHTML = isbn.val();
-
-    var titleText = document.createElement("h2");
-    titleText.innerHTML = title.val();
-
-    var authorsText = document.createElement("h3");
-    authorsText.innerHTML = this.listNames(getCreatorNames("author"));
-
-    spine.appendChild(isbnText);
-    spine.appendChild(titleText);
-    spine.appendChild(authorsText);
-
-    return spine;
-}
-
-/**
 Get a list of persons and return a string to display them..
 
 @param {Array.Person} nameList
@@ -474,7 +442,7 @@ $(document).ready(function(){
         $("#main-form input").not("#csrf_token").val("");
     }
 
-    var bookDetailsCtrl = new BookDetailsCtrl();
+    var bookDetailsCtrl = new AddBookDetailsCtrl();
     var bookSenderCtrl = new BookSenderCtrl(bookDetailsCtrl);
 
     /**
