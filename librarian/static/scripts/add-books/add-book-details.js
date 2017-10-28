@@ -6,7 +6,7 @@
 */
 
 function AddBookDetailsCtrl(){
-    BookDetailsCtrl.call()
+    BookDetailsCtrl.call(this)
 }
 
 AddBookDetailsCtrl.prototype = Object.create(BookDetailsCtrl.prototype);

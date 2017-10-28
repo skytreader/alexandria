@@ -319,7 +319,6 @@ BookDetailsCtrl.prototype.validBookAction = function(){
 @private
 */
 BookDetailsCtrl.prototype.fillGenres = function(){
-    console.debug("filling genres..");
     var me = this;
     $.ajax("/api/read/genres", {
         "type": "GET",
