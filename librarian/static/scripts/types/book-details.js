@@ -111,6 +111,9 @@ TODO Mark this class as "abstract" and make subclasses implement this method.
 @public
 */
 BookDetailsCtrl.prototype.clearProxyForm = function(){
+    var msg = "BookDetailsCtrl.clearProxyForm must be implemented!";
+    console.error(msg);
+    alert(msg);
 }
 
 /**
@@ -185,7 +188,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     */
     function recordDeleterFactory(creatorType){
         return function() {
-            $(me.parentNode.parentNode).remove();
+            $(this.parentNode.parentNode).remove();
         }
     };
 
@@ -203,17 +206,17 @@ BookDetailsCtrl.prototype.setUp = function(){
         }
     }
 
+    var me = this;
     // Event handlers
-    $("#clear-proxy").click(me.clearProxyForm);
+    $("#clear-proxy").click(function(){me.clearProxyForm()});
     // TODO rename the ID to something more generic for editing books.
-    $("#queue-book").click(this.saveBook);
+    $("#queue-book").click(function(){me.saveBook()});
 
     this.fillGenres();
     this.fillCompanies();
     this.fillNames();
     this.addValidationMethods();
 
-    var me = this;
     $("#author-proxy-lastname").blur(function(){
         me.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
     });
@@ -294,7 +297,7 @@ Event handler for clicking on the "Save Book" button.
 @private
 */
 BookDetailsCtrl.prototype.saveBook = function(){
-    if(me.isCreatorPending()){
+    if(this.isCreatorPending()){
         alertify.alert("Forgot something?",
           "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
     } else if($("#proxy-form").valid()){
