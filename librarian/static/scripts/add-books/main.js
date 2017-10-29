@@ -142,51 +142,52 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
     var possibleNewCompanies = [publisher, printer];
 
     var possibleNewGenre = document.getElementById("genre").value;
+    var me = this;
 
     function success(){
         $(domElement).removeClass("unsaved_book").addClass("saved_book");
 
         _.forEach(possibleNewNames, function(newNames){
             _.forEach(newNames, function(person){
-                if(!this.bookDetailsCtrl.BOOK_PERSONS_SET.has(person)){
-                    this.bookDetailsCtrl.BOOK_PERSONS_SET.add(person);
-                    if(this.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
-                        this.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
+                if(!me.bookDetailsCtrl.BOOK_PERSONS_SET.has(person)){
+                    me.bookDetailsCtrl.BOOK_PERSONS_SET.add(person);
+                    if(me.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
+                        me.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
                     }
-                    if(this.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
-                        this.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                    if(me.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
+                        me.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.push(person["lastname"]);
                     }
                 }
             });
         });
-        this.bookDetailsCtrl.BOOK_PERSONS = [...this.bookDetailsCtrl.BOOK_PERSONS_SET]
-        this.bookDetailsCtrl.resetAutocomplete();
+        me.bookDetailsCtrl.BOOK_PERSONS = [...me.bookDetailsCtrl.BOOK_PERSONS_SET]
+        me.bookDetailsCtrl.resetAutocomplete();
 
         _.forEach(possibleNewCompanies, function(company){
-            if(this.bookDetailsCtrl.COMPANIES.indexOf(company) < 0){
-                this.bookDetailsCtrl.COMPANIES.push(company);
+            if(me.bookDetailsCtrl.COMPANIES.indexOf(company) < 0){
+                me.bookDetailsCtrl.COMPANIES.push(company);
             }
         });
 
         _.forEach(possibleNewGenre, function(genre){
-            if(this.bookDetailsCtrl.GENRES.indexOf(genre) < 0){
-                this.bookDetailsCtrl.GENRES.push(genre);
+            if(me.bookDetailsCtrl.GENRES.indexOf(genre) < 0){
+                me.bookDetailsCtrl.GENRES.push(genre);
             }
         });
-        this.booksSaved++;
+        me.booksSaved++;
     }
 
     function fail(jqxhr){
         alertify.error(jqxhr.responseText);
         $(domElement).removeClass("unsaved_book").addClass("error_book");
-        this.booksErrorNoRetry++;
+        me.booksErrorNoRetry++;
     }
 
     function failRecover(jqxhr){
         alertify.warning("Failed to save a book. Please wait as we automatically retry.");
         $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
-        this.reprocessQueue.enqueue(domElement);
-        this.booksReprocessable++;
+        me.reprocessQueue.enqueue(domElement);
+        me.booksReprocessable++;
     }
 
     var data = {
@@ -211,7 +212,7 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
             409: fail,
             500: failRecover
         },
-        "complete": updateStatCounts
+        "complete": me.updateStatCounts
     });
 }
 
