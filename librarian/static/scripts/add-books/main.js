@@ -1,33 +1,3 @@
-/**
-Responsible for sending book data to the server. Manages queues and all.
-
-@module addBooks.main
-@namespace addBook.main
-@author Chad Estioco
-*/
-var PROCESS_INTERVAL = 8888;
-var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
-
-/**
-THE BOOK QUEUE. This is the internal representation of the book queue.
-*/
-var bookQueue = new Queue();
-
-/**
-Where the books eligible for reprocessing go.
-*/
-var reprocessQueue = new Queue();
-
-/**
-This script will manipulate ids a lot. We derive certain converntions from the
-actual ids of the hidden form field. This hidden form field is the one that
-is mapped to the Flask form. These are the fields to be included in the request.
-*/
-var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
-  "editors", "translators", "year", "publisher", "printer"];
-
-var visualQueue;
-
 var booksSaved = 0;
 var booksErrorNoRetry = 0;
 var booksReprocessable = 0;
@@ -45,7 +15,7 @@ form via queues. Sending the data to the server is also part of its
 responsibilites.
 
 @constructor
-@param {addBooks.bookDetails.BookDetailsCtrl} bookDetailsCtrl
+@param {addBooks.addBookDetails.AddBookDetailsCtrl} bookDetailsCtrl
     Expected to be initialized and all.
 */
 function BookSenderCtrl(bookDetailsCtrl){
@@ -65,7 +35,7 @@ function BookSenderCtrl(bookDetailsCtrl){
     @const {number}
     @member
     */
-    this.REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
+    this.REPROCESS_INTERVAL = this.PROCESS_INTERVAL + 1000;
     
     /**
     Where the books eligible for reprocessing go.
@@ -92,13 +62,6 @@ function BookSenderCtrl(bookDetailsCtrl){
       "editors", "translators", "year", "publisher", "printer"];
     
     /**
-    Visual representation of what is going on with the sending of books.
-
-    @member
-    */
-    this.visualQueue = new Queue();
-    
-    /**
     @member
     */
     this.booksSaved = 0;
@@ -119,7 +82,7 @@ function BookSenderCtrl(bookDetailsCtrl){
 }
 
 BookSenderCtrl.prototype.unsavedUpdater = function(){
-    return this.visualQueue.getLength();
+    return this.bookDetailsCtrl.visualQueue.getLength();
 }
 
 BookSenderCtrl.prototype.savedUpdater = function(){
@@ -323,17 +286,10 @@ function recordDeleterFactory(creatorType){
 };
 
 /**
-Clears the proxy form.
-*/
-function clearProxyForm(){
-    $("#proxy-form input").val("")
-}
-
-/**
 @return {boolean} Returns true if the proxy form is all blank and if there is
 nothing left in both queues.
 */
-function isWorkDone(){
+BookSenderCtrl.prototype.isWorkDone = function(){
     // TODO Check the condition where there is a _pending_ HTTP request. Should
     // this even handle that?
     function isProxyFormEmpty(){
@@ -345,7 +301,7 @@ function isWorkDone(){
         });
         return isEmpty;
     }
-    return bookQueue.getLength() == 0 && reprocessQueue.getLength() == 0 &&
+    return this.bookDetailsCtrl.bookQueue.getLength() == 0 && this.reprocessQueue.getLength() == 0 &&
       isProxyFormEmpty();
 }
 
@@ -379,7 +335,28 @@ $(document).ready(function(){
         $("#main-form input").not("#csrf_token").val("");
     }
 
-    var addBookDetailsCtrl = new AddBookDetailsCtrl();
+    $(window).bind("beforeunload", function(){
+        if(!isWorkDone()){
+            return "You are leaving the page with unsaved work.";
+        }
+    });
+
+    // Initialize the visualQueue
+    var qContainer = document.createElement("span");
+    qContainer.id = "bookq";
+    var defItem = document.createElement("div");
+    defItem.className = "queued_block empty_set";
+    var defText = document.createElement("h3");
+    defText.innerHTML = "Ooops. Nothing yet.";
+    defItem.appendChild(defText);
+    // Special styles to override from queued_block rule.
+    defItem.style.padding = "5% inherit";
+    var defs = {"defaultDisplay":defItem,
+      "defaultLocation": document.getElementById("qContainer")};
+    var visualQueue = new VisualQueue(qContainer, defs);
+    visualQueue.render();
+
+    var addBookDetailsCtrl = new AddBookDetailsCtrl(visualQueue);
     var bookSenderCtrl = new BookSenderCtrl(addBookDetailsCtrl);
 
     /**
@@ -408,40 +385,18 @@ $(document).ready(function(){
         return false;
     }
 
-    $(window).bind("beforeunload", function(){
-        if(!isWorkDone()){
-            return "You are leaving the page with unsaved work.";
-        }
-    });
-
-    // Initialize the visualQueue
-    var qContainer = document.createElement("span");
-    qContainer.id = "bookq";
-    var defItem = document.createElement("div");
-    defItem.className = "queued_block empty_set";
-    var defText = document.createElement("h3");
-    defText.innerHTML = "Ooops. Nothing yet.";
-    defItem.appendChild(defText);
-    // Special styles to override from queued_block rule.
-    defItem.style.padding = "5% inherit";
-    var defs = {"defaultDisplay":defItem,
-      "defaultLocation": document.getElementById("qContainer")};
-    window.visualQueue = new VisualQueue(qContainer, defs);
-    window.visualQueue.render();
-    bookSenderCtrl.updateStatCounts();
-
     // Start the polling interval timers.
     setInterval(function(){
-        var foo = loadFromQueueToForm(window.bookQueue);
+        var foo = loadFromQueueToForm(addBookDetailsCtrl.bookQueue);
         if(foo){
             bookSenderCtrl.sendSaveForm(foo.domElement);
         }
-    }, PROCESS_INTERVAL);
+    }, bookSenderCtrl.PROCESS_INTERVAL);
     
     setInterval(function(){
-        var foo = loadFromQueueToForm(window.reprocessQueue);
+        var foo = loadFromQueueToForm(bookSenderCtrl.reprocessQueue);
         if(foo){
             bookSenderCtrl.sendSaveForm(foo.domElement);
         }
-    }, REPROCESS_INTERVAL);
+    }, bookSenderCtrl.REPROCESS_INTERVAL);
 });

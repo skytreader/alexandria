@@ -5,7 +5,10 @@
 @author Chad Estioco
 */
 
-function AddBookDetailsCtrl(){
+/**
+@param {utils.visualQueue} visualQueue
+*/
+function AddBookDetailsCtrl(visualQueue){
     BookDetailsCtrl.call(this)
     
     /**
@@ -18,6 +21,7 @@ function AddBookDetailsCtrl(){
     @member
     */
     this.bookQueue = new Queue();
+    this.visualQueue = visualQueue;
     this.statCounter = null;
 }
 
