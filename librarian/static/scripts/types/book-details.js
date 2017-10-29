@@ -106,14 +106,10 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
 }
 
 /**
-TODO Mark this class as "abstract" and make subclasses implement this method.
-
 @public
 */
 BookDetailsCtrl.prototype.clearProxyForm = function(){
-    var msg = "BookDetailsCtrl.clearProxyForm must be implemented!";
-    console.error(msg);
-    alert(msg);
+    $("#proxy-form input").val("");
 }
 
 /**

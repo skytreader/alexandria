@@ -97,7 +97,6 @@ function BookSenderCtrl(bookDetailsCtrl){
     @member
     */
     this.visualQueue = new Queue();
-    console.log("visualQueue initialized with", this.visualQueue.getLength(), "items");
     
     /**
     @member
@@ -113,12 +112,13 @@ function BookSenderCtrl(bookDetailsCtrl){
     this.booksReprocessable = 0;
 
     var me = this;
-    this.statCounter = new StatCounter(function(){return me.unsavedUpdater()}, this.savedUpdater, this.errorUpdater, this.reprocessUpdater);
+    this.statCounter = new StatCounter(() => me.unsavedUpdater(),
+        () => me.savedUpdater(), () => me.errorUpdater(),
+        () => me.reprocessUpdater());
     this.bookDetailsCtrl.setStatCounter(this.statCounter);
 }
 
 BookSenderCtrl.prototype.unsavedUpdater = function(){
-    console.log("calling visualQueue", this);
     return this.visualQueue.getLength();
 }
 
