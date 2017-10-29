@@ -97,6 +97,7 @@ function BookSenderCtrl(bookDetailsCtrl){
     @member
     */
     this.visualQueue = new Queue();
+    console.log("visualQueue initialized with", this.visualQueue.getLength(), "items");
     
     /**
     @member
@@ -110,6 +111,27 @@ function BookSenderCtrl(bookDetailsCtrl){
     @member
     */
     this.booksReprocessable = 0;
+
+    var me = this;
+    this.statCounter = new StatCounter(function(){return me.unsavedUpdater()}, this.savedUpdater, this.errorUpdater, this.reprocessUpdater);
+    this.bookDetailsCtrl.setStatCounter(this.statCounter);
+}
+
+BookSenderCtrl.prototype.unsavedUpdater = function(){
+    console.log("calling visualQueue", this);
+    return this.visualQueue.getLength();
+}
+
+BookSenderCtrl.prototype.savedUpdater = function(){
+    return this.booksSaved;
+}
+
+BookSenderCtrl.prototype.errorUpdater = function(){
+    return this.booksErrorNoRetry;
+}
+
+BookSenderCtrl.prototype.reprocessUpdater = function(){
+    return this.booksReprocessable;
 }
 
 /**
@@ -357,8 +379,8 @@ $(document).ready(function(){
         $("#main-form input").not("#csrf_token").val("");
     }
 
-    var bookDetailsCtrl = new AddBookDetailsCtrl();
-    var bookSenderCtrl = new BookSenderCtrl(bookDetailsCtrl);
+    var addBookDetailsCtrl = new AddBookDetailsCtrl();
+    var bookSenderCtrl = new BookSenderCtrl(addBookDetailsCtrl);
 
     /**
     Load from the given queue to the actual form. The queue object is expected to 

@@ -18,15 +18,22 @@ function AddBookDetailsCtrl(){
     @member
     */
     this.bookQueue = new Queue();
+    this.statCounter = null;
 }
 
 AddBookDetailsCtrl.prototype = Object.create(BookDetailsCtrl.prototype);
+
+AddBookDetailsCtrl.prototype.setStatCounter = function(statCounter){
+    this.statCounter = statCounter;
+}
 
 AddBookDetailsCtrl.prototype.validBookAction = function(){
     var spine = this.renderSpine();
     this.internalizeBook(spine);
     window.visualQueue.prepend(spine);
-    this.updateStatCounts();
+    if(this.statCounter){
+        this.statCounter.updateAll();
+    }
     this.clearProxyForm();
     this.clearLists();
     this.resetAutocomplete();
@@ -48,10 +55,10 @@ AddBookDetailsCtrl.prototype.internalizeBook = function(spineDom){
     var isbn = $(allInputs).filter("#isbn-proxy").val();
     var title = $(allInputs).filter("#title-proxy").val();
     var genre = $(allInputs).filter("#genre-proxy").val();
-    var authors = JSON.stringify(getCreatorNames("author"));
-    var illustrators = JSON.stringify(getCreatorNames("illustrator"));
-    var editors = JSON.stringify(getCreatorNames("editor"));
-    var translators = JSON.stringify(getCreatorNames("translator"));
+    var authors = JSON.stringify(this.getCreatorNames("author"));
+    var illustrators = JSON.stringify(this.getCreatorNames("illustrator"));
+    var editors = JSON.stringify(this.getCreatorNames("editor"));
+    var translators = JSON.stringify(this.getCreatorNames("translator"));
     var publisher = $(allInputs).filter("#publisher-proxy").val();
     var printer = $(allInputs).filter("#printer-proxy").val();
     var year = $(allInputs).filter("#year-proxy").val();
