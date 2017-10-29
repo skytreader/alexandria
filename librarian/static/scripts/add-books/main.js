@@ -335,12 +335,6 @@ $(document).ready(function(){
         $("#main-form input").not("#csrf_token").val("");
     }
 
-    $(window).bind("beforeunload", function(){
-        if(!isWorkDone()){
-            return "You are leaving the page with unsaved work.";
-        }
-    });
-
     // Initialize the visualQueue
     var qContainer = document.createElement("span");
     qContainer.id = "bookq";
@@ -359,6 +353,12 @@ $(document).ready(function(){
     var addBookDetailsCtrl = new AddBookDetailsCtrl(visualQueue);
     var bookSenderCtrl = new BookSenderCtrl(addBookDetailsCtrl);
 
+    $(window).bind("beforeunload", function(){
+        if(!bookSenderCtrl.isWorkDone()){
+            return "You are leaving the page with unsaved work.";
+        }
+    });
+
     /**
     Load from the given queue to the actual form. The queue object is expected to 
     be from Queue.js.
@@ -373,10 +373,10 @@ $(document).ready(function(){
         var fromQ = queue.dequeue();
     
         if(fromQ){
-            var limit = window.realFormIds.length;
+            var limit = bookSenderCtrl.realFormIds.length;
     
             for(var i = 0; i < limit; i++){
-                document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+                document.getElementById(bookSenderCtrl.realFormIds[i]).value = fromQ[bookSenderCtrl.realFormIds[i]];
             }
     
             return fromQ;

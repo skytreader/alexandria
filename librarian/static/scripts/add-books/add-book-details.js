@@ -34,7 +34,7 @@ AddBookDetailsCtrl.prototype.setStatCounter = function(statCounter){
 AddBookDetailsCtrl.prototype.validBookAction = function(){
     var spine = this.renderSpine();
     this.internalizeBook(spine);
-    window.visualQueue.prepend(spine);
+    this.visualQueue.prepend(spine);
     if(this.statCounter){
         this.statCounter.updateAll();
     }
