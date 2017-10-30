@@ -373,7 +373,6 @@ BookDetailsCtrl.prototype.setAutoComplete = function(targetId, partnerId){
     var me = this;
     function mapAndSet(partner, target){
         var acSource = _.map(_.filter(me.BOOK_PERSONS, function(person){
-            console.log(person);
             return person[partner] == partnerElement.val();
           }), function(person){
             return person[target];

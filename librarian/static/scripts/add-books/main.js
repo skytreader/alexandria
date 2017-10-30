@@ -101,7 +101,8 @@ BookSenderCtrl.prototype.reprocessUpdater = function(){
 @public
 */
 BookSenderCtrl.prototype.updateStatCounts = function(){
-    $("#unsaved-count").text("" + this.visualQueue.getLength());
+    console.log(this);
+    $("#unsaved-count").text("" + this.bookDetailsCtrl.visualQueue.getLength());
     $("#saved-count").text("" + this.booksSaved);
     $("#error-count").text("" + this.booksErrorNoRetry);
     $("#reprocessed-count").text("" + this.booksReprocessable);
@@ -212,7 +213,7 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
             409: fail,
             500: failRecover
         },
-        "complete": me.updateStatCounts
+        "complete": function(){me.updateStatCounts}
     });
 }
 
