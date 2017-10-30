@@ -213,7 +213,7 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
             409: fail,
             500: failRecover
         },
-        "complete": function(){me.updateStatCounts}
+        "complete": function(){me.updateStatCounts()}
     });
 }
 

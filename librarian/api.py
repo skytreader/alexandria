@@ -142,8 +142,7 @@ def book_adder():
 
             __insert_contributions(book, form, db.session)
 
-            # NOTE: Uncomment this before merging. Just so the DB is not messed up.
-            #db.session.commit()
+            db.session.commit()
 
             return "Accepted", 200
         except IntegrityError, ierr:
