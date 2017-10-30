@@ -1,14 +1,3 @@
-var booksSaved = 0;
-var booksErrorNoRetry = 0;
-var booksReprocessable = 0;
-
-/**
-This is needed by the loadToForm method.
-
-Maps the creator type to the event handler used to add an entry to the creator list.
-*/
-var CREATOR_ADD_HANDLERS = {};
-
 /**
 This class is concerned with the interaction of the proxy form and the actual
 form via queues. Sending the data to the server is also part of its
@@ -101,7 +90,6 @@ BookSenderCtrl.prototype.reprocessUpdater = function(){
 @public
 */
 BookSenderCtrl.prototype.updateStatCounts = function(){
-    console.log(this);
     $("#unsaved-count").text("" + this.bookDetailsCtrl.visualQueue.getLength());
     $("#saved-count").text("" + this.booksSaved);
     $("#error-count").text("" + this.booksErrorNoRetry);
