@@ -262,7 +262,7 @@ BookDetailsCtrl.prototype.fillNames = function(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
-            BOOK_PERSONS = allNames;
+            me.BOOK_PERSONS = allNames;
             me.BOOK_PERSONS_SET.addAll(allNames);
             var allLastnames = _.map(allNames, function(x){return x["lastname"]});
             var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
@@ -373,6 +373,7 @@ BookDetailsCtrl.prototype.setAutoComplete = function(targetId, partnerId){
     var me = this;
     function mapAndSet(partner, target){
         var acSource = _.map(_.filter(me.BOOK_PERSONS, function(person){
+            console.log(person);
             return person[partner] == partnerElement.val();
           }), function(person){
             return person[target];
