@@ -109,7 +109,15 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
 @public
 */
 BookDetailsCtrl.prototype.clearProxyForm = function(){
-    $("#proxy-form input").val("");
+    alertify.confirm(
+        "Are you sure you want to clear the form?",
+        function() {
+            $("#proxy-form input").val("");
+            alertify.message("Form cleared.");
+        },
+        function() {
+        }
+    );
 }
 
 /**
