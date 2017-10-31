@@ -3,6 +3,12 @@ This class is concerned with the interaction of the proxy form and the actual
 form via queues. Sending the data to the server is also part of its
 responsibilites.
 
+@module addBooks.main
+@namespace addBooks.main
+@author Chad Estioco
+*/
+
+/**
 @constructor
 @param {addBooks.addBookDetails.AddBookDetailsCtrl} bookDetailsCtrl
     Expected to be initialized and all.

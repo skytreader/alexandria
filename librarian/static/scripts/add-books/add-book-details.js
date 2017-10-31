@@ -1,11 +1,12 @@
 /**
 @module addBooks.addBookDetails
 @namespace addBooks.addBookDetails
-@inheritdoc types.bookDetails
+@ineritdoc
 @author Chad Estioco
 */
 
 /**
+@constructor
 @param {utils.visualQueue} visualQueue
 */
 function AddBookDetailsCtrl(visualQueue){
