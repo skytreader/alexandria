@@ -39,7 +39,7 @@ AddBookDetailsCtrl.prototype.validBookAction = function(){
     if(this.statCounter){
         this.statCounter.updateAll();
     }
-    this.clearProxyForm();
+    $("#proxy-form input").val("");
     this.clearLists();
     this.resetAutocomplete();
 }
