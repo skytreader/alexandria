@@ -1,148 +1,108 @@
-var PROCESS_INTERVAL = 8888;
-var REPROCESS_INTERVAL = PROCESS_INTERVAL + 1000;
-var CREATORS = ["author", "illustrator", "editor", "translator"];
-
 /**
-THE BOOK QUEUE. This is the internal representation of the book queue.
+This class is concerned with the interaction of the proxy form and the actual
+form via queues. Sending the data to the server is also part of its
+responsibilites.
+
+@constructor
+@param {addBooks.addBookDetails.AddBookDetailsCtrl} bookDetailsCtrl
+    Expected to be initialized and all.
 */
-var bookQueue = new Queue();
+function BookSenderCtrl(bookDetailsCtrl){
+    this.bookDetailsCtrl = bookDetailsCtrl;
+    /**
+    The interval of time, in milliseconds, in which we process books.
 
-/**
-Where the books eligible for reprocessing go.
-*/
-var reprocessQueue = new Queue();
+    @const {number}
+    @member
+    */
+    this.PROCESS_INTERVAL = 8888;
 
-/**
-This script will manipulate ids a lot. We derive certain converntions from the
-actual ids of the hidden form field. This hidden form field is the one that
-is mapped to the Flask form. These are the fields to be included in the request.
-*/
-var realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
-  "editors", "translators", "year", "publisher", "printer"];
+    /**
+    The interval of time, in milliseconds, in which we reprocess books that
+    failed and in reprocessable.
 
-var visualQueue;
+    @const {number}
+    @member
+    */
+    this.REPROCESS_INTERVAL = this.PROCESS_INTERVAL + 1000;
+    
+    /**
+    Where the books eligible for reprocessing go.
 
-var booksSaved = 0;
-var booksErrorNoRetry = 0;
-var booksReprocessable = 0;
+    TODO Make this all caps for standards! Or is this really supposed to be a
+    constant?
 
-/**
-This is needed by the loadToForm method.
+    @const {Queue}
+    @member
+    */
+    this.reprocessQueue = new Queue();
+    
+    /**
+    This script will manipulate ids a lot. We derive certain converntions from the
+    actual ids of the hidden form field. This hidden form field is the one that
+    is mapped to the Flask form. These are the fields to be included in the request.
 
-Maps the creator type to the event handler used to add an entry to the creator list.
-*/
-var CREATOR_ADD_HANDLERS = {};
+    TODO Make this all caps for standards!
 
-function updateStatCounts(){
-    $("#unsaved-count").text("" + visualQueue.getLength());
-    $("#saved-count").text("" + booksSaved);
-    $("#error-count").text("" + booksErrorNoRetry);
-    $("#reprocessed-count").text("" + booksReprocessable);
+    @const {Array.String}
+    @member
+    */
+    this.realFormIds = ["isbn", "title", "genre", "authors", "illustrators",
+      "editors", "translators", "year", "publisher", "printer"];
+    
+    /**
+    @member
+    */
+    this.booksSaved = 0;
+    /**
+    @member
+    */
+    this.booksErrorNoRetry = 0;
+    /**
+    @member
+    */
+    this.booksReprocessable = 0;
+
+    var me = this;
+    this.statCounter = new StatCounter(() => me.unsavedUpdater(),
+        () => me.savedUpdater(), () => me.errorUpdater(),
+        () => me.reprocessUpdater());
+    this.bookDetailsCtrl.setStatCounter(this.statCounter);
+}
+
+BookSenderCtrl.prototype.unsavedUpdater = function(){
+    return this.bookDetailsCtrl.visualQueue.getLength();
+}
+
+BookSenderCtrl.prototype.savedUpdater = function(){
+    return this.booksSaved;
+}
+
+BookSenderCtrl.prototype.errorUpdater = function(){
+    return this.booksErrorNoRetry;
+}
+
+BookSenderCtrl.prototype.reprocessUpdater = function(){
+    return this.booksReprocessable;
 }
 
 /**
-Renders the "spine" display of the book list. Takes data from the proxy form
-directly.
-
-@return {HTMLElement} A div element which displays like a spine of a book. The
-div element has the isbn for its id.
+@public
 */
-function renderSpine(){
-    var spine = document.createElement("div");
-    spine.className = "unsaved_book queued_block";
-    var allInputs = $("#proxy-form input");
-    var isbn = $(allInputs).filter("#isbn-proxy");
-    spine.id = isbn.val();
-    var title = $(allInputs).filter("#title-proxy");
-
-    var isbnText = document.createElement("h3");
-    isbnText.innerHTML = isbn.val();
-
-    var titleText = document.createElement("h2");
-    titleText.innerHTML = title.val();
-
-    var authorsText = document.createElement("h3");
-    authorsText.innerHTML = listNames(getCreatorNames("author"));
-
-    spine.appendChild(isbnText);
-    spine.appendChild(titleText);
-    spine.appendChild(authorsText);
-
-    return spine;
-}
-
-/**
-Get a list of persons and return a string to display them..
-*/
-function listNames(nameList){
-    var names = [];
-    for(var i = 0; i < nameList.length; i++){
-        names.push(nameList[i].lastname + ", " + nameList[i].firstname);
-    }
-
-    return  names.join("; ");
-}
-
-/**
-Get all the names entered for the given creator.
-
-This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
-it must be guaranteed that the order of lastnames and firstnames returned is the
-same.
-
-@return Array.Person
-*/
-function getCreatorNames(creator){
-    var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
-    var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
-    var persons = [];
-
-    for(var i = 0; i < creatorsLastname.length; i++){
-        var firstname = creatorsFirstname[i].value.trim();
-        var lastname = creatorsLastname[i].value.trim();
-        if(firstname != "" && lastname != ""){
-            persons.push(new Person(lastname, firstname));
-        }
-    }
-
-    return persons;
-}
-
-/**
-Append the book described in #proxy-form to the internal queue.
-
-The DOM element representing the book is a required parameter since we use it to
-map the Book object to its visual representation.
-
-@param {HTMLElement} spineDom - the DOM element representing the book spine.
-  This is just necessary for mapping, which in turn is necessary for the
-  reprocess function.
-*/
-function internalizeBook(spineDom){
-    var allInputs = $("#proxy-form input");
-    var isbn = $(allInputs).filter("#isbn-proxy").val();
-    var title = $(allInputs).filter("#title-proxy").val();
-    var genre = $(allInputs).filter("#genre-proxy").val();
-    var authors = JSON.stringify(getCreatorNames("author"));
-    var illustrators = JSON.stringify(getCreatorNames("illustrator"));
-    var editors = JSON.stringify(getCreatorNames("editor"));
-    var translators = JSON.stringify(getCreatorNames("translator"));
-    var publisher = $(allInputs).filter("#publisher-proxy").val();
-    var printer = $(allInputs).filter("#printer-proxy").val();
-    var year = $(allInputs).filter("#year-proxy").val();
-
-    var bookObj = new Book(isbn, title, genre, authors, illustrators, editors,
-      translators, publisher, printer, year, spineDom);
-
-    window.bookQueue.enqueue(bookObj);
+BookSenderCtrl.prototype.updateStatCounts = function(){
+    $("#unsaved-count").text("" + this.bookDetailsCtrl.visualQueue.getLength());
+    $("#saved-count").text("" + this.booksSaved);
+    $("#error-count").text("" + this.booksErrorNoRetry);
+    $("#reprocessed-count").text("" + this.booksReprocessable);
 }
 
 /**
 Generates the delete button to be added at the end of every row record.
 
 @return {HTMLElement}
+@private
 */
-function renderDeleteButton(){
+BookSenderCtrl.prototype.renderDeleteButton = function(){
     var container = document.createElement("input");
     container.onclick = removeRow;
     container.type = "button";
@@ -153,8 +113,101 @@ function renderDeleteButton(){
 }
 
 /**
+Send the actual, hidden form to the server via AJAX so that the data may be
+saved.
+
+@param {HTMLElement} domElement - the book spine representing the book to be
+  sent, as a DOM element.
+*/
+BookSenderCtrl.prototype.sendSaveForm = function(domElement){
+    var authors = JSON.parse(document.getElementById("authors").value);
+    var illustrators = JSON.parse(document.getElementById("illustrators").value);
+    var editors = JSON.parse(document.getElementById("editors").value);
+    var translators = JSON.parse(document.getElementById("translators").value);
+    var possibleNewNames = [authors, illustrators, editors, translators];
+
+    var publisher = document.getElementById("publisher").value;
+    var printer = document.getElementById("printer").value;
+    var possibleNewCompanies = [publisher, printer];
+
+    var possibleNewGenre = document.getElementById("genre").value;
+    var me = this;
+
+    function success(){
+        $(domElement).removeClass("unsaved_book").addClass("saved_book");
+
+        _.forEach(possibleNewNames, function(newNames){
+            _.forEach(newNames, function(person){
+                if(!me.bookDetailsCtrl.BOOK_PERSONS_SET.has(person)){
+                    me.bookDetailsCtrl.BOOK_PERSONS_SET.add(person);
+                    if(me.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
+                        me.bookDetailsCtrl.BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
+                    }
+                    if(me.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
+                        me.bookDetailsCtrl.BOOK_PERSONS_LASTNAME.push(person["lastname"]);
+                    }
+                }
+            });
+        });
+        me.bookDetailsCtrl.BOOK_PERSONS = [...me.bookDetailsCtrl.BOOK_PERSONS_SET]
+        me.bookDetailsCtrl.resetAutocomplete();
+
+        _.forEach(possibleNewCompanies, function(company){
+            if(me.bookDetailsCtrl.COMPANIES.indexOf(company) < 0){
+                me.bookDetailsCtrl.COMPANIES.push(company);
+            }
+        });
+
+        _.forEach(possibleNewGenre, function(genre){
+            if(me.bookDetailsCtrl.GENRES.indexOf(genre) < 0){
+                me.bookDetailsCtrl.GENRES.push(genre);
+            }
+        });
+        me.booksSaved++;
+    }
+
+    function fail(jqxhr){
+        alertify.error(jqxhr.responseText);
+        $(domElement).removeClass("unsaved_book").addClass("error_book");
+        me.booksErrorNoRetry++;
+    }
+
+    function failRecover(jqxhr){
+        alertify.warning("Failed to save a book. Please wait as we automatically retry.");
+        $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
+        me.reprocessQueue.enqueue(domElement);
+        me.booksReprocessable++;
+    }
+
+    var data = {
+        "csrf_token": document.getElementById("csrf_token").value,
+        "isbn": document.getElementById("isbn").value,
+        "title": document.getElementById("title").value,
+        "genre": document.getElementById("genre").value,
+        "authors": document.getElementById("authors").value,
+        "illustrators": document.getElementById("illustrators").value,
+        "editors": document.getElementById("editors").value,
+        "translators": document.getElementById("translators").value,
+        "publisher": document.getElementById("publisher").value,
+        "printer": document.getElementById("printer").value,
+        "year": document.getElementById("year").value
+    }
+    $.ajax("/api/add/books", {
+        "type": "POST",
+        "data": data,
+        "success": success,
+        "statusCode":{
+            400: fail,
+            409: fail,
+            500: failRecover
+        },
+        "complete": function(){me.updateStatCounts()}
+    });
+}
+
+/**
 Create a list element for displaying a creator's name. The name displayed is
-dependent on what is currently entered in the procy fields for this creator.
+dependent on what is currently entered in the proxy fields for this creator.
 
 TODO Test me
 
@@ -223,17 +276,10 @@ function recordDeleterFactory(creatorType){
 };
 
 /**
-Clears the proxy form.
-*/
-function clearProxyForm(){
-    $("#proxy-form input").val("")
-}
-
-/**
 @return {boolean} Returns true if the proxy form is all blank and if there is
 nothing left in both queues.
 */
-function isWorkDone(){
+BookSenderCtrl.prototype.isWorkDone = function(){
     // TODO Check the condition where there is a _pending_ HTTP request. Should
     // this even handle that?
     function isProxyFormEmpty(){
@@ -245,7 +291,7 @@ function isWorkDone(){
         });
         return isEmpty;
     }
-    return bookQueue.getLength() == 0 && reprocessQueue.getLength() == 0 &&
+    return this.bookDetailsCtrl.bookQueue.getLength() == 0 && this.reprocessQueue.getLength() == 0 &&
       isProxyFormEmpty();
 }
 
@@ -262,124 +308,6 @@ function removeBlock(e){
     // TODO
 }
 
-/**
-Send the actual, hidden form to the server via AJAX so that the data may be
-saved.
-
-@param {HTMLElement} domElement - the book spine representing the book to be
-  sent, as a DOM element.
-*/
-function sendSaveForm(domElement){
-    var authors = JSON.parse(document.getElementById("authors").value);
-    var illustrators = JSON.parse(document.getElementById("illustrators").value);
-    var editors = JSON.parse(document.getElementById("editors").value);
-    var translators = JSON.parse(document.getElementById("translators").value);
-    var possibleNewNames = [authors, illustrators, editors, translators];
-
-    var publisher = document.getElementById("publisher").value;
-    var printer = document.getElementById("printer").value;
-    var possibleNewCompanies = [publisher, printer];
-
-    var possibleNewGenre = document.getElementById("genre").value;
-
-    function success(){
-        $(domElement).removeClass("unsaved_book").addClass("saved_book");
-
-        _.forEach(possibleNewNames, function(newNames){
-            _.forEach(newNames, function(person){
-                if(!BOOK_PERSONS_SET.has(person)){
-                    BOOK_PERSONS_SET.add(person);
-                    if(BOOK_PERSONS_FIRSTNAME.indexOf(person["firstname"]) < 0){
-                        BOOK_PERSONS_FIRSTNAME.push(person["firstname"]);
-                    }
-                    if(BOOK_PERSONS_LASTNAME.indexOf(person["lastname"]) < 0){
-                        BOOK_PERSONS_LASTNAME.push(person["lastname"]);
-                    }
-                }
-            });
-        });
-        BOOK_PERSONS = [...BOOK_PERSONS_SET]
-        resetAutocomplete();
-
-        _.forEach(possibleNewCompanies, function(company){
-            if(COMPANIES.indexOf(company) < 0){
-                COMPANIES.push(company);
-            }
-        });
-
-        _.forEach(possibleNewGenre, function(genre){
-            if(GENRES.indexOf(genre) < 0){
-                GENRES.push(genre);
-            }
-        });
-        window.booksSaved++;
-    }
-
-    function fail(jqxhr){
-        alertify.error(jqxhr.responseText);
-        $(domElement).removeClass("unsaved_book").addClass("error_book");
-        window.booksErrorNoRetry++;
-    }
-
-    function failRecover(jqxhr){
-        alertify.warning("Failed to save a book. Please wait as we automatically retry.");
-        $(domElement).removeClass("unsaved_book").addClass("reprocess_book");
-        reprocessQueue.enqueue(domElement);
-        window.booksReprocessable++;
-    }
-
-    var data = {
-        "csrf_token": document.getElementById("csrf_token").value,
-        "isbn": document.getElementById("isbn").value,
-        "title": document.getElementById("title").value,
-        "genre": document.getElementById("genre").value,
-        "authors": document.getElementById("authors").value,
-        "illustrators": document.getElementById("illustrators").value,
-        "editors": document.getElementById("editors").value,
-        "translators": document.getElementById("translators").value,
-        "publisher": document.getElementById("publisher").value,
-        "printer": document.getElementById("printer").value,
-        "year": document.getElementById("year").value
-    }
-    $.ajax("/api/add/books", {
-        "type": "POST",
-        "data": data,
-        "success": success,
-        "statusCode":{
-            400: fail,
-            409: fail,
-            500: failRecover
-        },
-        "complete": updateStatCounts
-    });
-}
-
-/**
-TODO I thought of this method to automate my testing but I realized this could
-also be useful for a "reprocess" feature. If saving a book fails, you can reload
-the book's record into the form and redo what you think failed.
-*/
-function loadToForm(reqData){
-    
-    function insertAllCreators(all, type){
-        for(var i = 0; i < all.length; i++){
-            $("#" + type + "-proxy-firstname").val(all[i].firstname);
-            $("#" + type + "-proxy-lastname").val(all[i].lastname);
-            CREATOR_ADD_HANDLERS[type]();
-        }
-    }
-
-    $("#isbn-proxy").val(reqData.isbn);
-    $("#title-proxy").val(reqData.title);
-    $("#genre-proxy").val(reqData.genre);
-    $("#publisher-proxy").val(reqData.publisher);
-    $("#printer-proxy").val(reqData.printer);
-    $("#year-proxy").val(reqData.year);
-    insertAllCreators(reqData.authors, "author");
-    insertAllCreators(reqData.illustrators, "illustrator");
-    insertAllCreators(reqData.editors, "editor");
-    insertAllCreators(reqData.translators, "translator");
-}
 
 /**
 TODO Move everything above elsewhere (maybe book-submit-queue.js?) so that
@@ -397,6 +325,30 @@ $(document).ready(function(){
         $("#main-form input").not("#csrf_token").val("");
     }
 
+    // Initialize the visualQueue
+    var qContainer = document.createElement("span");
+    qContainer.id = "bookq";
+    var defItem = document.createElement("div");
+    defItem.className = "queued_block empty_set";
+    var defText = document.createElement("h3");
+    defText.innerHTML = "Ooops. Nothing yet.";
+    defItem.appendChild(defText);
+    // Special styles to override from queued_block rule.
+    defItem.style.padding = "5% inherit";
+    var defs = {"defaultDisplay":defItem,
+      "defaultLocation": document.getElementById("qContainer")};
+    var visualQueue = new VisualQueue(qContainer, defs);
+    visualQueue.render();
+
+    var addBookDetailsCtrl = new AddBookDetailsCtrl(visualQueue);
+    var bookSenderCtrl = new BookSenderCtrl(addBookDetailsCtrl);
+
+    $(window).bind("beforeunload", function(){
+        if(!bookSenderCtrl.isWorkDone()){
+            return "You are leaving the page with unsaved work.";
+        }
+    });
+
     /**
     Load from the given queue to the actual form. The queue object is expected to 
     be from Queue.js.
@@ -411,10 +363,10 @@ $(document).ready(function(){
         var fromQ = queue.dequeue();
     
         if(fromQ){
-            var limit = window.realFormIds.length;
+            var limit = bookSenderCtrl.realFormIds.length;
     
             for(var i = 0; i < limit; i++){
-                document.getElementById(window.realFormIds[i]).value = fromQ[window.realFormIds[i]];
+                document.getElementById(bookSenderCtrl.realFormIds[i]).value = fromQ[bookSenderCtrl.realFormIds[i]];
             }
     
             return fromQ;
@@ -423,64 +375,18 @@ $(document).ready(function(){
         return false;
     }
 
-    $(window).bind("beforeunload", function(){
-        if(!isWorkDone()){
-            return "You are leaving the page with unsaved work.";
-        }
-    });
-
-    $("#proxy-form").validate({
-        rules:{
-            "isbn-rule":{
-                isbnVal: true,
-                required: true,
-                maxlength: 13
-            },
-            "year-rule":{
-                yearVal: true,
-                required: true
-            },
-            "genre-rule":{
-                required: true,
-                maxlength: 40
-            },
-            "title-rule":{
-                required: true
-            },
-            "publisher-rule":{
-                required: true
-            }
-        }
-    });
-
-    // Initialize the visualQueue
-    var qContainer = document.createElement("span");
-    qContainer.id = "bookq";
-    var defItem = document.createElement("div");
-    defItem.className = "queued_block empty_set";
-    var defText = document.createElement("h3");
-    defText.innerHTML = "Ooops. Nothing yet.";
-    defItem.appendChild(defText);
-    // Special styles to override from queued_block rule.
-    defItem.style.padding = "5% inherit";
-    var defs = {"defaultDisplay":defItem,
-      "defaultLocation": document.getElementById("qContainer")};
-    window.visualQueue = new VisualQueue(qContainer, defs);
-    window.visualQueue.render();
-    updateStatCounts();
-
     // Start the polling interval timers.
     setInterval(function(){
-        var foo = loadFromQueueToForm(window.bookQueue);
+        var foo = loadFromQueueToForm(addBookDetailsCtrl.bookQueue);
         if(foo){
-            sendSaveForm(foo.domElement);
+            bookSenderCtrl.sendSaveForm(foo.domElement);
         }
-    }, PROCESS_INTERVAL);
+    }, bookSenderCtrl.PROCESS_INTERVAL);
     
     setInterval(function(){
-        var foo = loadFromQueueToForm(window.reprocessQueue);
+        var foo = loadFromQueueToForm(bookSenderCtrl.reprocessQueue);
         if(foo){
-            sendSaveForm(foo.domElement);
+            bookSenderCtrl.sendSaveForm(foo.domElement);
         }
-    }, REPROCESS_INTERVAL);
+    }, bookSenderCtrl.REPROCESS_INTERVAL);
 });

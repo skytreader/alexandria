@@ -5,11 +5,14 @@ and removal of other dom objects.
 Depends on jQuery.
 
 @author Chad Estioco
+@module utils.visualQueue
+@namesapce utils.visualQueue
 */
 
 /**
 Constructor for a visual queue.
 
+@constructor
 @param domContainer
     The container for the queue in the DOM. Typically a span or a div element.
 @param defs
@@ -32,6 +35,9 @@ function VisualQueue(domContainer, defs){
 /**
 To facilitate the removal of objects, it is recommended that the domElement
 enqueued have an id attribute.
+
+@public
+@param domElement
 */
 VisualQueue.prototype.enqueue = function(domElement){
     if(this.queueCounter == 0){

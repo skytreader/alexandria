@@ -58,3 +58,14 @@ variables that need to be set in order for tests to be successful. The script
 takes care of that.
 
 More relevant information can be found at `.travis.yml`.
+
+# Documentation
+
+## JavaScript
+
+Assuming `npm` is installed, use jsdoc.
+
+    $ npm install jsdoc
+    $ node_modules/jsdoc/jsdoc.js -r librarian/static/scripts/
+
+You can then find the docs in the `/out` directory of the project's root.

@@ -1,0 +1,26 @@
+{
+  "name": "alexandria",
+  "version": "0.1.0",
+  "description": "library crud",
+  "main": "/",
+  "dependencies": {
+    "jsdoc": "~3.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "./runtests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skytreader/alexandria"
+  },
+  "keywords": [
+    "library",
+    "books"
+  ],
+  "author": "Chad Estioco",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skytreader/alexandria/issues"
+  }
+}

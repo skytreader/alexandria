@@ -2,6 +2,8 @@
 Javascript code related to the book details form.
 
 @module types.bookDetails
+@requires utils.isbnVerify
+@requires alertify
 @namespace types.bookDetails
 @author Chad Estioco
 */
@@ -104,11 +106,10 @@ BookDetailsCtrl.prototype.loadToForm = function(reqData){
 }
 
 /**
-TODO Mark this class as "abstract" and make subclasses implement this method.
-
 @public
 */
 BookDetailsCtrl.prototype.clearProxyForm = function(){
+    $("#proxy-form input").val("");
 }
 
 /**
@@ -183,7 +184,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     */
     function recordDeleterFactory(creatorType){
         return function() {
-            $(me.parentNode.parentNode).remove();
+            $(this.parentNode.parentNode).remove();
         }
     };
 
@@ -201,56 +202,42 @@ BookDetailsCtrl.prototype.setUp = function(){
         }
     }
 
+    var me = this;
     // Event handlers
-    $("#clear-proxy").click(me.clearProxyForm);
-    $("#queue-book").click(function(){
-        if(me.isCreatorPending()){
-            alertify.alert("Forgot something?",
-              "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
-        } else if($("#proxy-form").valid()){
-            var spine = renderSpine();
-            me.internalizeBook(spine);
-            window.visualQueue.prepend(spine);
-            me.updateStatCounts();
-            me.clearProxyForm();
-            me.clearLists();
-            me.resetAutocomplete();
-        } else{
-            alertify.alert("Oh no!",
-              "There is a problem with this book's details. Check the fields for specifics.");
-        }
-    });
+    $("#clear-proxy").click(function(){me.clearProxyForm()});
+    // TODO rename the ID to something more generic for editing books.
+    $("#queue-book").click(function(){me.saveBook()});
 
     this.fillGenres();
     this.fillCompanies();
     this.fillNames();
+    this.addValidationMethods();
 
     $("#author-proxy-lastname").blur(function(){
-        this.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
+        me.setAutoComplete("author-proxy-firstname", "author-proxy-lastname");
     });
     $("#author-proxy-firstname").blur(function(){
-        this.setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
+        me.setAutoComplete("author-proxy-lastname", "author-proxy-firstname");
     });
     $("#illustrator-proxy-lastname").blur(function(){
-        this.setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
+        me.setAutoComplete("illustrator-proxy-firstname", "illustrator-proxy-lastname");
     });
     $("#illustrator-proxy-firstname").blur(function(){
-        this.setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
+        me.setAutoComplete("illustrator-proxy-lastname", "illustrator-proxy-firstname");
     });
     $("#editor-proxy-lastname").blur(function(){
-        this.setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
+        me.setAutoComplete("editor-proxy-firstname", "editor-proxy-lastname");
     });
     $("#editor-proxy-firstname").blur(function(){
-        this.setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
+        me.setAutoComplete("editor-proxy-lastname", "editor-proxy-firstname");
     });
     $("#translator-proxy-lastname").blur(function(){
-        this.setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
+        me.setAutoComplete("translator-proxy-firstname", "translator-proxy-lastname");
     });
     $("#translator-proxy-firstname").blur(function(){
-        this.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
+        me.setAutoComplete("translator-proxy-lastname", "translator-proxy-firstname");
     });
 
-    var me = this;
     this.CREATORS.forEach(function(creatorTitle){
         me.CREATOR_ADD_HANDLERS[creatorTitle] = rendererFactory(creatorTitle);
         $("#" + creatorTitle + "-add").click(me.CREATOR_ADD_HANDLERS[creatorTitle]);
@@ -275,7 +262,7 @@ BookDetailsCtrl.prototype.fillNames = function(){
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
             var allNames = data["data"];
-            BOOK_PERSONS = allNames;
+            me.BOOK_PERSONS = allNames;
             me.BOOK_PERSONS_SET.addAll(allNames);
             var allLastnames = _.map(allNames, function(x){return x["lastname"]});
             var allFirstnames = _.map(allNames, function(x){return x["firstname"]});
@@ -301,19 +288,47 @@ BookDetailsCtrl.prototype.fillNames = function(){
 }
 
 /**
+Event handler for clicking on the "Save Book" button.
+
+@private
+*/
+BookDetailsCtrl.prototype.saveBook = function(){
+    if(this.isCreatorPending()){
+        alertify.alert("Forgot something?",
+          "Did you forget to hit 'add' on a creator's name? Please add all creators first before proceeding.");
+    } else if($("#proxy-form").valid()){
+        this.validBookAction();
+    } else{
+        alertify.alert("Oh no!",
+          "There is a problem with this book's details. Check the fields for specifics.");
+    }
+}
+
+/**
+Encapsulates what happens when the entered book data is valid.
+
+@public
+*/
+BookDetailsCtrl.prototype.validBookAction = function(){
+    console.error("BookDetailsCtrl.validBookAction must be implemented!");
+    alert("BookDetailsCtrl.validBookAction must be implemented!");
+}
+
+/**
 @private
 */
 BookDetailsCtrl.prototype.fillGenres = function(){
+    var me = this;
     $.ajax("/api/read/genres", {
         "type": "GET",
         "success": function(data, textStatus, jqXHR){
-            window.GENRES = data["data"];
+            me.GENRES = data["data"];
             $("#genre-proxy").autocomplete({
-                source: this.GENRES
+                source: me.GENRES
             });
         },
         "error": function(jqXHR, textStatus, error){
-            setTimeout(this.fillGenres, 8000);
+            setTimeout(me.fillGenres, 8000);
         }
     });
 }
@@ -355,8 +370,9 @@ stucture.
 */
 BookDetailsCtrl.prototype.setAutoComplete = function(targetId, partnerId){
     "use strict";
+    var me = this;
     function mapAndSet(partner, target){
-        var acSource = _.map(_.filter(this.BOOK_PERSONS, function(person){
+        var acSource = _.map(_.filter(me.BOOK_PERSONS, function(person){
             return person[partner] == partnerElement.val();
           }), function(person){
             return person[target];
@@ -427,6 +443,40 @@ BookDetailsCtrl.prototype.isCreatorPending = function(){
     return false;
 }
 
-$(document).ready(function() {
-    var bookDetailsCtrl = new BookDetailsCtrl();
-})
+/**
+@private
+*/
+BookDetailsCtrl.prototype.addValidationMethods = function(){
+    $.validator.addMethod("isbnVal", function(value, element, param){
+        var stripped = value.trim();
+        return verifyISBN10(stripped) || verifyISBN13(stripped);
+    }, "Invalid ISBN input.");
+
+    $.validator.addMethod("yearVal", function(value, element, param){
+        return /^\d{4}$/.test(value);
+    }, "Please enter a valid year.");
+
+    $("#proxy-form").validate({
+        rules:{
+            "isbn-rule":{
+                isbnVal: true,
+                required: true,
+                maxlength: 13
+            },
+            "year-rule":{
+                yearVal: true,
+                required: true
+            },
+            "genre-rule":{
+                required: true,
+                maxlength: 40
+            },
+            "title-rule":{
+                required: true
+            },
+            "publisher-rule":{
+                required: true
+            }
+        }
+    });
+}
