@@ -69,25 +69,8 @@ def create_library(
 
     Returns a list of `BookRecord` objects.
     """
-
-    def __create_unique(factory, field_getter, count):
-        unique_guard = set()
-        uniquely_created = []
-
-        for _ in range(count):
-            dummy = factory()
-            watch_field = field_getter(dummy)
-
-            while watch_field in unique_guard:
-                dummy = factory()
-                watch_field = field_getter(dummy)
-
-            uniquely_created.add(dummy)
-
-        return uniquely_created
-
-    book_persons = [ContributorFactory() for _ in range(book_person_c)]
-    printers = [BookCompanyFactory() for _ in range(company_c)]
+    book_persons = [ContributorFactory(creator=admin) for _ in range(book_person_c)]
+    printers = [BookCompanyFactory(creator=admin) for _ in range(company_c)]
     person_fns = [bp.firstname for bp in book_persons]
 
     for bp in book_persons:
