@@ -10,7 +10,7 @@ from librarian.utils import BookRecord, NUMERIC_REGEX, Person
 from flask import Blueprint, request
 from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 from sqlalchemy.exc import IntegrityError
 
 import config
@@ -404,11 +404,19 @@ def quick_stats():
     stats["top_author"] = top_author[0] if top_author else None
     return flask.jsonify(stats)
 
+# FIXME Slow as f*ck.
 def search(searchq):
+    # Idea: check the search query if it looks like an ISBN and if it is, query
+    # exclusively for the ISBN.
     results = (
-      BookRecord.base_assembler_query()
-      .filter(Book.title.like("".join(("%", searchq, "%"))))
-      .all())
+        BookRecord.base_assembler_query()
+        .filter(
+            or_(
+                Book.title.like("".join(("%", searchq, "%"))),
+                Book.isbn == searchq
+            )
+        ).all()
+    )
 
     book_listing = BookRecord.assembler(results, as_obj=False)
 

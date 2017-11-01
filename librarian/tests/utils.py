@@ -60,13 +60,32 @@ def create_book(session, book_record, creator):
 
     return book.id
 
-def create_library(session, admin, roles, book_person_c=8, company_c=8, book_c=8,
-  participant_c=8):
+def create_library(
+    session, admin, roles, book_person_c=8, company_c=8, book_c=8,
+    participant_c=8
+):
     """
     Create a library in the database with the given counts.
 
     Returns a list of `BookRecord` objects.
     """
+
+    def __create_unique(factory, field_getter, count):
+        unique_guard = set()
+        uniquely_created = []
+
+        for _ in range(count):
+            dummy = factory()
+            watch_field = field_getter(dummy)
+
+            while watch_field in unique_guard:
+                dummy = factory()
+                watch_field = field_getter(dummy)
+
+            uniquely_created.add(dummy)
+
+        return uniquely_created
+
     book_persons = [ContributorFactory() for _ in range(book_person_c)]
     printers = [BookCompanyFactory() for _ in range(company_c)]
     person_fns = [bp.firstname for bp in book_persons]

@@ -20,6 +20,7 @@ import factory
 import flask_login
 import json
 import librarian
+import librarian.api as api
 import random
 import re
 import string
@@ -472,10 +473,15 @@ class ApiTests(AppTestCase):
         self.assertEquals(participants_per_book, stats.get("participants_per_book"))
 
     def test_search_exact(self):
-        search_book = BookRecord.factory(
+        search_book = BookRecord(
             isbn=fake.isbn(), title="Find XYZ Inside", publisher="Creative Awesome",
             publish_year=2017, author=[Person("Munroe", "Randall")], genre="Test"
         )
+        create_book(librarian.db.session, search_book, self.admin_user)
+        librarian.db.session.flush()
+        librarian.db.session.commit()
+        results = api.search("XYZ")
+        self.assertEqual(len(results), 1)
 
     def test_title_edit_book(self):
         _creator = LibrarianFactory()
