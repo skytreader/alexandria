@@ -21,6 +21,9 @@ import re
 import traceback
 
 """
+Contains API endpoints or Python methods (one can be both) useful for other
+parts of the app.
+
 Convention:
 /api/add/* - add some records to the database
 /api/read/* - get data from backend

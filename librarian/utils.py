@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from librarian import app, db
+from librarian.errors import ConstraintError
 
 import config
 import copy
@@ -9,6 +10,11 @@ import re
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
+
+"""
+Contains classes and functions useful for both unit tests and the actual app.
+Methods that are too small for an API endpoint also fall here.
+"""
  
 class RequestData(object):
     
@@ -319,7 +325,7 @@ def isbn_check(isbn):
     """
     Checks for the valididty of the given ISBN string and returns a boolean to
     indicate validity. If the given string is not exactly either of length 10 or
-    13, raise ConstraintError.
+    13, return False.
     """
     if ISBN_REGEX.match(isbn):
         if len(isbn) == 10:
@@ -346,6 +352,42 @@ def isbn_check(isbn):
             return (check % 10) == 0
 
     return False
+
+def compute_isbn13_checkdigit(isbn):
+    """
+    Takes a string of length 12 and return the check digit (as a one-character
+    string). If string is not exactly of length 12 or not numeric, raise
+    ConstraintError.
+    """
+    if len(isbn) != 12:
+        raise ConstraintError("should be length 12", isbn)
+    elif not NUMERIC_REGEX.match(isbn):
+        raise ConstraintError("should be a numeric string", isbn)
+
+    check = 0
+    for idx, d in enumerate(isbn):
+        if idx % 2:
+            check += 3 * int(d)
+        else:
+            check += int(d)
+
+    return 10 - (check % 10)
+
+def has_equivalent_isbn(isbn):
+    """
+    Check the DB if a book with an equivalent ISBN exists.
+    """
+    candidate_equiv = ""
+    isbn_len = len(isbn)
+    if isbn_len == 13:
+        if isbn.startswith("978"):
+            candidate_equiv = isbn[3:]
+        else:
+            # This is a book issued with no equivalent ISBN 10
+            # (Not sure if this is how ISBN 13 works.)
+            return False
+    else:
+        candidate_equiv = "978" + isbn[:-1]
 
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())

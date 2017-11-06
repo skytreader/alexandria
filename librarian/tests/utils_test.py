@@ -5,7 +5,7 @@ from librarian.models import Book, BookCompany, BookContribution, Contributor, R
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
 from librarian.tests import utils
-from librarian.utils import BookRecord, isbn_check, Person
+from librarian.utils import BookRecord, compute_isbn13_checkdigit, isbn_check, Person
 
 import copy
 import unittest
@@ -38,6 +38,9 @@ class IsbnTests(unittest.TestCase):
 
         for i in range(100):
             self.assertTrue(isbn_check(fake.isbn(False)))
+
+    def test_compute_isbn13_checkdigit(self):
+        self.assertEqual(7, compute_isbn13_checkdigit("978030640615"))
 
 class BookRecordTests(AppTestCase):
     
