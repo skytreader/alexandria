@@ -371,7 +371,7 @@ def compute_isbn13_checkdigit(isbn):
         else:
             check += int(d)
 
-    return 10 - (check % 10)
+    return str(10 - (check % 10))
 
 def has_equivalent_isbn(isbn):
     """
@@ -388,6 +388,8 @@ def has_equivalent_isbn(isbn):
             return False
     else:
         candidate_equiv = "978" + isbn[:-1]
+        checkdigit = compute_isbn13_checkdigit(isbn)
+        candidate_equiv += checkdigit
 
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())

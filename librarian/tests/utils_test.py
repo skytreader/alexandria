@@ -40,7 +40,7 @@ class IsbnTests(unittest.TestCase):
             self.assertTrue(isbn_check(fake.isbn(False)))
 
     def test_compute_isbn13_checkdigit(self):
-        self.assertEqual(7, compute_isbn13_checkdigit("978030640615"))
+        self.assertEqual('7', compute_isbn13_checkdigit("978030640615"))
 
 class BookRecordTests(AppTestCase):
     
