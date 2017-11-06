@@ -6,7 +6,7 @@ from datetime import datetime
 from librarian import app, db
 from librarian.errors import InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
-from librarian.utils import BookRecord, NUMERIC_REGEX, Person
+from librarian.utils import BookRecord, has_equivalent_isbn, NUMERIC_REGEX, Person
 from flask import Blueprint, request
 from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
@@ -117,6 +117,11 @@ def book_adder():
     form = AddBooksForm(request.form)
     app.logger.info(str(form))
     app.logger.debug(form.debug_validate())
+
+    if has_equivalent_isbn(form.isbn.data):
+        err_str = "A book with that ISBN (in another form) is already in the database."
+        app.logger.error(err_str)
+        return err_str, 409
 
     if form.validate_on_submit():
         try:
