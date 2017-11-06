@@ -5,7 +5,7 @@ from librarian.models import Book, BookCompany, BookContribution, Contributor, R
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
 from librarian.tests import utils
-from librarian.utils import BookRecord, compute_isbn13_checkdigit, isbn_check, Person
+from librarian.utils import BookRecord, compute_isbn10_checkdigit, compute_isbn13_checkdigit, has_equivalent_isbn, isbn_check, Person
 
 import copy
 import unittest
@@ -24,6 +24,7 @@ class IsbnTests(unittest.TestCase):
         isbn13_incorrect = "9780306406155"
 
         self.assertTrue(isbn_check(isbn10_correct))
+        self.assertTrue(isbn_check("0843610727"))
         self.assertTrue(isbn_check(isbn13_correct))
         self.assertFalse(isbn_check(isbn10_incorrect))
         self.assertFalse(isbn_check(isbn13_incorrect))
@@ -39,8 +40,25 @@ class IsbnTests(unittest.TestCase):
         for i in range(100):
             self.assertTrue(isbn_check(fake.isbn(False)))
 
+    def test_compute_isbn10_checkdigit(self):
+        self.assertEqual('2', compute_isbn10_checkdigit("030640615"))
+
     def test_compute_isbn13_checkdigit(self):
         self.assertEqual('7', compute_isbn13_checkdigit("978030640615"))
+
+    def test_has_equivalent_isbn_10to13(self):
+        saturday = BookFactory(isbn="0099497166", title="Saturday")
+        librarian.db.session.add(saturday)
+        librarian.db.session.flush()
+
+        self.assertTrue(has_equivalent_isbn("9780099497165"))
+
+    def test_has_equivalent_isbn_13to10(self):
+        saturday = BookFactory(isbn="9780099497165", title="Saturday")
+        librarian.db.session.add(saturday)
+        librarian.db.session.flush()
+
+        self.assertTrue(has_equivalent_isbn("0099497166"))
 
 class BookRecordTests(AppTestCase):
     

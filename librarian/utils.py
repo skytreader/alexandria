@@ -353,9 +353,28 @@ def isbn_check(isbn):
 
     return False
 
+def compute_isbn10_checkdigit(isbn):
+    """
+    Takes a string of length 9 and returns the check digit (as a one-character
+    string). If string is not exactly of length 9 or not numeric, raise
+    ConstraintError.
+    """
+    if len(isbn) != 9:
+        raise ConstraintError("should be length 9", isbn)
+    elif not NUMERIC_REGEX.match(isbn):
+        raise ConstraintError("should be a numeric string", isbn)
+
+    check = 0
+    multiplier = 10
+    for d in isbn:
+        check += int(d) * multiplier
+        multiplier -= 1
+
+    return str(11 - (check % 11))
+
 def compute_isbn13_checkdigit(isbn):
     """
-    Takes a string of length 12 and return the check digit (as a one-character
+    Takes a string of length 12 and returns the check digit (as a one-character
     string). If string is not exactly of length 12 or not numeric, raise
     ConstraintError.
     """
@@ -377,19 +396,26 @@ def has_equivalent_isbn(isbn):
     """
     Check the DB if a book with an equivalent ISBN exists.
     """
+    from librarian.models import Book
     candidate_equiv = ""
     isbn_len = len(isbn)
     if isbn_len == 13:
         if isbn.startswith("978"):
-            candidate_equiv = isbn[3:]
+            candidate_equiv = isbn[3:-1]
+            checkdigit = compute_isbn10_checkdigit(candidate_equiv)
+            candidate_equiv += checkdigit
         else:
             # This is a book issued with no equivalent ISBN 10
             # (Not sure if this is how ISBN 13 works.)
             return False
     else:
         candidate_equiv = "978" + isbn[:-1]
-        checkdigit = compute_isbn13_checkdigit(isbn)
+        checkdigit = compute_isbn13_checkdigit(candidate_equiv)
         candidate_equiv += checkdigit
+
+    book_exists = db.session.query(Book).filter(Book.isbn == candidate_equiv).count()
+
+    return book_exists == 1
 
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())
