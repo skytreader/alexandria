@@ -3,6 +3,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
+from librarian import app
 from librarian.errors import InvalidRecordState
 from librarian.utils import BookRecord, StatsDescriptor
 from librarian.models import Book
@@ -11,7 +12,6 @@ from utils import route_exists
 import config
 import flask
 import json
-import logging
 
 librarian_bp = Blueprint('librarian', __name__)
 
@@ -28,7 +28,7 @@ def login():
     from flask_login import current_user
     from models import Librarian
     form = LoginForm()
-    logging.info("Got login form %s" % form)
+    app.logger.info("Got login form %s" % form)
 
     if form.validate_on_submit():
         user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
@@ -112,7 +112,7 @@ def edit_books():
     if not book_id:
         return flask.abort(400)
 
-    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id).limit(1)
+    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id)
     query_results = book_query.all()
     assembled = BookRecord.assembler(query_results)
 
@@ -122,7 +122,7 @@ def edit_books():
         raise InvalidRecordState("book id %s" % book_id)
 
     book = assembled[0]
-    book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)
+    book_js = "var bookForEditing = JSON.parse(%s)" % json.dumps(json.dumps(book.__dict__))
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "types/book-details.js", "edit-book/main.js", "edit-book/controller.js", 

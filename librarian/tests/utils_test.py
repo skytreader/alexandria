@@ -128,7 +128,6 @@ class BookRecordTests(AppTestCase):
 
         books = BookRecord.base_assembler_query().all()
         
-        set(expected_records)
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
 
     def test_deepcopy(self):
