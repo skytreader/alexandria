@@ -119,7 +119,7 @@ def edit_books():
     if not assembled:
         return flask.abort(400)
     elif len(assembled) > 1:
-        raise InvalidRecordState("Wow. More than one book from a single id.")
+        raise InvalidRecordState("book id %s" % book_id)
 
     book = assembled[0]
     book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)

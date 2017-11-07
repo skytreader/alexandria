@@ -184,7 +184,7 @@ def edit_book():
             )]
 
         if len(spam) > 1:
-            raise InvalidRecordState("Contribution role + person + book defined more than one record %s" % spam)
+            raise InvalidRecordState("Contribution role + person + book %s" % spam)
 
         if spam:
            return spam[0].contributor_id

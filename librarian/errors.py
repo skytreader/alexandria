@@ -15,4 +15,9 @@ class InvalidRecordState(Exception):
     """
     Throw whenever you think that the records in the database is inconsistent. 
     """
-    pass
+
+    def __init__(self, record_descriptor):
+        self.record_descriptor = record_descriptor
+
+    def __str__(self):
+        return "DB record %s violates constraints." % self.record_descriptor
