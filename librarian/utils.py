@@ -393,11 +393,7 @@ def compute_isbn13_checkdigit(isbn):
 
     return str((10 - (check % 10)) % 10)
 
-def has_equivalent_isbn(isbn):
-    """
-    Check the DB if a book with an equivalent ISBN exists.
-    """
-    from librarian.models import Book
+def make_equivalent_isbn(isbn):
     candidate_equiv = ""
     isbn_len = len(isbn)
     if isbn_len == 13:
@@ -408,12 +404,20 @@ def has_equivalent_isbn(isbn):
         else:
             # This is a book issued with no equivalent ISBN 10
             # (Not sure if this is how ISBN 13 works.)
-            return False
+            return None
     else:
         candidate_equiv = "978" + isbn[:-1]
         checkdigit = compute_isbn13_checkdigit(candidate_equiv)
         candidate_equiv += checkdigit
+    
+    return candidate_equiv
 
+def has_equivalent_isbn(isbn):
+    """
+    Check the DB if a book with an equivalent ISBN exists.
+    """
+    from librarian.models import Book
+    candidate_equiv = make_equivalent_isbn(isbn)
     book_exists = db.session.query(Book).filter(Book.isbn == candidate_equiv).count()
 
     return book_exists == 1

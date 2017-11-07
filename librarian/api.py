@@ -6,11 +6,11 @@ from datetime import datetime
 from librarian import app, db
 from librarian.errors import InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
-from librarian.utils import BookRecord, has_equivalent_isbn, NUMERIC_REGEX, Person
+from librarian.utils import BookRecord, make_equivalent_isbn, has_equivalent_isbn, ISBN_REGEX, NUMERIC_REGEX, Person
 from flask import Blueprint, request
 from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
-from sqlalchemy import desc, func, or_
+from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.exc import IntegrityError
 
 import config
@@ -414,17 +414,29 @@ def quick_stats():
 
 # FIXME Slow as f*ck.
 def search(searchq):
-    # Idea: check the search query if it looks like an ISBN and if it is, query
-    # exclusively for the ISBN.
-    results = (
-        BookRecord.base_assembler_query()
-        .filter(
+    # Will only fail if some f*cker names their book after their own ISBN.
+    results = BookRecord.base_assembler_query()
+    if ISBN_REGEX.match(searchq):
+        alt_isbn = make_equivalent_isbn(searchq)
+        results = results.filter(
             or_(
-                Book.title.like("".join(("%", searchq, "%"))),
-                Book.isbn == searchq
+                Book.isbn == searchq,
+                Book.isbn == alt_isbn
             )
         ).all()
-    )
+    else:
+        results = (
+            BookRecord.base_assembler_query()
+            .filter(
+                or_(
+                    Book.title.like("".join(("%", searchq, "%"))),
+                    and_(
+                        Book.publisher_id == BookCompany.id,
+                        BookCompany.name == searchq
+                    )
+                )
+            ).all()
+        )
 
     book_listing = BookRecord.assembler(results, as_obj=False)
 
