@@ -11,6 +11,8 @@ from librarian.utils import BookRecord, compute_isbn10_checkdigit, compute_isbn1
 import copy
 import unittest
 import librarian
+import random
+import string
 
 fake = Faker()
 fake.add_provider(BookFieldsProvider)
@@ -46,10 +48,18 @@ class IsbnTests(unittest.TestCase):
         self.assertRaises(ConstraintError, compute_isbn10_checkdigit, "978030640615")
         self.assertRaises(ConstraintError, compute_isbn10_checkdigit, "abcdefghi")
 
+        for i in range(100):
+            partial_isbn = "".join([random.choice(string.digits) for _ in range(9)])
+            self.assertEqual(1, len(compute_isbn10_checkdigit(partial_isbn)))
+
     def test_compute_isbn13_checkdigit(self):
         self.assertEqual('7', compute_isbn13_checkdigit("978030640615"))
         self.assertRaises(ConstraintError, compute_isbn13_checkdigit, "030640615")
         self.assertRaises(ConstraintError, compute_isbn13_checkdigit, "abcdefghijkl")
+
+        for i in range(100):
+            partial_isbn = "".join([random.choice(string.digits) for _ in range(12)])
+            self.assertEqual(1, len(compute_isbn13_checkdigit(partial_isbn)))
 
     def test_has_equivalent_isbn_10to13(self):
         saturday = BookFactory(isbn="0099497166", title="Saturday")

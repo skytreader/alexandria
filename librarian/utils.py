@@ -370,7 +370,8 @@ def compute_isbn10_checkdigit(isbn):
         check += int(d) * multiplier
         multiplier -= 1
 
-    return str(11 - (check % 11))
+    checker = (11 - (check % 11)) % 11
+    return 'X' if checker == 10 else str(checker)
 
 def compute_isbn13_checkdigit(isbn):
     """
@@ -390,7 +391,7 @@ def compute_isbn13_checkdigit(isbn):
         else:
             check += int(d)
 
-    return str(10 - (check % 10))
+    return str((10 - (check % 10)) % 10)
 
 def has_equivalent_isbn(isbn):
     """
