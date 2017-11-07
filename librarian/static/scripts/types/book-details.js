@@ -412,10 +412,13 @@ Reset all name autocomplete based on the BOOK_PERSONS field.
 */
 BookDetailsCtrl.prototype.resetAutocomplete = function(){
     "use strict";
-    this.BOOK_PERSONS_FIRSTNAME = _.map(this.BOOK_PERSONS,
-      function(x){return x["firstname"]});
-    this.BOOK_PERSONS_LASTNAME = _.map(this.BOOK_PERSONS,
-      function(x){return x["lastname"]});
+    var firstnameSet = new Set(_.map(this.BOOK_PERSONS,
+      function(x){return x["firstname"]}));
+    var lastnameSet = new Set(_.map(this.BOOK_PERSONS,
+      function(x){return x["lastname"]}));
+
+    this.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
+    this.BOOK_PERSONS_LASTNAME = [...lastnameSet];
 
     $(".auto-lastname").autocomplete({
         source: this.BOOK_PERSONS_LASTNAME
