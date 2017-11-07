@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from base import AppTestCase
 from faker import Faker
+from librarian.errors import ConstraintError
 from librarian.models import Book, BookCompany, BookContribution, Contributor, Role
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.factories import BookContributionFactory, BookFactory, ContributorFactory
@@ -42,9 +43,13 @@ class IsbnTests(unittest.TestCase):
 
     def test_compute_isbn10_checkdigit(self):
         self.assertEqual('2', compute_isbn10_checkdigit("030640615"))
+        self.assertRaises(ConstraintError, compute_isbn10_checkdigit, "978030640615")
+        self.assertRaises(ConstraintError, compute_isbn10_checkdigit, "abcdefghi")
 
     def test_compute_isbn13_checkdigit(self):
         self.assertEqual('7', compute_isbn13_checkdigit("978030640615"))
+        self.assertRaises(ConstraintError, compute_isbn13_checkdigit, "030640615")
+        self.assertRaises(ConstraintError, compute_isbn13_checkdigit, "abcdefghijkl")
 
     def test_has_equivalent_isbn_10to13(self):
         saturday = BookFactory(isbn="0099497166", title="Saturday")

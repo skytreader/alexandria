@@ -147,7 +147,7 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(duplicate._status_code, 409)
         
-    def test_book_adder_duplicate_isbn(self):
+    def test_book_adder_duplicate_isbn13(self):
         _creator = LibrarianFactory()
         librarian.db.session.add(_creator)
         librarian.db.session.flush()
@@ -181,6 +181,48 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Quebecor World Fairfield")
 
         books_you_havent_read.isbn = "1596914696"
+
+        duplicate = self.client.post("/api/add/books", data=books_you_havent_read.request_data())
+
+        self.assertEquals(duplicate._status_code, 409)
+
+    def test_book_adder_duplicate_isbn10(self):
+        """
+        Switch ISBNs of test_book_adder_duplicate_isbn13.
+        """
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+
+        isbn13 = "1596914696"
+
+        self.verify_does_not_exist(Book, isbn=isbn13)
+        self.verify_does_not_exist(Genre, name="Academic Nonfiction")
+        self.verify_does_not_exist(Contributor, lastname="Bayard", firstname="Pierre")
+        self.verify_does_not_exist(Contributor, lastname="Mehlman", firstname="Jeffrey")
+        self.verify_does_not_exist(BookCompany, name="Bloomsbury")
+        self.verify_does_not_exist(BookCompany, name="Quebecor World Fairfield")
+
+        author = [Person(lastname="Bayard", firstname="Pierre")]
+        translator = [Person(lastname="Mehlman", firstname="Jeffrey")]
+        books_you_havent_read = BookRecord(
+            isbn=isbn13, title="How to Talk About Books You Haven't Read",
+            author=author, translator=translator, genre="Academic Nonfiction",
+            publisher="Bloomsbury", printer="Quebecor World Fairfield", 
+            publish_year=2007
+        )
+
+        self.set_current_user(_creator)
+        havent_read_rv = self.client.post("/api/add/books", data=books_you_havent_read.request_data())
+
+        self.verify_inserted(Book, isbn=isbn13)
+        self.verify_inserted(Genre, name="Academic Nonfiction")
+        self.verify_inserted(Contributor, lastname="Bayard", firstname="Pierre")
+        self.verify_inserted(Contributor, lastname="Mehlman", firstname="Jeffrey")
+        self.verify_inserted(BookCompany, name="Bloomsbury")
+        self.verify_inserted(BookCompany, name="Quebecor World Fairfield")
+
+        books_you_havent_read.isbn = "9781596914698"
 
         duplicate = self.client.post("/api/add/books", data=books_you_havent_read.request_data())
 
