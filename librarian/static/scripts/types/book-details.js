@@ -417,6 +417,10 @@ BookDetailsCtrl.prototype.resetAutocomplete = function(){
     var lastnameSet = new Set(_.map(this.BOOK_PERSONS,
       function(x){return x["lastname"]}));
 
+    /*
+    At this point we are sure that the autocomplete entries are unique.
+    **However**, actual behavior shows that the firstnames are still repeated. :(
+    */
     this.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
     this.BOOK_PERSONS_LASTNAME = [...lastnameSet];
 
