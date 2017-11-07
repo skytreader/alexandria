@@ -67,16 +67,6 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
-    def verify_bookperson_inserted(self, persons, role, bookid):
-        """
-        Will be deprected in favor of `verify_persons_inserted` below. Soon.
-        """
-        for p in persons:
-            _p = self.verify_inserted(Contributor, firstname=p["firstname"],
-              lastname=p["lastname"])
-            self.verify_inserted(BookContribution, contributor_id=_p.id,
-              role_id=self.ROLE_IDS[role], book_id=bookid)
-
     def verify_persons_inserted(self, persons, role, bookid):
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p.firstname,
