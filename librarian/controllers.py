@@ -12,6 +12,7 @@ from utils import route_exists
 import config
 import flask
 import json
+import time
 
 librarian_bp = Blueprint('librarian', __name__)
 
@@ -142,14 +143,16 @@ def edit_books():
 @librarian_bp.route("/books")
 def show_books():
     from flask_login import current_user
+    load_start = time.time()
     books = json.loads(api.get_books().data)["data"]
+    load_end = time.time()
     scripts = ("show-books/main.js",)
     styles = ("books.css",)
 
     user = current_user if current_user.is_authenticated else None
 
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
-      books=books, user=user)
+      books=books, user=user, perftime=(load_end - load_start))
 
 @librarian_bp.route("/search")
 def search():
@@ -157,7 +160,9 @@ def search():
     user = current_user if current_user.is_authenticated else None
     search_form = SearchForm(request.form)
     searchq = request.args.get("q")
+    search_start = time.time()
     books = api.search(searchq)
+    search_end = time.time()
     styles = ("books.css",)
     return render_template("books.jinja", stylesheets=styles, books=books,
-      query=searchq, search_form=search_form, user=user)
+      query=searchq, search_form=search_form, user=user, perftime=(search_end - search_start))

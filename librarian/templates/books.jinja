@@ -8,6 +8,7 @@
     {% else %}
         <h1>Browse the library's collection</h1>
     {% endif %}
+    <p>(Took {{ perftime }}ms.)</p>
 
     {% if search_form %}
         {% include "_book-search.jinja" %}

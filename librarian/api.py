@@ -17,7 +17,6 @@ import config
 import flask
 import json
 import pytz
-import re
 import traceback
 
 """
@@ -25,7 +24,7 @@ Contains API endpoints or Python methods (one can be both) useful for other
 parts of the app.
 
 Convention:
-/api/add/* - add some records to the database
+/api/add/* - add some eecords to the database
 /api/read/* - get data from backend
 /api/edit/* - edit data in the database
 /api/util/* - for utility functions. Functions that are usually and can find use
@@ -445,7 +444,7 @@ def search(searchq):
                         Book.publisher_id == BookCompany.id,
                         BookCompany.name.like("".join(("%", searchq, "%")))
                     ),
-                    Book.id.in_(contribooks)
+                    Book.id.in_(contribooks) if contribooks else False
                 )
             ).all()
         )
