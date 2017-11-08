@@ -432,7 +432,7 @@ def search(searchq):
                     Book.title.like("".join(("%", searchq, "%"))),
                     and_(
                         Book.publisher_id == BookCompany.id,
-                        BookCompany.name == searchq
+                        BookCompany.name.like("".join(("%", searchq, "%")))
                     )
                 )
             ).all()

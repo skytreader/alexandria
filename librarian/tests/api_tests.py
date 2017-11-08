@@ -568,6 +568,18 @@ class ApiTests(AppTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["isbn"], search_book.isbn)
 
+    def test_search_publisher(self):
+        search_book = BookRecord(
+            isbn=fake.isbn(), title="Totally Unrelated to Search Query",
+            publisher="Walnut Publishing", publish_year=2017,
+            author=[Person("Hawking", "Stevie")], genre="Test"
+        )
+        create_book(librarian.db.session, search_book, self.admin_user)
+        librarian.db.session.flush()
+        results = api.search("walnut")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["isbn"], search_book.isbn)
+
     def test_title_edit_book(self):
         _creator = LibrarianFactory()
         librarian.db.session.add(_creator)
