@@ -24,7 +24,7 @@ Contains API endpoints or Python methods (one can be both) useful for other
 parts of the app.
 
 Convention:
-/api/add/* - add some eecords to the database
+/api/add/* - add some records to the database
 /api/read/* - get data from backend
 /api/edit/* - edit data in the database
 /api/util/* - for utility functions. Functions that are usually and can find use
@@ -132,8 +132,10 @@ def book_adder():
             # Publishing information
             publisher = get_or_create(BookCompany, will_commit=True,
               name=form.publisher.data, creator=current_user)
-            printer = get_or_create(BookCompany, will_commit=True,
-              name=form.printer.data, creator=current_user)
+            has_printer = form.printer.data.strip()
+            if has_printer:
+                printer = get_or_create(BookCompany, will_commit=True,
+                  name=form.printer.data, creator=current_user)
 
             # Book
             book = Book(isbn=form.isbn.data, title=form.title.data,
@@ -143,9 +145,10 @@ def book_adder():
             db.session.flush()
 
             # Create printer entry
-            printer_record = Printer(company=printer, book=book,
-              creator=current_user)
-            db.session.add(printer_record)
+            if has_printer:
+                printer_record = Printer(company=printer, book=book,
+                  creator=current_user)
+                db.session.add(printer_record)
 
             __insert_contributions(book, form, db.session)
 

@@ -67,6 +67,39 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
+    def test_book_adder_no_printer(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        isbn = fake.isbn()
+
+        # Check that the relevant records do not exist yet
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="io9")
+        self.verify_does_not_exist(Contributor, lastname="Eschbach",
+          firstname="Andreas")
+        self.verify_does_not_exist(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="Eschbach", firstname="Andreas")]
+
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", publish_year=2013
+        )
+
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
+
+        self.assertEquals(single_rv._status_code, 200)
+
+        self.verify_inserted(Book, isbn=isbn)
+        self.verify_inserted(Genre, name="io9")
+        self.verify_inserted(Contributor, lastname="Eschbach",
+          firstname="Andreas")
+        self.verify_inserted(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="")
+
     def verify_persons_inserted(self, persons, role, bookid):
         for p in persons:
             _p = self.verify_inserted(Contributor, firstname=p.firstname,
