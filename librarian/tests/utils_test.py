@@ -82,27 +82,27 @@ class BookRecordTests(AppTestCase):
         booka = BookFactory()
 
         booka_author = BookContributionFactory(role=Role.get_preset_role("Author"),
-          book=booka)
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_author)
         booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
-          book=booka)
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_translator)
         booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka)
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_illus1)
         librarian.db.session.commit()
         booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka)
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_illus2)
         librarian.db.session.commit()
 
         bookb = BookFactory()
         bookb_author = BookContributionFactory(role=Role.get_preset_role("Author"),
-          book=bookb)
+          book=bookb, creator=self.admin_user)
         bookb_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
-          book=bookb)
+          book=bookb, creator=self.admin_user)
         bookb_illus = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=bookb)
+          book=bookb, creator=self.admin_user)
         self.session_add_all((bookb_author, bookb_translator, bookb_illus))
         librarian.db.session.flush()
 
