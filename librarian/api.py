@@ -425,6 +425,17 @@ def search(searchq):
             )
         ).all()
     else:
+        contrib_query = (
+            db.session.query(Book.id)
+            .filter(BookContribution.book_id == Book.id)
+            .filter(BookContribution.contributor_id == Contributor.id)
+            .filter(
+                func.concat(
+                    Contributor.firstname, ' ', Contributor.lastname
+                ).like("".join(("%", searchq, "%")))
+            ).all()
+        )
+        contribooks = [bid for bid, in contrib_query]
         results = (
             BookRecord.base_assembler_query()
             .filter(
@@ -434,13 +445,7 @@ def search(searchq):
                         Book.publisher_id == BookCompany.id,
                         BookCompany.name.like("".join(("%", searchq, "%")))
                     ),
-                    and_(
-                        BookContribution.book_id == Book.id,
-                        BookContribution.contributor_id == Contributor.id,
-                        func.concat(
-                            Contributor.firstname, ' ', Contributor.lastname
-                        ).like("".join(("%", searchq, "%")))
-                    )
+                    Book.id.in_(contribooks)
                 )
             ).all()
         )
