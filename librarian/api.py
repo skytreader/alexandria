@@ -433,6 +433,13 @@ def search(searchq):
                     and_(
                         Book.publisher_id == BookCompany.id,
                         BookCompany.name.like("".join(("%", searchq, "%")))
+                    ),
+                    and_(
+                        BookContribution.book_id == Book.id,
+                        BookContribution.contributor_id == Contributor.id,
+                        func.concat(
+                            Contributor.firstname, ' ', Contributor.lastname
+                        ).like("".join(("%", searchq, "%")))
                     )
                 )
             ).all()
