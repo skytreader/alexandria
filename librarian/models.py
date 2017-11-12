@@ -208,6 +208,7 @@ class Contributor(Base, UserTags):
         self.lastname = kwargs["lastname"]
         self.firstname = kwargs["firstname"]
         self.creator = kwargs["creator"]
+        self.active = kwargs.get("active", True)
         self.creator_id = self.creator.id
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
@@ -285,6 +286,7 @@ class BookContribution(Base, UserTags):
         self.contributor_id = self.contributor.id
         self.role = kwargs["role"]
         self.role_id = self.role.id
+        self.active = kwargs.get("active", True)
         self.creator = kwargs["creator"]
         self.creator_id = self.creator.id
         self.last_modifier = kwargs["creator"]

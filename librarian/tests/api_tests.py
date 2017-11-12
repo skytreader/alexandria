@@ -532,9 +532,21 @@ class ApiTests(AppTestCase):
         for p in persons:
             librarian.db.session.add(p)
 
+        inactive = ContributorFactory(lastname="GLadwell", firstname="MAlcolm III", active=False)
+        librarian.db.session.add(inactive)
+
         librarian.db.session.flush()
         expected_person_set = set([Person(p.lastname, p.firstname) for p in persons])
 
+        list_persons = self.client.get("/api/read/persons")
+        data = json.loads(list_persons.data)
+        person_set = set([Person(p["lastname"], p["firstname"]) for p in data["data"]])
+
+        self.assertEqual(expected_person_set, person_set)
+
+        inactive.active = True
+        librarian.db.session.flush()
+        expected_person_set.add(Person(inactive.lastname, inactive.firstname))
         list_persons = self.client.get("/api/read/persons")
         data = json.loads(list_persons.data)
         person_set = set([Person(p["lastname"], p["firstname"]) for p in data["data"]])

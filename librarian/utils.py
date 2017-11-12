@@ -75,6 +75,8 @@ class BookRecord(RequestData):
                 Contributor.firstname, Role.name, BookCompany.name, Genre.name,
                 Book.publish_year
             ).filter(Book.id == BookContribution.book_id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
             .filter(Book.publisher_id == BookCompany.id)

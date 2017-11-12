@@ -377,8 +377,16 @@ def list_companies():
 
 @librarian_api.route("/api/read/persons")
 def list_persons():
-    persons = db.session.query(Contributor.lastname, Contributor.firstname).all()
-    persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
+    """
+    Return the active Contributors in the database. The endpoint might be a bit
+    misleading since we are filtering here. But meh, this is only used for the
+    autocomplete suggestions.
+    """
+    persons = (
+        db.session.query(Contributor.lastname, Contributor.firstname)
+        .filter(Contributor.active).all()
+    )
+    persons = [{"lastname": p[0], "firstname": p[1]} for p in persons]
     return flask.jsonify({"data": persons})
 
 def get_top_contributors(contrib_type, limit=4):
