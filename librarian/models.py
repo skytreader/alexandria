@@ -198,6 +198,7 @@ class Contributor(Base, UserTags):
     __tablename__ = "contributors"
     lastname = db.Column(db.String(255), nullable=False)
     firstname = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True, server_default=db.false())
     creator = relationship("Librarian", foreign_keys="Contributor.creator_id")
     last_modifier = relationship("Librarian", foreign_keys="Contributor.last_modifier_id")
 
