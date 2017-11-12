@@ -729,15 +729,16 @@ class ApiTests(AppTestCase):
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
 
-        book_authors = (
+        updated_book_authors = (
             librarian.db.session.query(Contributor)
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
             .all()
         )
-        author_persons = set([
+        updated_author_persons = set([
             Person(firstname=a.firstname, lastname=a.lastname)
-            for a in book_authors
+            for a in updated_book_authors
         ])
-        self.assertEqual(set(_book_authors), author_persons)
+        self.assertEqual(set(_book_authors), updated_author_persons)

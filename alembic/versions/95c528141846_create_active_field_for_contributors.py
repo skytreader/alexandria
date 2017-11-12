@@ -24,7 +24,9 @@ import sqlalchemy as sa
 
 def upgrade():
     op.add_column("contributors", sa.Column("active", sa.Boolean, nullable=False, default=True, server_default=db.false()))
+    op.add_column("book_contributions", sa.Column("active", sa.Boolean, nullable=False, default=True, server_default=db.false()))
 
 
 def downgrade():
     op.drop_column("contributors", "active")
+    op.drop_column("book_contributions", "active")
