@@ -714,9 +714,11 @@ class ApiTests(AppTestCase):
         self.set_current_user(_creator)
 
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
-        book = BookRecord(isbn=fake.isbn(), title=fake.title(),
-          publisher="Mumford and Sons", author=authors, publish_year=2016,
-          genre="Fiction")
+        book = BookRecord(
+            isbn=fake.isbn(), title=fake.title(),
+            publisher="Mumford and Sons", author=authors, publish_year=2016,
+            genre="Fiction"
+        )
         book_id = create_book(librarian.db.session, book, self.admin_user)
         librarian.db.session.commit()
 
@@ -735,9 +737,11 @@ class ApiTests(AppTestCase):
         self.assertEquals(set(authors), author_persons)
 
         _book_authors = list(book.authors)[0:-1]
-        edit_data = BookRecord(isbn=book.isbn, title=book.title,
-          publisher=book.publisher, author=_book_authors,
-          publish_year=book.publish_year, genre=book.genre, id=book_id)
+        edit_data = BookRecord(
+            isbn=book.isbn, title=book.title,
+            publisher=book.publisher, author=_book_authors,
+            publish_year=book.publish_year, genre=book.genre, id=book_id
+        )
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
 
