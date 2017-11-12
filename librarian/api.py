@@ -36,7 +36,7 @@ librarian_api = Blueprint("librarian_api", __name__)
 
 def __create_bookperson(form_data):
     """
-    Create a bookperson record from the given form_data. Return the created
+    Create a Contributor record from the given form_data. Return the created
     records as a list, if any. Else return None.
 
     form_data is expected to be a JSON list of objects. Each object should have
@@ -79,24 +79,32 @@ def __insert_contributions(book, form, session):
     for author in authors:
         author_part = BookContribution(book=book, contributor=author,
           role=author_role, creator=current_user)
+        if not author.active:
+            author.active = True
         session.add(author)
         session.add(author_part)
 
     for illustrator in illustrators:
         illus_part = BookContribution(book=book, contributor=illustrator,
           role=illus_role, creator=current_user)
+        if not illustrator.active:
+            illustrator.active = True
         session.add(illustrator)
         session.add(illus_part)
 
     for editor in editors:
         editor_part = BookContribution(book=book, contributor=editor,
           role=editor_role, creator=current_user)
+        if not editor.active:
+            editor.active = True
         session.add(editor)
         session.add(editor_part)
 
     for translator in translators:
         translator_part = BookContribution(book=book, 
           contributor=translator, role=trans_role, creator=current_user)
+        if not translator.active:
+            translator.active = True
         session.add(translator)
         session.add(translator_part)
 
@@ -186,7 +194,7 @@ def edit_book():
             )]
 
         if len(spam) > 1:
-            raise InvalidRecordState("Contribution role + person + book %s" % spam)
+            raise InvalidRecordState("uniqueness of contribution role + person + book %s" % spam)
 
         if spam:
            return spam[0].contributor_id
@@ -229,14 +237,17 @@ def edit_book():
 
         deletables = recorded_contribs - existing_records
         
+        # TODO Maybe better to add equality and hashing methods to Contributor
+        # objects and then, since they are already queried for contributor_record
+        # above, just re-use them here.
         for d in deletables:
-            db.session.delete(
+            (
                 BookContribution.query
                 .filter(BookContribution.role_id == d[0])
                 .filter(BookContribution.book_id == book.id)
                 .filter(BookContribution.contributor_id == d[1])
                 .first()
-            )
+            ).active = False
 
     from flask_login import current_user
 
