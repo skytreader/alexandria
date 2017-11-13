@@ -84,7 +84,7 @@ def create_library(
     session.commit()
     printers = session.query(BookCompany).all()
 
-    books = [BookFactory(publisher=random.choice(printers)) for _ in range(book_c)]
+    books = [BookFactory(publisher=random.choice(printers), creator=admin) for _ in range(book_c)]
     book_isbns = [b.isbn for b in books]
 
     for b in books:

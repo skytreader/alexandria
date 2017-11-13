@@ -219,7 +219,6 @@ class Contributor(Base, UserTags):
     def __repr__(self):
         return self.__str__()
 
-    # TODO Use this even in tests
     def make_plain_person(self):
         return Person(lastname=self.lastname, firstname=self.firstname)
 

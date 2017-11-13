@@ -746,7 +746,9 @@ class ApiTests(AppTestCase):
         librarian.db.session.flush()
         self.set_current_user(_creator)
 
-        authors = [ContributorFactory().make_plain_person() for _ in range(3)]
+        # These two are always parallel arrays.
+        contributor_objs = [ContributorFactory() for _ in range(3)]
+        authors = [co.make_plain_person() for co in contributor_objs]
         book = BookRecord(
             isbn=fake.isbn(), title=fake.title(),
             publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -769,10 +771,11 @@ class ApiTests(AppTestCase):
         ])
         self.assertEquals(set(authors), author_persons)
 
-        _book_authors = list(book.authors)[0:-1]
+        # The last author is the one we delete
+        edited_book_authors = authors[0:-1]
         edit_data = BookRecord(
             isbn=book.isbn, title=book.title,
-            publisher=book.publisher, author=_book_authors,
+            publisher=book.publisher, author=edited_book_authors,
             publish_year=book.publish_year, genre=book.genre, id=book_id
         )
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
@@ -790,4 +793,12 @@ class ApiTests(AppTestCase):
             Person(firstname=a.firstname, lastname=a.lastname)
             for a in updated_book_authors
         ])
-        self.assertEqual(set(_book_authors), updated_author_persons)
+        self.assertEqual(set(edited_book_authors), updated_author_persons)
+        # Verify that the BookRecord for the "deleted" contribution remains
+        # but inactive.
+        the_deleted = contributor_objs[-1]
+        self.verify_inserted(
+            BookContribution, book_id=book_id, contributor_id=the_deleted.id,
+            role_id=author_role.id, active=False
+        )
+        self.verify_inserted(Contributor, id=the_deleted.id, active=False)
