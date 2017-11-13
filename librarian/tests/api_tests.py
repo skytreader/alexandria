@@ -67,6 +67,39 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
+    def test_book_adder_reactivation(self):
+        self.set_current_user(self.admin_user)
+        inactive_contributor = ContributorFactory(
+            lastname="Duffer", firstname="Matt", active=False
+        )
+        librarian.db.session.add(inactive_contributor)
+        librarian.db.session.flush()
+
+        isbn = fake.isbn()
+
+        # Check that the relevant records do not exist yet
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="Horror")
+        self.verify_does_not_exist(BookCompany, name="Netflix")
+        self.verify_does_not_exist(BookCompany, name="WWW")
+        author = [Person(lastname="Duffer", firstname="Matt")]
+
+        single_author = BookRecord(
+            isbn=isbn, title="Stranger Things", genre="Horror", author=author,
+            publisher="Netflix", printer="WWW", publish_year=2016
+        )
+
+        reactivate = self.client.post("/api/add/books", data=single_author.request_data())
+
+        self.assertEquals(reactivate._status_code, 200)
+        self.verify_inserted(Book, isbn=isbn)
+        self.verify_inserted(Genre, name="Horror")
+        self.verify_inserted(BookCompany, name="Netflix")
+        self.verify_inserted(BookCompany, name="WWW")
+        self.verify_inserted(
+            Contributor, lastname="Duffer", firstname="Matt", active=True
+        )
+
     def test_book_adder_no_printer(self):
         _creator = LibrarianFactory()
         librarian.db.session.add(_creator)

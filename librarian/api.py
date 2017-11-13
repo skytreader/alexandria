@@ -116,6 +116,7 @@ def book_adder():
 
     Possible responses:
         200 Accepted - Book was added to the database successfully.
+        302 Error - API endpoint called while not logged in.
         400 Error - The request did not validate. Client _must not_ retry.
         409 IntegrityError - Database error for possible duplicate records.
           Client _must not_ retry.
