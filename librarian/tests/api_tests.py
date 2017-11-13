@@ -756,6 +756,7 @@ class ApiTests(AppTestCase):
         )
         book_id = create_book(librarian.db.session, book, self.admin_user)
         librarian.db.session.commit()
+        self.verify_inserted(Contributor, id=contributor_objs[-1].id, active=True)
 
         author_role = Role.get_preset_role("Author")
         book_authors = (

@@ -250,6 +250,17 @@ def edit_book():
                 .first()
             ).active = False
 
+            other_contrib = (
+                BookContribution.query
+                .filter(BookContribution.contributor_id == d[1])
+                .filter(BookContribution.book_id != book.id)
+                .filter(BookContribution.role_id != d[0])
+                .first()
+            )
+
+            if other_contrib is None:
+                Contributor.query.filter(Contributor.id == d[1]).first().active = False
+
     from flask_login import current_user
 
     form = EditBookForm(request.form)
