@@ -205,7 +205,7 @@ def edit_book():
     def edit_contrib(book, all_contribs, role, submitted_persons):
         """
         Adds all new contributors to the session and deletes all removed
-        contributors to the session. This does not commit.
+        contributors to the session.
 
         Where `submitted_persons` is the data straight out of the form (hence it
         is a JSON string).
@@ -214,6 +214,7 @@ def edit_book():
         # Set of tuples (role_id, person_id)
         existing_records = set()
 
+        # Create all the contributions mentioned in the form.
         for p in parsons:
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
@@ -223,6 +224,10 @@ def edit_book():
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
+                app.logger.debug("%s has role %s for book %s" % (contributor_record.id, role.name, book.id))
+
+                if not contributor_record.active:
+                    contributor_record.active = True
 
                 contribution = BookContribution(
                     book=book, contributor=contributor_record, role=role,
@@ -259,9 +264,12 @@ def edit_book():
                         BookContribution.role_id != d[0]
                     )
                 )
+                .filter(BookContribution.active)
                 .first()
             )
-            app.logger.debug("Contributor %s has another contribution %s" % (d[1], other_contrib))
+            app.logger.debug(
+                "Contributor %s has another contribution %s (checked from %s)" % (d[1], other_contrib, role.name)
+            )
 
             if other_contrib is None:
                 Contributor.query.filter(Contributor.id == d[1]).first().active = False
