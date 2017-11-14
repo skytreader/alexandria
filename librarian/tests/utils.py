@@ -45,7 +45,7 @@ def create_book(session, book_record, creator):
                   role=role, creator=creator)
                 session.add(contribution)
 
-    genre = GenreFactory(name="Test")
+    genre = GenreFactory(name=book_record.genre)
     publisher = BookCompanyFactory(name=book_record.publisher)
     _book = {"isbn": book_record.isbn, "title": book_record.title,
       "genre": genre, "publisher": publisher, "creator": creator,
