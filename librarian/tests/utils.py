@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from factory.fuzzy import FuzzyText
-from librarian.models import Book, BookCompany, BookContribution, Contributor, get_or_create, Role
+from librarian.models import Book, BookCompany, BookContribution, Contributor, Genre, get_or_create, Role
 from librarian.utils import BookRecord, Person
 from librarian.tests.factories import (
-  BookFactory, BookCompanyFactory, ContributorFactory, GenreFactory
+  BookFactory, BookCompanyFactory, ContributorFactory
 )
 
 import random
@@ -43,8 +43,14 @@ def create_book(session, book_record, creator):
                   role=role, creator=creator)
                 session.add(contribution)
 
-    genre = GenreFactory(name=book_record.genre)
-    publisher = BookCompanyFactory(name=book_record.publisher)
+    genre = get_or_create(
+        Genre, name=book_record.genre, creator=creator, session=session,
+        will_commit=True,
+    )
+    publisher = get_or_create(
+        BookCompany, name=book_record.publisher, creator=creator,
+        session=session, will_commit=True
+    )
     _book = {"isbn": book_record.isbn, "title": book_record.title,
       "genre": genre, "publisher": publisher, "creator": creator,
       "publish_year": book_record.publish_year}
@@ -140,6 +146,7 @@ def create_library(
         book = library[isbn]
         book["isbn"] = isbn
         book["id"] = isbn_id_map[isbn]
+        book["genre"] = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
         library_list.insert(0, BookRecord(**book))
 
     return library_list
