@@ -35,8 +35,6 @@ def create_book(session, book_record, creator):
             for p in persons:
                 contributor = get_or_create(Contributor, session=session, will_commit=True,
                   lastname=p.lastname, firstname=p.firstname, creator=creator)
-                #contributor = Contributor(lastname=p.lastname, firstname=p.firstname,
-                #  creator=creator)
                 try:
                     session.add(contributor)
                 except IntegrityError:

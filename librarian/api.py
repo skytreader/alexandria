@@ -253,10 +253,15 @@ def edit_book():
             other_contrib = (
                 BookContribution.query
                 .filter(BookContribution.contributor_id == d[1])
-                .filter(BookContribution.book_id != book.id)
-                .filter(BookContribution.role_id != d[0])
+                .filter(
+                    or_(
+                        BookContribution.book_id != book.id,
+                        BookContribution.role_id != d[0]
+                    )
+                )
                 .first()
             )
+            app.logger.debug("Contributor %s has another contribution %s" % (d[1], other_contrib))
 
             if other_contrib is None:
                 Contributor.query.filter(Contributor.id == d[1]).first().active = False
