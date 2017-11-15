@@ -28,9 +28,40 @@ EditBookDetailsCtrl.prototype.clearProxyForm = function(){
 }
 
 /**
+Move the data in the proxy form to the actual form, reformatting them as necessary.
+
+@private
+*/
+EditBookDetailsCtrl.prototype.moveFormData = function(){
+    var allInputs = $("#proxy-form input");
+    var isbn = $(allInputs).filter("#isbn-proxy").val();
+    var title = $(allInputs).filter("#title-proxy").val();
+    var genre = $(allInputs).filter("#genre-proxy").val();
+    var authors = JSON.stringify(this.getCreatorNames("author"));
+    var illustrators = JSON.stringify(this.getCreatorNames("illustrator"));
+    var editors = JSON.stringify(this.getCreatorNames("editor"));
+    var translators = JSON.stringify(this.getCreatorNames("translator"));
+    var publisher = $(allInputs).filter("#publisher-proxy").val();
+    var printer = $(allInputs).filter("#printer-proxy").val();
+    var year = $(allInputs).filter("#year-proxy").val();
+
+    document.getElementById("isbn").value = isbn;
+    document.getElementById("title").value = title;
+    document.getElementById("genre").value = genre;
+    document.getElementById("authors").value = authors;
+    document.getElementById("illustrators").value = illustrators;
+    document.getElementById("editors").value = editors;
+    document.getElementById("translators").value = translators;
+    document.getElementById("publisher").value = publisher;
+    document.getElementById("printer").value = printer;
+    document.getElementById("year").value = year;
+}
+
+/**
 Get-things-done: This is a stripped-down version of the one in BookSenderCtrl.sendSaveForm.
 */
 EditBookDetailsCtrl.prototype.validBookAction = function(){
+    this.moveFormData();
     var authors = JSON.parse(document.getElementById("authors").value);
     var illustrators = JSON.parse(document.getElementById("illustrators").value);
     var editors = JSON.parse(document.getElementById("editors").value);
@@ -71,7 +102,7 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
         "printer": document.getElementById("printer").value,
         "year": document.getElementById("year").value
     }
-    $.ajax("/api/add/books", {
+    $.ajax("/api/edit/books", {
         "type": "POST",
         "data": data,
         "success": success,

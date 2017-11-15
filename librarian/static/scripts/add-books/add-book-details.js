@@ -121,31 +121,3 @@ AddBookDetailsCtrl.prototype.listNames = function(nameList){
 
     return  names.join("; ");
 }
-
-/**
-Get all the names entered for the given creator.
-
-This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
-it must be guaranteed that the order of lastnames and firstnames returned is the
-same.
-
-@param {string} creator
-    The name given to the creator type.
-@return {Array.Person} An array of persons.
-@private
-*/
-AddBookDetailsCtrl.prototype.getCreatorNames = function(creator){
-    var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
-    var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
-    var persons = [];
-
-    for(var i = 0; i < creatorsLastname.length; i++){
-        var firstname = creatorsFirstname[i].value.trim();
-        var lastname = creatorsLastname[i].value.trim();
-        if(firstname != "" && lastname != ""){
-            persons.push(new Person(lastname, firstname));
-        }
-    }
-
-    return persons;
-}
