@@ -1023,3 +1023,66 @@ class ApiTests(AppTestCase):
         )
         the_deleted = librarian.db.session.query(Contributor).filter(Contributor.id == the_deleted.id).first()
         self.verify_inserted(Contributor, id=the_deleted.id, active=True)
+
+    def test_edit_book_contrib_correction(self):
+        """
+        Actual (unexpected) error encountered while live testing.
+        """
+        self.set_current_user(self.admin_user)
+
+        # These two are always parallel arrays.
+        contributor_objs = [ContributorFactory(lastname="Stewart", firstname="John")]
+        authors = [co.make_plain_person() for co in contributor_objs]
+        the_deleted = contributor_objs[0]
+        book = BookRecord(
+            isbn=fake.isbn(), title=fake.title(),
+            publisher="Mumford and Sons", author=authors, publish_year=2016,
+            genre="Fiction"
+        )
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+
+        author_role = Role.get_preset_role("Author")
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .all()
+        )
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+        self.assertEquals(set(authors), author_persons)
+
+        # The last author is the one we delete
+        edited_book_authors = [Person(lastname="Stewart", firstname="Jon")]
+        edit_data = BookRecord(
+            isbn=book.isbn, title=book.title,
+            publisher=book.publisher, author=edited_book_authors,
+            publish_year=book.publish_year, genre=book.genre, id=book_id
+        )
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
+
+        updated_book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .all()
+        )
+        updated_author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in updated_book_authors
+        ])
+        self.assertEqual(set(edited_book_authors), updated_author_persons)
+        # Verify that the BookRecord for the "deleted" contribution remains
+        # but inactive.
+        self.verify_inserted(
+            BookContribution, book_id=book_id, contributor_id=the_deleted.id,
+            role_id=author_role.id, active=False
+        )
+        self.verify_inserted(Contributor, id=the_deleted.id, active=False)
