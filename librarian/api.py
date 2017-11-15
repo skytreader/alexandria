@@ -177,6 +177,9 @@ def book_adder():
 def edit_book():
     def contribution_exists(all_contribs, role_id, person):
         """
+        Check if the given person contributed for the given role in all the
+        contributions related to the present book being edited.
+
         Where
         
         `all_contribs` is all the BookContribution records for the book being
@@ -184,21 +187,20 @@ def edit_book():
 
         person is an instance of librarian.utils.Person.
 
-        Returns the person_id if the described BookContribution exists, else
-        False.
+        Returns the BookContribution object if it exists, else False.
         """
-        spam = [
+        the_contribution = [
             contrib for contrib in all_contribs if (
                 contrib.role_id == role_id and
                 contrib.contributor.firstname == person.firstname and
                 contrib.contributor.lastname == person.lastname
             )]
 
-        if len(spam) > 1:
+        if len(the_contribution) > 1:
             raise InvalidRecordState("uniqueness of contribution role + person + book %s" % spam)
 
-        if spam:
-           return spam[0].contributor_id
+        if the_contribution:
+           return the_contribution[0]
         else:
            return False
 
@@ -211,14 +213,13 @@ def edit_book():
         is a JSON string).
         """
         parsons = json.loads(submitted_persons)
-        # Set of tuples (role_id, person_id)
         existing_records = set()
 
-        # Create all the contributions mentioned in the form.
+        # Create or load all the contributions mentioned in the form.
         for p in parsons:
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
-                existing_records.add((role.id, ce))
+                existing_records.add(ce)
             else:
                 contributor_record = get_or_create(
                     Contributor, will_commit=False, firstname=p["firstname"],
@@ -234,45 +235,47 @@ def edit_book():
                     creator=current_user
                 )
                 db.session.add(contribution)
-                existing_records.add((role.id, contributor_record.id))
+                existing_records.add(contribution)
 
         recorded_contribs = set([
             (contrib.role.id, contrib.contributor.id) for contrib in all_contribs
             if contrib.role.id == role.id
         ])
 
-        deletables = recorded_contribs - existing_records
+        deletables = set(all_contribs) - existing_records
         
         # TODO Maybe better to add equality and hashing methods to Contributor
         # objects and then, since they are already queried for contributor_record
         # above, just re-use them here.
         for d in deletables:
-            (
-                BookContribution.query
-                .filter(BookContribution.role_id == d[0])
-                .filter(BookContribution.book_id == book.id)
-                .filter(BookContribution.contributor_id == d[1])
-                .first()
-            ).active = False
+            #(
+            #    BookContribution.query
+            #    .filter(BookContribution.role_id == d[0])
+            #    .filter(BookContribution.book_id == book.id)
+            #    .filter(BookContribution.contributor_id == d[1])
+            #    .first()
+            #).active = False
+            d.active = False
 
             other_contrib = (
                 BookContribution.query
-                .filter(BookContribution.contributor_id == d[1])
+                .filter(BookContribution.contributor_id == d.contributor_id)
                 .filter(
                     or_(
                         BookContribution.book_id != book.id,
-                        BookContribution.role_id != d[0]
+                        BookContribution.role_id != d.role_id
                     )
                 )
                 .filter(BookContribution.active)
                 .first()
             )
             app.logger.debug(
-                "Contributor %s has another contribution %s (checked from %s)" % (d[1], other_contrib, role.name)
+                "Contributor %s has another contribution %s (checked from %s)" % (d.contributor_id, other_contrib, role.name)
             )
 
             if other_contrib is None:
-                Contributor.query.filter(Contributor.id == d[1]).first().active = False
+                #Contributor.query.filter(Contributor.id == d[1]).first().active = False
+                d.contributor.active = False
 
     from flask_login import current_user
 

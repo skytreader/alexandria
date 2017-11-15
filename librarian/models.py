@@ -298,6 +298,16 @@ class BookContribution(Base, UserTags):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        return (
+            self.book_id == other.book_id and
+            self.contributor_id == other.contributor_id and
+            self.role_id == other.role_id
+        )
+
+    def __hash__(self):
+        return hash((self.book_id, self.contributor_id, self.role_id))
+
 class Printer(UserTags):
     __tablename__ = "printers"
     company_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
