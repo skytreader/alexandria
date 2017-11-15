@@ -91,6 +91,7 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
 
     var data = {
         "csrf_token": document.getElementById("csrf_token").value,
+        "book_id": bookForEditing.id,
         "isbn": document.getElementById("isbn").value,
         "title": document.getElementById("title").value,
         "genre": document.getElementById("genre").value,
