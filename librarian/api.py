@@ -238,23 +238,13 @@ def edit_book():
                 existing_records.add(contribution)
 
         recorded_contribs = set([
-            (contrib.role.id, contrib.contributor.id) for contrib in all_contribs
+            contrib for contrib in all_contribs
             if contrib.role.id == role.id
         ])
 
-        deletables = set(all_contribs) - existing_records
-        
-        # TODO Maybe better to add equality and hashing methods to Contributor
-        # objects and then, since they are already queried for contributor_record
-        # above, just re-use them here.
+        deletables = recorded_contribs - existing_records
+
         for d in deletables:
-            #(
-            #    BookContribution.query
-            #    .filter(BookContribution.role_id == d[0])
-            #    .filter(BookContribution.book_id == book.id)
-            #    .filter(BookContribution.contributor_id == d[1])
-            #    .first()
-            #).active = False
             d.active = False
 
             other_contrib = (
@@ -270,11 +260,11 @@ def edit_book():
                 .first()
             )
             app.logger.debug(
-                "Contributor %s has another contribution %s (checked from %s)" % (d.contributor_id, other_contrib, role.name)
+                "Contributor %s has another contribution %s (checked from %s)" %
+                (d.contributor_id, other_contrib, role.name)
             )
 
             if other_contrib is None:
-                #Contributor.query.filter(Contributor.id == d[1]).first().active = False
                 d.contributor.active = False
 
     from flask_login import current_user

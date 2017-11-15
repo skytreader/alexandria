@@ -753,6 +753,7 @@ class ApiTests(AppTestCase):
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         authors = [co.make_plain_person() for co in contributor_objs]
+        the_deleted = contributor_objs[-1]
         book = BookRecord(
             isbn=fake.isbn(), title=fake.title(),
             publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -791,6 +792,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            # Just for thoroughness, but in an ideal world BookContribution.active is sufficient
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([
@@ -800,7 +803,6 @@ class ApiTests(AppTestCase):
         self.assertEqual(set(edited_book_authors), updated_author_persons)
         # Verify that the BookRecord for the "deleted" contribution remains
         # but inactive.
-        the_deleted = contributor_objs[-1]
         self.verify_inserted(
             BookContribution, book_id=book_id, contributor_id=the_deleted.id,
             role_id=author_role.id, active=False
