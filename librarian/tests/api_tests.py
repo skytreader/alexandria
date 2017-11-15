@@ -1031,9 +1031,9 @@ class ApiTests(AppTestCase):
         self.set_current_user(self.admin_user)
 
         # These two are always parallel arrays.
-        contributor_objs = [ContributorFactory(lastname="Stewart", firstname="John")]
+        contributor_objs = [ContributorFactory(lastname="Jill", firstname="Jack"), ContributorFactory(lastname="Stewart", firstname="John")]
         authors = [co.make_plain_person() for co in contributor_objs]
-        the_deleted = contributor_objs[0]
+        the_deleted = contributor_objs[-1]
         book = BookRecord(
             isbn=fake.isbn(), title=fake.title(),
             publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -1041,6 +1041,12 @@ class ApiTests(AppTestCase):
         )
         book_id = create_book(librarian.db.session, book, self.admin_user)
         librarian.db.session.commit()
+        js_autobio = BookRecord(
+            isbn=fake.isbn(), title="JS Autobio", publisher="Green Cross",
+            author=[Person(lastname="Stewart", firstname="Jon")],
+            publish_year=2016, genre="Fiction"
+        )
+        create_book(librarian.db.session, js_autobio, self.admin_user)
 
         author_role = Role.get_preset_role("Author")
         book_authors = (
@@ -1056,8 +1062,7 @@ class ApiTests(AppTestCase):
         ])
         self.assertEquals(set(authors), author_persons)
 
-        # The last author is the one we delete
-        edited_book_authors = [Person(lastname="Stewart", firstname="Jon")]
+        edited_book_authors = [Person(lastname="Jill", firstname="Jack"), Person(lastname="Stewart", firstname="Jon")]
         edit_data = BookRecord(
             isbn=book.isbn, title=book.title,
             publisher=book.publisher, author=edited_book_authors,
