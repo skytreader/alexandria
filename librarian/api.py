@@ -414,6 +414,8 @@ def get_top_contributors(contrib_type, limit=4):
       .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
+      .filter(Contributor.active)
+      .filter(BookContribution.active)
       .order_by(desc("contrib_count"))
       .group_by(Contributor.id).order_by("contrib_count").limit(limit)
       .all())
@@ -426,6 +428,8 @@ def get_recent_contributors(contrib_type, limit=4):
       .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
+      .filter(Contributor.active)
+      .filter(BookContribution.active)
       .order_by(desc(BookParticipant.date_created)).limit(limit).all())
     
     return top
@@ -443,7 +447,7 @@ def get_recent_books(limit=4):
 def quick_stats():
     stats = {}
     books = len(db.session.query(Book).all())
-    contributors = len(db.session.query(BookContribution).all())
+    contributors = len(db.session.query(BookContribution).filter(BookContribution.active).all())
     top_author = get_top_contributors("Author", 1)
     stats["participants_per_book"] = (contributors / books) if books else 0
     stats["recent_books"] = get_recent_books()
