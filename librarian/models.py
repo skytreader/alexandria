@@ -252,7 +252,7 @@ class Role(Base, UserTags):
         return role
 
     def __str__(self):
-        return self.name
+        return "%s (%d)" % (self.name, self.id)
         
     def __repr__(self):
         return self.name + "#" + str(self.id)

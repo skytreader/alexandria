@@ -234,6 +234,7 @@ def edit_book():
                     book=book, contributor=contributor_record, role=role,
                     creator=current_user
                 )
+                app.logger.debug("creating contribution %s" % contribution)
                 db.session.add(contribution)
                 existing_records.add(contribution)
 
