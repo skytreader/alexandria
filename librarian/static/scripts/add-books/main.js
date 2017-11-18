@@ -212,59 +212,6 @@ BookSenderCtrl.prototype.sendSaveForm = function(domElement){
 }
 
 /**
-Create a list element for displaying a creator's name. The name displayed is
-dependent on what is currently entered in the proxy fields for this creator.
-
-TODO Test me
-
-@param {string} creatorType
-*/
-function renderContentCreatorListing(creatorType){
-    var hiddenLastnameProxy = document.createElement("input");
-    hiddenLastnameProxy.type = "hidden";
-    hiddenLastnameProxy.name = creatorType + "-proxy-lastname";
-
-    var hiddenFirstnameProxy = document.createElement("input");
-    hiddenFirstnameProxy.type = "hidden";
-    hiddenFirstnameProxy.name = creatorType + "-proxy-firstname";
-
-    var divRow = document.createElement("div");
-    $(divRow).addClass("row");
-
-    var delCol = document.createElement("div");
-    $(delCol).addClass("col-xs-1 del-col");
-
-    var nameCol = document.createElement("div");
-    $(nameCol).addClass("col-xs-11");
-
-    divRow.appendChild(delCol);
-    divRow.appendChild(nameCol);
-
-    var lastName = $("#" + creatorType + "-proxy-lastname").val().trim();
-    var firstName = $("#" + creatorType + "-proxy-firstname").val().trim();
-    hiddenLastnameProxy.value = lastName;
-    hiddenFirstnameProxy.value = firstName;
-    clearCreatorInput(creatorType);
-    var nameElement = document.createElement("span");
-    nameElement.innerHTML = lastName + ", " + firstName;
-
-    nameCol.appendChild(nameElement);
-
-    var deleteButton = document.createElement("i");
-    $(deleteButton).addClass("fa fa-times-circle")
-      .click(recordDeleterFactory(creatorType));
-
-    delCol.appendChild(deleteButton);
-
-    var listing = document.createElement("li");
-    listing.appendChild(divRow);
-    listing.appendChild(hiddenLastnameProxy);
-    listing.appendChild(hiddenFirstnameProxy);
-
-    return listing;
-}
-
-/**
 @param {string} creatorType
 */
 function clearCreatorInput(creatorType){
