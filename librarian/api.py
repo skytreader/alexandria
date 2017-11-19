@@ -294,6 +294,9 @@ def edit_book():
             all_contribs = (
                 BookContribution.query
                 .filter(BookContribution.book_id == book_id)
+                .filter(BookContribution.active)
+                .filter(BookContribution.contributor_id == Contributor.id)
+                .filter(Contributor.active)
                 .all()
             )
 
