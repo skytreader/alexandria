@@ -210,7 +210,8 @@ def edit_book():
         contributors to the session.
 
         Where `submitted_persons` is the data straight out of the form (hence it
-        is a JSON string).
+        is a JSON string), `all_contribs` are all the active contributions in
+        the book as recorded in the DB (pre-edit).
         """
         parsons = json.loads(submitted_persons)
         existing_records = set()
@@ -225,7 +226,6 @@ def edit_book():
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
-                app.logger.debug("%s has role %s for book %s" % (contributor_record.id, role.name, book.id))
 
                 if not contributor_record.active:
                     contributor_record.active = True
@@ -234,7 +234,7 @@ def edit_book():
                     book=book, contributor=contributor_record, role=role,
                     creator=current_user
                 )
-                app.logger.debug("creating contribution %s" % contribution)
+                #db.session.commit()
                 db.session.add(contribution)
                 existing_records.add(contribution)
 
@@ -266,6 +266,7 @@ def edit_book():
             )
 
             if other_contrib is None:
+                app.logger.debug("Deactivating %s" % d)
                 d.contributor.active = False
 
     from flask_login import current_user
