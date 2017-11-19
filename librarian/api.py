@@ -234,7 +234,6 @@ def edit_book():
                     book=book, contributor=contributor_record, role=role,
                     creator=current_user
                 )
-                #db.session.commit()
                 db.session.add(contribution)
                 existing_records.add(contribution)
 
@@ -276,7 +275,6 @@ def edit_book():
     app.logger.debug(form.debug_validate())
 
     if form.validate_on_submit():
-        db.session.commit()
         book_id = int(form.book_id.data)
         try:
             # Update records in books table

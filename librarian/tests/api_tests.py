@@ -1047,6 +1047,7 @@ class ApiTests(AppTestCase):
             publish_year=2016, genre="Fiction"
         )
         create_book(librarian.db.session, js_autobio, self.admin_user)
+        librarian.db.session.commit()
 
         author_role = Role.get_preset_role("Author")
         book_authors = (
