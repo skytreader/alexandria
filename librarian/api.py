@@ -299,21 +299,14 @@ def edit_book():
                 .all()
             )
 
-            if form.authors.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
-                  form.authors.data)
-
-            if form.illustrators.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
-                  form.illustrators.data)
-
-            if form.editors.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
-                  form.editors.data)
-
-            if form.translators.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
-                  form.editors.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
+              form.authors.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
+              form.illustrators.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
+              form.editors.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
+              form.editors.data)
 
             db.session.commit()
             return "Accepted", 200
