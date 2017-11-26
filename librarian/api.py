@@ -214,13 +214,13 @@ def edit_book():
         the book as recorded in the DB (pre-edit).
         """
         parsons = json.loads(submitted_persons)
-        existing_records = set()
+        form_records = set()
 
         # Create or load all the contributions mentioned in the form.
         for p in parsons:
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
-                existing_records.add(ce)
+                form_records.add(ce)
             else:
                 contributor_record = get_or_create(
                     Contributor, will_commit=False, firstname=p["firstname"],
@@ -235,14 +235,16 @@ def edit_book():
                     creator=current_user
                 )
                 db.session.add(contribution)
-                existing_records.add(contribution)
+                form_records.add(contribution)
 
         recorded_contribs = set([
             contrib for contrib in all_contribs
             if contrib.role.id == role.id
         ])
 
-        deletables = recorded_contribs - existing_records
+        app.logger.debug("recorded contribs for %s %s" % (role, recorded_contribs))
+        app.logger.debug("form records %s" % form_records)
+        deletables = recorded_contribs - form_records
         app.logger.debug("The deletables %s" % deletables)
 
         for d in deletables:
@@ -306,8 +308,10 @@ def edit_book():
               form.illustrators.data)
             edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
               form.editors.data)
+            app.logger.debug("======================")
             edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
-              form.editors.data)
+              form.translators.data)
+            app.logger.debug("======================")
 
             db.session.commit()
             return "Accepted", 200
