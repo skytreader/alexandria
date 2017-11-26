@@ -710,6 +710,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -732,6 +734,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -768,6 +772,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -845,6 +851,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -869,6 +877,7 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([
@@ -915,6 +924,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -940,6 +951,7 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([
@@ -983,6 +995,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -1008,6 +1022,7 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([
@@ -1058,6 +1073,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -1133,6 +1150,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         book_illustrators = (
@@ -1140,6 +1159,8 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.book_id==book_id)
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==illustrator_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         author_persons = set([
@@ -1165,6 +1186,7 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([

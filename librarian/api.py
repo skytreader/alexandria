@@ -243,6 +243,7 @@ def edit_book():
         ])
 
         deletables = recorded_contribs - existing_records
+        app.logger.debug("The deletables %s" % deletables)
 
         for d in deletables:
             d.active = False
