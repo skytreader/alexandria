@@ -76,7 +76,6 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
     var me = this;
 
     function success(){
-        // Maybe redirect to a search page for the isbn
         alertify.success("Updated book record successfully.");
         window.location.replace("/search?q=" + document.getElementById("isbn").value);
     }
@@ -112,7 +111,6 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
             409: fail,
             500: failRecover
         },
-        "complete": function(){me.updateStatCounts()}
     });
 }
 
