@@ -1098,6 +1098,7 @@ class ApiTests(AppTestCase):
             .filter(BookContribution.contributor_id==Contributor.id)
             .filter(BookContribution.role_id==author_role.id)
             .filter(BookContribution.active)
+            .filter(Contributor.active)
             .all()
         )
         updated_author_persons = set([
@@ -1193,7 +1194,7 @@ class ApiTests(AppTestCase):
             Person(firstname=a.firstname, lastname=a.lastname)
             for a in updated_book_authors
         ])
-        self.assertEqual(set(book_authors), updated_author_persons)
+        self.assertEqual(set(author_persons), updated_author_persons)
         updated_book_illustrators = (
             librarian.db.session.query(Contributor)
             .filter(BookContribution.book_id==book_id)
