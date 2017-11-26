@@ -4,6 +4,8 @@ from librarian.custom.forms import JsonField
 from wtforms import HiddenField, PasswordField, TextField
 from wtforms.validators import Length, Required
 
+import json
+
 class SearchForm(Form):
     q = TextField("Search for", [Required(message="What are you looking for?")])
 
@@ -37,11 +39,18 @@ class AddBooksForm(Form):
     year = HiddenField("Year", [Required(message="Edition Year")])
 
     def __str__(self):
-        return u"/".join((self.isbn.data.encode("ascii", "ignore").decode("ascii"), self.title.data.encode("ascii", "ignore").decode("ascii"),
-          self.genre.data.encode("ascii", "ignore").decode("ascii"), self.authors.data.encode("ascii", "ignore").decode("ascii"),
-          self.illustrators.data.encode("ascii", "ignore").decode("ascii"), self.editors.data.encode("ascii", "ignore").decode("ascii"),
-          self.translators.data.encode("ascii", "ignore").decode("ascii"), self.publisher.data.encode("ascii", "ignore").decode("ascii"),
-          self.printer.data.encode("ascii", "ignore").decode("ascii"), self.year.data.encode("ascii", "ignore").decode("ascii")))
+        return json.dumps({
+            "isbn": self.isbn.data.encode("ascii", "ignore").decode("ascii"),
+            "title": self.title.data.encode("ascii", "ignore").decode("ascii"),
+            "genre": self.genre.data.encode("ascii", "ignore").decode("ascii"),
+            "authors": self.authors.data.encode("ascii", "ignore").decode("ascii"),
+            "illustrators": self.illustrators.data.encode("ascii", "ignore").decode("ascii"),
+            "editors": self.editors.data.encode("ascii", "ignore").decode("ascii"),
+            "translators": self.translators.data.encode("ascii", "ignore").decode("ascii"),
+            "publisher": self.publisher.data.encode("ascii", "ignore").decode("ascii"),
+            "printer": self.printer.data.encode("ascii", "ignore").decode("ascii"),
+            "year": self.year.data.encode("ascii", "ignore").decode("ascii")
+        })
 
     def debug_validate(self):
         fields = self.__dict__
