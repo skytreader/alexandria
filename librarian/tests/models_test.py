@@ -90,7 +90,7 @@ class ModelsTest(AppTestCase):
         self.assertTrue(milo is not None)
 
         milo_clone = get_or_create(
-            Contributor, will_commit=True, firstname="Milo", lastname="Marana",
+            Contributor, will_commit=True, firstname="Milo", lastname="Manara",
             creator=self.admin_user
         )
 
