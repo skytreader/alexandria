@@ -77,7 +77,7 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
 
     function success(){
         alertify.success("Updated book record successfully.");
-        window.location.replace("/search?q=" + document.getElementById("isbn").value);
+        //window.location.replace("/search?q=" + document.getElementById("isbn").value);
     }
 
     function fail(jqxhr){
@@ -102,6 +102,7 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
         "printer": document.getElementById("printer").value,
         "year": document.getElementById("year").value
     }
+    console.log(data);
     $.ajax("/api/edit/books", {
         "type": "POST",
         "data": data,
