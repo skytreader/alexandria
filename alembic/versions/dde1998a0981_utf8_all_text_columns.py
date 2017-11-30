@@ -24,8 +24,12 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    pass
+    """
+    See https://stackoverflow.com/questions/34804164/how-to-change-character-encoding-for-column-in-mysql-table
+    for reference.
+    """
+    op.execute("ALTER TABLE librarians CONVERT TO CHARACTER SET utf8")
 
 
 def downgrade():
-    pass
+    op.execute("ALTER TABLE librarians CONVERT TO CHARACTER SET latin1")
