@@ -231,6 +231,7 @@ def edit_book():
                 )
 
                 app.logger.debug("got contributor_record %s" % contributor_record)
+                assert p["firstname"] == contributor_record.firstname
 
                 if not contributor_record.active:
                     contributor_record.active = True
