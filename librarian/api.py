@@ -213,7 +213,6 @@ def edit_book():
         is a JSON string), `all_contribs` are all the active contributions in
         the book as recorded in the DB (pre-edit).
         """
-        app.logger.debug(submitted_persons)
         parsons = json.loads(submitted_persons)
         form_records = set()
 
@@ -221,16 +220,12 @@ def edit_book():
         for p in parsons:
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
-                app.logger.debug("if adding %s" % ce)
                 form_records.add(ce)
             else:
-                app.logger.debug("contribution does not exist for %s" % p)
                 contributor_record = get_or_create(
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
-
-                app.logger.debug("got contributor_record %s" % contributor_record)
                 assert p["firstname"] == contributor_record.firstname
 
                 if not contributor_record.active:
@@ -240,7 +235,6 @@ def edit_book():
                     book=book, contributor=contributor_record, role=role,
                     creator=current_user
                 )
-                app.logger.debug("else adding %s" % contribution)
                 db.session.add(contribution)
                 form_records.add(contribution)
 
@@ -311,28 +305,26 @@ def edit_book():
 
             edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
               form.authors.data)
-            app.logger.debug(form.illustrators.data)
             edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
               form.illustrators.data)
             edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
               form.editors.data)
+            app.logger.debug("======================")
             edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
               form.translators.data)
+            app.logger.debug("======================")
 
             db.session.commit()
             return "Accepted", 200
         except IntegrityError, ierr:
-            db.session.rollback()
             app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
         except Exception as ex:
             import traceback
             traceback.print_exc()
-            db.session.rollback()
             app.logger.error("error except")
             return "Unknown error", 500
     else:
-        db.session.rollback()
         app.logger.error("error else")
         return "Unknown error", 500
 
