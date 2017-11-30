@@ -226,7 +226,6 @@ def edit_book():
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
-                assert p["firstname"] == contributor_record.firstname
 
                 if not contributor_record.active:
                     contributor_record.active = True
