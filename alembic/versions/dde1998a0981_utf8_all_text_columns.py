@@ -28,16 +28,16 @@ def upgrade():
     See https://stackoverflow.com/questions/34804164/how-to-change-character-encoding-for-column-in-mysql-table
     for reference.
     """
-    op.execute("ALTER TABLE librarians CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE genres CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE books CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE book_companies CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE imprints CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE contributors CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE roles CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE book_contributions CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE printers CONVERT TO CHARACTER SET utf8;")
-    op.execute("ALTER TABLE pseudonyms CONVERT TO CHARACTER SET utf8;")
+    op.execute("ALTER TABLE librarians CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE genres CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE books CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE book_companies CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE imprints CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE contributors CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE roles CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE book_contributions CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE printers CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
+    op.execute("ALTER TABLE pseudonyms CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;")
 
 
 def downgrade():
