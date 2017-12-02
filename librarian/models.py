@@ -33,7 +33,6 @@ def get_or_create(model, session=None, will_commit=False, **kwargs):
     as the current user. If no user is logged-in when this is called, the admin
     user is used.
     """
-    app.logger.debug("the kwargs are %s" % kwargs)
     session = session if session else db.session
     given_creator = kwargs.pop("creator", None)
     instance = session.query(model).filter_by(**kwargs).first()
@@ -51,6 +50,9 @@ def get_or_create(model, session=None, will_commit=False, **kwargs):
         if will_commit:
             session.add(instance)
             session.commit()
+        else:
+            app.logger.debug("no commit so flushing instead")
+            session.flush()
         return instance
 
 

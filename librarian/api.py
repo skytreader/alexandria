@@ -226,9 +226,12 @@ def edit_book():
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
+                assert contributor_record.firstname == p["firstname"]
+                app.logger.debug("got contributor record %s" % contributor_record)
 
                 if not contributor_record.active:
                     contributor_record.active = True
+                db.session.add(contributor_record)
 
                 contribution = BookContribution(
                     book=book, contributor=contributor_record, role=role,
@@ -308,15 +311,14 @@ def edit_book():
               form.illustrators.data)
             edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
               form.editors.data)
-            app.logger.debug("======================")
             edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
               form.translators.data)
-            app.logger.debug("======================")
 
             db.session.commit()
             return "Accepted", 200
         except IntegrityError, ierr:
             db.session.rollback()
+            app.logger.error("Integrity Error occurred")
             app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
         except Exception as ex:
