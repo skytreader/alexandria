@@ -1255,6 +1255,7 @@ class ApiTests(AppTestCase):
             publisher=book.publisher, illustrator=edited_book_illustrators,
             publish_year=book.publish_year, genre=book.genre, id=book_id
         )
+        librarian.db.session.commit()
         edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
         self.assertEqual(200, edit_book.status_code)
 

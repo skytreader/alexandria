@@ -485,10 +485,10 @@ def search(searchq):
             BookRecord.base_assembler_query()
             .filter(
                 or_(
-                    Book.title.like("".join(("%", searchq, "%"))),
+                    Book.title.ilike("".join(("%", searchq, "%"))),
                     and_(
                         Book.publisher_id == BookCompany.id,
-                        BookCompany.name.like("".join(("%", searchq, "%")))
+                        BookCompany.name.ilike("".join(("%", searchq, "%")))
                     ),
                     Book.id.in_(contribooks) if contribooks else False
                 )
