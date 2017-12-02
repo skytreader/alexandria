@@ -228,6 +228,7 @@ def edit_book():
                 )
                 assert contributor_record.firstname == p["firstname"]
                 app.logger.debug("got contributor record %s" % contributor_record)
+                app.logger.debug("will attach role %s" % role)
 
                 if not contributor_record.active:
                     contributor_record.active = True
