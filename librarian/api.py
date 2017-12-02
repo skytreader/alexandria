@@ -316,14 +316,17 @@ def edit_book():
             db.session.commit()
             return "Accepted", 200
         except IntegrityError, ierr:
+            db.session.rollback()
             app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
         except Exception as ex:
             import traceback
             traceback.print_exc()
+            db.session.rollback()
             app.logger.error("error except")
             return "Unknown error", 500
     else:
+        db.session.rollback()
         app.logger.error("error else")
         return "Unknown error", 500
 
