@@ -10,7 +10,7 @@ librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 librarian.init_blueprints()
 
 logging.getLogger("factory").setLevel(logging.WARN)
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+#logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 class AppTestCase(TestCase):
     

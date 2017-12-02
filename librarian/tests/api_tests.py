@@ -1227,7 +1227,7 @@ class ApiTests(AppTestCase):
         the_deleted = contributor_objs[-1]
         book = BookRecord(
             isbn=fake.isbn(), title=fake.title(),
-            publisher="Mumford and Sons", illustrator=illustrators, publish_year=2016,
+            publisher="Mumford and Sons", author=illustrators, publish_year=2016,
             genre="Fiction"
         )
         book_id = create_book(librarian.db.session, book, self.admin_user)
@@ -1249,10 +1249,10 @@ class ApiTests(AppTestCase):
         ])
         self.assertEquals(set(illustrators), illustrator_persons)
 
-        edited_book_illustrators = [Person(lastname="Manara", firstname="Milo")]
+        edited_book_illustrators = [Person(lastname="McKean", firstname="Dave"), Person(lastname="Manara", firstname="Milo")]
         edit_data = BookRecord(
             isbn=book.isbn, title=book.title,
-            publisher=book.publisher, illustrator=edited_book_illustrators,
+            publisher=book.publisher, author=edited_book_illustrators,
             publish_year=book.publish_year, genre=book.genre, id=book_id
         )
         librarian.db.session.commit()
