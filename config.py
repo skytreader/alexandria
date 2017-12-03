@@ -40,7 +40,7 @@ CACHE_CONFIG = {
 }
 
 CACHE_TIMEOUT = 88
-FOREVER_TIMEOUT = 88888888
+FOREVER_TIMEOUT = 88888888 if not TESTING else 0
 
 # Application threads. A common general assumption is
 # using 2 per available processor cores - to handle

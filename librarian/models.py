@@ -51,7 +51,6 @@ def get_or_create(model, session=None, will_commit=False, **kwargs):
             session.add(instance)
             session.commit()
         else:
-            app.logger.debug("no commit so flushing instead")
             session.flush()
         return instance
 

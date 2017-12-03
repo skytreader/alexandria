@@ -27,7 +27,7 @@ class AppTestCase(TestCase):
             _r = get_or_create(Role, will_commit=True, name=r,
               display_text="%s(s)" % r, creator_id=self.admin_user.id)
             self.ROLE_IDS[r] = _r.id
-        librarian.db.session.flush()
+        librarian.db.session.commit()
 
     def set_current_user(self, user):
         with self.client.session_transaction() as sesh:

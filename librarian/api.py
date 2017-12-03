@@ -189,6 +189,7 @@ def edit_book():
 
         Returns the BookContribution object if it exists, else False.
         """
+        app.logger.debug("Checking if contrib %s %s exists" % (role_id, person))
         the_contribution = [
             contrib for contrib in all_contribs if (
                 contrib.role_id == role_id and
@@ -213,6 +214,7 @@ def edit_book():
         is a JSON string), `all_contribs` are all the active contributions in
         the book as recorded in the DB (pre-edit).
         """
+        app.logger.debug("considering role %s" % role)
         parsons = json.loads(submitted_persons)
         form_records = set()
 
@@ -232,7 +234,6 @@ def edit_book():
 
                 if not contributor_record.active:
                     contributor_record.active = True
-                db.session.add(contributor_record)
 
                 contribution = BookContribution(
                     book=book, contributor=contributor_record, role=role,
@@ -308,7 +309,8 @@ def edit_book():
 
             edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
               form.authors.data)
-            edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
+            r_illustrator = Role.get_preset_role("Illustrator")
+            edit_contrib(book, all_contribs, r_illustrator,
               form.illustrators.data)
             edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
               form.editors.data)
