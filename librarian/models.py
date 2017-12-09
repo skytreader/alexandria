@@ -61,8 +61,8 @@ class Base(db.Model):
 
 class Librarian(Base, UserMixin):
     __tablename__ = "librarians"
-    username = db.Column(db.String(50), nullable=False, unique=True, collation="utf8_bin")
-    password = db.Column(db.String(255), nullable=False, collation="utf8_bin")
+    username = db.Column(db.String(50, collation="utf8_bin"), nullable=False, unique=True)
+    password = db.Column(db.String(255, collation="utf8_bin"), nullable=False)
     can_read = db.Column(db.Boolean, nullable=False, default=False,
       server_default=db.false())
     can_write = db.Column(db.Boolean, nullable=False, default=False,
@@ -109,7 +109,7 @@ class UserTags(db.Model):
 
 class Genre(Base, UserTags):
     __tablename__ = "genres"
-    name = db.Column(db.String(40), nullable=False, unique=True, collation="utf8_bin")
+    name = db.Column(db.String(40, collation="utf8_bin"), nullable=False, unique=True)
     creator = relationship("Librarian", foreign_keys="Genre.creator_id")
     last_modifier = relationship("Librarian", foreign_keys="Genre.last_modifier_id")
 
@@ -122,8 +122,8 @@ class Genre(Base, UserTags):
 
 class Book(Base, UserTags):
     __tablename__ = "books"
-    isbn = db.Column(db.String(13), nullable=False, unique=True, index=True, collation="utf8_bin")
-    title = db.Column(db.String(255), nullable=False, index=True, collation="utf8_bin")
+    isbn = db.Column(db.String(13, collation="utf8_bin"), nullable=False, unique=True, index=True)
+    title = db.Column(db.String(255, collation="utf8_bin"), nullable=False, index=True)
     genre_id = db.Column(db.Integer, db.ForeignKey("genres.id",
       name="book_genre_fk"))
     publisher_id = db.Column(db.Integer, db.ForeignKey("book_companies.id",
@@ -162,7 +162,7 @@ class BookCompany(Base, UserTags):
     List?! List?! This is better off in NoSQL form!
     """
     __tablename__ = "book_companies"
-    name = db.Column(db.String(255), nullable=False, unique=True, collation="utf8_bin")
+    name = db.Column(db.String(255, collation="utf8_bin"), nullable=False, unique=True)
     creator = relationship("Librarian", foreign_keys="BookCompany.creator_id")
     last_modifier = relationship("Librarian", foreign_keys="BookCompany.last_modifier_id")
 
@@ -198,8 +198,8 @@ class Imprint(Base, UserTags):
 
 class Contributor(Base, UserTags):
     __tablename__ = "contributors"
-    lastname = db.Column(db.String(255), nullable=False, collation="utf8_bin")
-    firstname = db.Column(db.String(255), nullable=False, collation="utf8_bin")
+    lastname = db.Column(db.String(255, collation="utf8_bin"), nullable=False)
+    firstname = db.Column(db.String(255, collation="utf8_bin"), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True, server_default=db.false())
     creator = relationship("Librarian", foreign_keys="Contributor.creator_id")
     last_modifier = relationship("Librarian", foreign_keys="Contributor.last_modifier_id")
@@ -233,8 +233,8 @@ class Role(Base, UserTags):
     display_text is for how it is prompted for in the app's forms.
     """
     __tablename__ = "roles"
-    name = db.Column(db.String(255), unique=True, nullable=False, collation="utf8_bin")
-    display_text = db.Column(db.String(255), nullable=False, collation="utf8_bin")
+    name = db.Column(db.String(255, collation="utf8_bin"), unique=True, nullable=False)
+    display_text = db.Column(db.String(255, collation="utf8_bin"), nullable=False)
 
     creator = relationship("Librarian", foreign_keys="Role.creator_id")
     last_modifier = relationship("Librarian", foreign_keys="Role.last_modifier_id")
@@ -344,8 +344,8 @@ class Pseudonym(Base, UserTags):
     book_id = db.Column(db.Integer, db.ForeignKey("books.id",
       name="pseudonym_book_fk1", ondelete="CASCADE"), primary_key=True)
     # Pseudonyms are weird so only require the last!
-    lastname = db.Column(db.String(255), nullable=False, collation="utf8_bin")
-    firstname = db.Column(db.String(255), nullable=True, collation="utf8_bin")
+    lastname = db.Column(db.String(255, collation="utf8_bin"), nullable=False)
+    firstname = db.Column(db.String(255, collation="utf8_bin"), nullable=True)
 
     person = relationship("Contributor")
     book = relationship("Book")
