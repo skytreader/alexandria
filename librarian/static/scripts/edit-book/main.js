@@ -77,7 +77,7 @@ EditBookDetailsCtrl.prototype.validBookAction = function(){
 
     function success(){
         alertify.success("Updated book record successfully.");
-        //window.location.replace("/search?q=" + document.getElementById("isbn").value);
+        window.location.replace("/search?q=" + document.getElementById("isbn").value);
     }
 
     function fail(jqxhr){
