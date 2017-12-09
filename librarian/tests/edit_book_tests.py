@@ -1,13 +1,14 @@
 from base import AppTestCase
 from faker import Faker
 from librarian.models import (
-    BookContribution, Contributor, Role
+    Book, BookContribution, Contributor, Role
 )
-from librarian.tests.factories import ContributorFactory
+from librarian.tests.factories import ContributorFactory, LibrarianFactory
 from librarian.tests.fakers import BookFieldsProvider
 from librarian.tests.utils import create_book
 from librarian.utils import BookRecord, Person
 
+import copy
 import librarian
 import librarian.api as api
 
