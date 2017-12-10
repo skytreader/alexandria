@@ -75,6 +75,8 @@ class BookRecord(RequestData):
                 Contributor.firstname, Role.name, BookCompany.name, Genre.name,
                 Book.publish_year
             ).filter(Book.id == BookContribution.book_id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
             .filter(Book.publisher_id == BookCompany.id)
@@ -82,8 +84,8 @@ class BookRecord(RequestData):
         )
     
     def __init__(
-        self, isbn, title, publisher, publish_year=None, author=None,
-        translator=None, illustrator=None, editor=None, genre=None, id=None,
+        self, isbn, title, publisher, genre, publish_year=None, author=None,
+        translator=None, illustrator=None, editor=None, id=None,
         printer=None
      ):
         """
@@ -201,11 +203,13 @@ class BookRecord(RequestData):
         edits = dict_struct.get("editor")
         person_editors = [Person(**spam) for spam in edits] if edits else []
 
-        return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
-          publisher=dict_struct["publisher"], author=person_authors,
-          translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors, id=dict_struct["id"],
-          printer=dict_struct["printer"])
+        return BookRecord(
+            isbn=dict_struct["isbn"], title=dict_struct["title"],
+            publisher=dict_struct["publisher"], author=person_authors,
+            translator=person_translators, illustrator=person_illustrators,
+            editor=person_editors, id=dict_struct["id"],
+            printer=dict_struct["printer"], genre="Test"
+        )
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and

@@ -95,7 +95,8 @@ def add_books():
       "add-books/main.js", "types/book-details.js", "add-books/types.js",
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js",
-      "add-books/add-book-details.js", "add-books/stat-counter.js"]
+      "add-books/add-book-details.js", "add-books/stat-counter.js",
+      "types/person.js"]
 
     if config.DEVEL:
         scripts.insert(0, "add-books/testdata.js")
@@ -128,7 +129,7 @@ def edit_books():
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "types/book-details.js", "edit-book/main.js", "edit-book/controller.js", 
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
-      "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
+      "jquery-ui.min.js", "lodash.js", "alertify.min.js", "types/person.js"]
 
     if config.DEVEL:
         scripts.insert(0, "add-books/testdata.js")

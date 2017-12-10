@@ -36,7 +36,7 @@ librarian_api = Blueprint("librarian_api", __name__)
 
 def __create_bookperson(form_data):
     """
-    Create a bookperson record from the given form_data. Return the created
+    Create a Contributor record from the given form_data. Return the created
     records as a list, if any. Else return None.
 
     form_data is expected to be a JSON list of objects. Each object should have
@@ -79,24 +79,32 @@ def __insert_contributions(book, form, session):
     for author in authors:
         author_part = BookContribution(book=book, contributor=author,
           role=author_role, creator=current_user)
+        if not author.active:
+            author.active = True
         session.add(author)
         session.add(author_part)
 
     for illustrator in illustrators:
         illus_part = BookContribution(book=book, contributor=illustrator,
           role=illus_role, creator=current_user)
+        if not illustrator.active:
+            illustrator.active = True
         session.add(illustrator)
         session.add(illus_part)
 
     for editor in editors:
         editor_part = BookContribution(book=book, contributor=editor,
           role=editor_role, creator=current_user)
+        if not editor.active:
+            editor.active = True
         session.add(editor)
         session.add(editor_part)
 
     for translator in translators:
         translator_part = BookContribution(book=book, 
           contributor=translator, role=trans_role, creator=current_user)
+        if not translator.active:
+            translator.active = True
         session.add(translator)
         session.add(translator_part)
 
@@ -108,6 +116,7 @@ def book_adder():
 
     Possible responses:
         200 Accepted - Book was added to the database successfully.
+        302 Error - API endpoint called while not logged in.
         400 Error - The request did not validate. Client _must not_ retry.
         409 IntegrityError - Database error for possible duplicate records.
           Client _must not_ retry.
@@ -168,6 +177,9 @@ def book_adder():
 def edit_book():
     def contribution_exists(all_contribs, role_id, person):
         """
+        Check if the given person contributed for the given role in all the
+        contributions related to the present book being edited.
+
         Where
         
         `all_contribs` is all the BookContribution records for the book being
@@ -175,68 +187,94 @@ def edit_book():
 
         person is an instance of librarian.utils.Person.
 
-        Returns the person_id if the described BookContribution exists, else
-        False.
+        Returns the BookContribution object if it exists, else False.
         """
-        spam = [
+        app.logger.debug("Checking if contrib %s %s exists" % (role_id, person))
+        the_contribution = [
             contrib for contrib in all_contribs if (
                 contrib.role_id == role_id and
                 contrib.contributor.firstname == person.firstname and
                 contrib.contributor.lastname == person.lastname
             )]
 
-        if len(spam) > 1:
-            raise InvalidRecordState("Contribution role + person + book %s" % spam)
+        if len(the_contribution) > 1:
+            raise InvalidRecordState("uniqueness of contribution role + person + book %s" % spam)
 
-        if spam:
-           return spam[0].contributor_id
+        if the_contribution:
+           return the_contribution[0]
         else:
            return False
 
     def edit_contrib(book, all_contribs, role, submitted_persons):
         """
         Adds all new contributors to the session and deletes all removed
-        contributors to the session. This does not commit.
+        contributors to the session.
 
         Where `submitted_persons` is the data straight out of the form (hence it
-        is a JSON string).
+        is a JSON string), `all_contribs` are all the active contributions in
+        the book as recorded in the DB (pre-edit).
         """
+        app.logger.debug("considering role %s" % role)
         parsons = json.loads(submitted_persons)
-        # Set of tuples (role_id, person_id)
-        existing_records = set()
+        form_records = set()
 
+        # Create or load all the contributions mentioned in the form.
         for p in parsons:
             ce = contribution_exists(all_contribs, role.id, Person(**p))
             if ce is not False:
-                existing_records.add((role.id, ce))
+                form_records.add(ce)
             else:
                 contributor_record = get_or_create(
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
+                assert contributor_record.firstname == p["firstname"]
+                app.logger.debug("got contributor record %s" % contributor_record)
+                app.logger.debug("will attach role %s" % role)
+
+                if not contributor_record.active:
+                    contributor_record.active = True
 
                 contribution = BookContribution(
                     book=book, contributor=contributor_record, role=role,
                     creator=current_user
                 )
                 db.session.add(contribution)
-                existing_records.add((role.id, contributor_record.id))
+                form_records.add(contribution)
 
         recorded_contribs = set([
-            (contrib.role.id, contrib.contributor.id) for contrib in all_contribs
+            contrib for contrib in all_contribs
             if contrib.role.id == role.id
         ])
 
-        deletables = recorded_contribs - existing_records
-        
+        app.logger.debug("recorded contribs for %s %s" % (role, recorded_contribs))
+        app.logger.debug("form records %s" % form_records)
+        deletables = recorded_contribs - form_records
+        app.logger.debug("The deletables %s" % deletables)
+
         for d in deletables:
-            db.session.delete(
+            d.active = False
+
+            other_contrib = (
                 BookContribution.query
-                .filter(BookContribution.role_id == d[0])
-                .filter(BookContribution.book_id == book.id)
-                .filter(BookContribution.contributor_id == d[1])
+                .filter(BookContribution.contributor_id == d.contributor_id)
+                .filter(
+                    or_(
+                        BookContribution.book_id != book.id,
+                        BookContribution.role_id != d.role_id
+                    )
+                )
+                .filter(BookContribution.active)
                 .first()
             )
+            app.logger.debug(
+                "Contributor %s has another contribution %s (checked from %s)" %
+                (d.contributor_id, other_contrib, role.name)
+            )
+
+            if other_contrib is None:
+                app.logger.debug("Deactivating %s" % d)
+                d.contributor.active = False
 
     from flask_login import current_user
 
@@ -263,36 +301,37 @@ def edit_book():
             all_contribs = (
                 BookContribution.query
                 .filter(BookContribution.book_id == book_id)
+                .filter(BookContribution.active)
+                .filter(BookContribution.contributor_id == Contributor.id)
+                .filter(Contributor.active)
                 .all()
             )
 
-            if form.authors.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
-                  form.authors.data)
-
-            if form.illustrators.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Illustrator"),
-                  form.illustrators.data)
-
-            if form.editors.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
-                  form.editors.data)
-
-            if form.translators.data:
-                edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
-                  form.editors.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Author"),
+              form.authors.data)
+            r_illustrator = Role.get_preset_role("Illustrator")
+            edit_contrib(book, all_contribs, r_illustrator,
+              form.illustrators.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Editor"),
+              form.editors.data)
+            edit_contrib(book, all_contribs, Role.get_preset_role("Translator"),
+              form.translators.data)
 
             db.session.commit()
             return "Accepted", 200
         except IntegrityError, ierr:
+            db.session.rollback()
+            app.logger.error("Integrity Error occurred")
             app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
         except Exception as ex:
             import traceback
             traceback.print_exc()
+            db.session.rollback()
             app.logger.error("error except")
             return "Unknown error", 500
     else:
+        db.session.rollback()
         app.logger.error("error else")
         return "Unknown error", 500
 
@@ -366,8 +405,16 @@ def list_companies():
 
 @librarian_api.route("/api/read/persons")
 def list_persons():
-    persons = db.session.query(Contributor.lastname, Contributor.firstname).all()
-    persons = map(lambda p: {"lastname": p[0], "firstname": p[1]}, persons)
+    """
+    Return the active Contributors in the database. The endpoint might be a bit
+    misleading since we are filtering here. But meh, this is only used for the
+    autocomplete suggestions.
+    """
+    persons = (
+        db.session.query(Contributor.lastname, Contributor.firstname)
+        .filter(Contributor.active).all()
+    )
+    persons = [{"lastname": p[0], "firstname": p[1]} for p in persons]
     return flask.jsonify({"data": persons})
 
 def get_top_contributors(contrib_type, limit=4):
@@ -377,6 +424,8 @@ def get_top_contributors(contrib_type, limit=4):
       .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
+      .filter(Contributor.active)
+      .filter(BookContribution.active)
       .order_by(desc("contrib_count"))
       .group_by(Contributor.id).order_by("contrib_count").limit(limit)
       .all())
@@ -389,6 +438,8 @@ def get_recent_contributors(contrib_type, limit=4):
       .filter(Contributor.id==BookContribution.contributor_id)
       .filter(BookContribution.role_id==Role.id)
       .filter(Role.name==contrib_type)
+      .filter(Contributor.active)
+      .filter(BookContribution.active)
       .order_by(desc(BookParticipant.date_created)).limit(limit).all())
     
     return top
@@ -406,7 +457,7 @@ def get_recent_books(limit=4):
 def quick_stats():
     stats = {}
     books = len(db.session.query(Book).all())
-    contributors = len(db.session.query(BookContribution).all())
+    contributors = len(db.session.query(BookContribution).filter(BookContribution.active).all())
     top_author = get_top_contributors("Author", 1)
     stats["participants_per_book"] = (contributors / books) if books else 0
     stats["recent_books"] = get_recent_books()
@@ -442,10 +493,10 @@ def search(searchq):
             BookRecord.base_assembler_query()
             .filter(
                 or_(
-                    Book.title.like("".join(("%", searchq, "%"))),
+                    Book.title.ilike("".join(("%", searchq, "%"))),
                     and_(
                         Book.publisher_id == BookCompany.id,
-                        BookCompany.name.like("".join(("%", searchq, "%")))
+                        BookCompany.name.ilike("".join(("%", searchq, "%")))
                     ),
                     Book.id.in_(contribooks) if contribooks else False
                 )

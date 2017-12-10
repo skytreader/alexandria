@@ -111,18 +111,18 @@ class BookRecordTests(AppTestCase):
         booka_translators = [booka_translator.contributor.make_plain_person()]
         booka_illustrators = [booka_illus1.contributor.make_plain_person(),
           booka_illus2.contributor.make_plain_person()]
-        booka_record = BookRecord(isbn=booka.isbn, title=booka.title,
-          publisher=booka.publisher.name, author=booka_authors,
-          translator=booka_translators, illustrator=booka_illustrators,
-          id=booka.id)
+        booka_record = BookRecord(
+            isbn=booka.isbn, title=booka.title, publisher=booka.publisher.name,
+            author=booka_authors, translator=booka_translators,
+            illustrator=booka_illustrators, id=booka.id, genre="Test")
 
         bookb_authors = [bookb_author.contributor.make_plain_person()]
         bookb_translators = [bookb_translator.contributor.make_plain_person()]
         bookb_illustrators = [bookb_illus.contributor.make_plain_person()]
-        bookb_record = BookRecord(isbn=bookb.isbn, title=bookb.title,
-          publisher=bookb.publisher.name, author=bookb_authors,
-          translator=bookb_translators, illustrator=bookb_illustrators,
-          id=bookb.id)
+        bookb_record = BookRecord(
+            isbn=bookb.isbn, title=bookb.title, publisher=bookb.publisher.name,
+            author=bookb_authors, translator=bookb_translators,
+            illustrator=bookb_illustrators, id=bookb.id, genre="Test")
 
         expected_records = [booka_record, bookb_record]
 
@@ -218,9 +218,11 @@ class FunctionsTests(AppTestCase):
         book = bookq.first()
 
         self.assertTrue(book is None)
-        br = BookRecord(isbn=sample_isbn, title="Another Chance for Poland",
-          publisher="Eurosport", author=(Person(lastname="Enrique",
-          firstname="Luis"),), publish_year=2016, id=314)
+        br = BookRecord(
+            isbn=sample_isbn, title="Another Chance for Poland",
+            publisher="Eurosport", author=(Person(lastname="Enrique",
+            firstname="Luis"),), publish_year=2016, id=314, genre="Test"
+        )
         utils.create_book(librarian.db.session, br, self.admin_user)
 
         book = bookq.first()

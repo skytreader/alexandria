@@ -37,13 +37,3 @@ function Book(isbn, title, genre, authors, illustrators, editors, translators,
     this.year = year;
     this.domElement = domElement;
 }
-
-/**
-@constructor
-@param {string} lastname
-@param {String} firstname
-*/
-function Person(lastname, firstname){
-    this.firstname = firstname;
-    this.lastname = lastname;
-}

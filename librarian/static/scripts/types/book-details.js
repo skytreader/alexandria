@@ -128,7 +128,7 @@ BookDetailsCtrl.prototype.setUp = function(){
 
     /**
     Create a list element for displaying a creator's name. The name displayed is
-    dependent on what is currently entered in the procy fields for this creator.
+    dependent on what is currently entered in the proxy fields for this creator.
     
     TODO Test me
     
@@ -167,7 +167,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     
         var deleteButton = document.createElement("i");
         $(deleteButton).addClass("fa fa-times-circle")
-          .click(recordDeleterFactory(creatorType));
+          .click(recordDeleterFactory(creatorType, hiddenLastnameProxy, hiddenFirstnameProxy));
     
         delCol.appendChild(deleteButton);
     
@@ -189,17 +189,23 @@ BookDetailsCtrl.prototype.setUp = function(){
 
     /**
     @param {string} creatorType
+    @param {HTMLElement} hiddenLastnameProxy
+        The corresponding lastname field for the element for which the delete
+        function will be attached to.
+    @param {HTMLElement} hiddenFirstnameProxy
+        The corresponding firstname field for the element for which the delete
+        function will be attached to.
     */
-    function recordDeleterFactory(creatorType){
+    function recordDeleterFactory(creatorType, hiddenLastnameProxy, hiddenFirstnameProxy){
         return function() {
             $(this.parentNode.parentNode).remove();
+            $(hiddenLastnameProxy).remove();
+            $(hiddenFirstnameProxy).remove();
         }
     };
 
     /**
-    Return a function that generates an input row for a given creatorType. The
-    generated function was meant to be called for the click event on the add
-    button.
+    Return a function that handles the display of a new creator entry.
     */
     function rendererFactory(creatorType){
         return function(){
@@ -456,6 +462,34 @@ BookDetailsCtrl.prototype.isCreatorPending = function(){
         }
     }
     return false;
+}
+
+/**
+Get all the names entered for the given creator.
+
+This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
+it must be guaranteed that the order of lastnames and firstnames returned is the
+same.
+
+@param {string} creator
+    The name given to the creator type.
+@return {Array.Person} An array of persons.
+@private
+*/
+BookDetailsCtrl.prototype.getCreatorNames = function(creator){
+    var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
+    var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
+    var persons = [];
+
+    for(var i = 0; i < creatorsLastname.length; i++){
+        var firstname = creatorsFirstname[i].value.trim();
+        var lastname = creatorsLastname[i].value.trim();
+        if(firstname != "" && lastname != ""){
+            persons.push(new Person(lastname, firstname));
+        }
+    }
+
+    return persons;
 }
 
 /**
