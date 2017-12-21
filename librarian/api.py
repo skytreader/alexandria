@@ -189,7 +189,6 @@ def edit_book():
 
         Returns the BookContribution object if it exists, else False.
         """
-        app.logger.debug("Checking if contrib %s %s exists" % (role_id, person))
         the_contribution = [
             contrib for contrib in all_contribs if (
                 contrib.role_id == role_id and
@@ -228,7 +227,6 @@ def edit_book():
                     Contributor, will_commit=False, firstname=p["firstname"],
                     lastname=p["lastname"], creator=current_user
                 )
-                assert contributor_record.firstname == p["firstname"]
                 app.logger.debug("got contributor record %s" % contributor_record)
                 app.logger.debug("will attach role %s" % role)
 
