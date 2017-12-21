@@ -657,3 +657,23 @@ class ApiTests(AppTestCase):
         results = api.search("walnut")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["isbn"], search_book.isbn)
+
+    def test_search_contributor(self):
+        search_book = BookRecord(
+            isbn=fake.isbn(), title="Don Quixote", publisher="Instituto Cervantes",
+            publish_year=1957, author=[Person("de Cervantes Saavedra", "Miguel")],
+            genre="Sci-Fi"
+        )
+        create_book(librarian.db.session, search_book, self.admin_user)
+        librarian.db.session.flush()
+        results = api.search("Cervantes")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["isbn"], search_book.isbn)
+
+        results = api.search("cervantes")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["isbn"], search_book.isbn)
+
+        results = api.search("migueld de cervantes")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["isbn"], search_book.isbn)
