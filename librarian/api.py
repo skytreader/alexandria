@@ -483,7 +483,7 @@ def search(searchq):
             .filter(
                 func.concat(
                     Contributor.firstname, ' ', Contributor.lastname
-                ).like("".join(("%", searchq, "%")))
+                ).ilike("".join(("%", searchq, "%")))
             ).all()
         )
         contribooks = [bid for bid, in contrib_query]

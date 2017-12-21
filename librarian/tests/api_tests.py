@@ -674,6 +674,6 @@ class ApiTests(AppTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["isbn"], search_book.isbn)
 
-        results = api.search("migueld de cervantes")
+        results = api.search("miguel de cervantes")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["isbn"], search_book.isbn)
