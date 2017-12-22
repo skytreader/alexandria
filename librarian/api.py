@@ -323,14 +323,14 @@ def edit_book():
             app.logger.exception(traceback.format_exc())
             return "IntegrityError", 409
         except Exception as ex:
+            db.session.rollback()
+            app.logger.error("error except. traceback follows:")
             import traceback
             traceback.print_exc()
-            db.session.rollback()
-            app.logger.error("error except")
             return "Unknown error", 500
     else:
         db.session.rollback()
-        app.logger.error("error else")
+        app.logger.error("Form does not validate.")
         return "Unknown error", 500
 
 @librarian_api.route("/api/util/servertime")

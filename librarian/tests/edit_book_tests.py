@@ -639,3 +639,78 @@ class EditBookTests(AppTestCase):
             role_id=illustrator_role.id, active=False
         )
         self.verify_inserted(Contributor, id=the_deleted.id, active=False)
+
+    def __make_book(self):
+        contributor_objs = [ContributorFactory() for _ in range(3)]
+        authors = [co.make_plain_person() for co in contributor_objs]
+        book = BookRecord(
+            isbn=fake.isbn(), title=fake.title(), publisher="somepublisher",
+            author=authors, publish_year=2017, genre="Fiction"
+        )
+        book_id = create_book(librarian.db.session, book, self.admin_user)
+        librarian.db.session.commit()
+        return book_id
+
+    def __basic_edit_test(self, book_id):
+        author_role = Role.get_preset_role("Author")
+        book = (
+            librarian.db.session.query(Book)
+            .filter(Book.id==book_id)
+            .first()
+        )
+        book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
+            .all()
+        )
+        authors = [co.make_plain_person() for co in book_authors]
+        the_deleted = book_authors[-1]
+        author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in book_authors
+        ])
+
+        edited_book_authors = authors[0:-1]
+        edit_data = BookRecord(
+            isbn=book.isbn, title=book.title, publisher=book.publisher,
+            author=edited_book_authors, publish_year=book.publish_year,
+            genre=book.genre.name, id=book_id
+        )
+        edit_book = self.client.post("/api/edit/books", data=edit_data.request_data())
+        self.assertEqual(200, edit_book.status_code)
+        updated_book_authors = (
+            librarian.db.session.query(Contributor)
+            .filter(BookContribution.book_id==book_id)
+            .filter(BookContribution.contributor_id==Contributor.id)
+            .filter(BookContribution.role_id==author_role.id)
+            .filter(BookContribution.active)
+            # Just for thoroughness, but in an ideal world BookContribution.active is sufficient
+            .filter(Contributor.active)
+            .all()
+        )
+        updated_author_persons = set([
+            Person(firstname=a.firstname, lastname=a.lastname)
+            for a in updated_book_authors
+        ])
+        self.assertEqual(set(edited_book_authors), updated_author_persons)
+        # Verify that the BookRecord for the "deleted" contribution remains
+        # but inactive.
+        self.verify_inserted(
+            BookContribution, book_id=book_id, contributor_id=the_deleted.id,
+            role_id=author_role.id, active=False
+        )
+        self.verify_inserted(Contributor, id=the_deleted.id, active=False)
+
+    def test_trigger_invalidrequesterror(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+        book1 = self.__make_book()
+        book2 = self.__make_book()
+        self.__basic_edit_test(book1)
+        self.__basic_edit_test(book2)
