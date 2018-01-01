@@ -35,11 +35,7 @@ class ApiTests(AppTestCase):
         super(ApiTests, self).setUp()
     
     def test_book_adder_happy(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
@@ -68,11 +64,7 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="UP Press")
 
     def test_book_adder_blank_person(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
@@ -130,11 +122,7 @@ class ApiTests(AppTestCase):
         )
 
     def test_book_adder_no_printer(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
@@ -170,11 +158,7 @@ class ApiTests(AppTestCase):
               role_id=self.ROLE_IDS[role], book_id=bookid)
 
     def test_book_adder_utf8(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
@@ -206,10 +190,7 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="UP Press")
 
     def test_book_adder_duplicate_records(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-
+        self.make_current_user()
         isbn = fake.isbn()
 
         # Check that the relevant records do not exist yet
@@ -226,7 +207,6 @@ class ApiTests(AppTestCase):
             publisher="Scholastic", printer="UP Press", publish_year=2013
         )
 
-        self.set_current_user(_creator)
         single_rv = self.client.post("/api/add/books", data=single_author.request_data())
 
         self.assertEquals(single_rv._status_code, 200)
@@ -243,10 +223,7 @@ class ApiTests(AppTestCase):
         self.assertEquals(duplicate._status_code, 409)
         
     def test_book_adder_duplicate_isbn13(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-
+        self.make_current_user()
         isbn13 = "9781596914698"
 
         self.verify_does_not_exist(Book, isbn=isbn13)
@@ -265,7 +242,6 @@ class ApiTests(AppTestCase):
             publish_year=2007
         )
 
-        self.set_current_user(_creator)
         havent_read_rv = self.client.post("/api/add/books", data=books_you_havent_read.request_data())
 
         self.verify_inserted(Book, isbn=isbn13)
@@ -285,10 +261,7 @@ class ApiTests(AppTestCase):
         """
         Switch ISBNs of test_book_adder_duplicate_isbn13.
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-
+        self.make_current_user()
         isbn13 = "1596914696"
 
         self.verify_does_not_exist(Book, isbn=isbn13)
@@ -307,7 +280,6 @@ class ApiTests(AppTestCase):
             publish_year=2007
         )
 
-        self.set_current_user(_creator)
         havent_read_rv = self.client.post("/api/add/books", data=books_you_havent_read.request_data())
 
         self.verify_inserted(Book, isbn=isbn13)
@@ -328,11 +300,7 @@ class ApiTests(AppTestCase):
         Test adding multiple people for the fields where person names are
         expected. We can assume that records are "fresh".
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
         title = fake.title()
 
@@ -375,11 +343,7 @@ class ApiTests(AppTestCase):
             self.verify_inserted(Contributor, firstname=p.firstname,
               lastname=p.lastname)
 
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         isbn = fake.isbn()
         title = fake.title()
 
@@ -409,11 +373,7 @@ class ApiTests(AppTestCase):
         self.assertEqual(200, req_val.status_code)
 
     def test_no_printer(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         single_author = BookRecord(
             isbn="9780062330260", title="Trigger Warning",
             genre="Short Story Collection", author=[Person(lastname="Gaiman", firstname="Neil")],
@@ -425,11 +385,7 @@ class ApiTests(AppTestCase):
         self.assertEquals(single_rv._status_code, 200)
 
     def test_extra_whitespace(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         self.verify_does_not_exist(
             Contributor, lastname="de Cervantes", firstname="Miguel"
         )
@@ -448,11 +404,7 @@ class ApiTests(AppTestCase):
         )
 
     def test_multiple_same_names(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         Neil_Gaiman = Person(lastname="Gaiman", firstname="Neil")
         single_author = BookRecord(
             isbn="9780062330260", title="Trigger Warning",
@@ -510,11 +462,7 @@ class ApiTests(AppTestCase):
         self.assertEquals(agenre_orm.genre.name, g2.name)
 
     def test_same_person_diff_roles(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         jtamaki_exists = (
             librarian.db.session.query(Contributor)
             .filter(Contributor.firstname == "Jillian")

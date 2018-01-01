@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask_testing import TestCase
 from librarian.models import get_or_create, Librarian, Role
+from librarian.tests.factories import LibrarianFactory
 import librarian
 import logging
 import unittest
@@ -10,7 +11,6 @@ librarian.init_db(librarian.app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 librarian.init_blueprints()
 
 logging.getLogger("factory").setLevel(logging.WARN)
-#logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 class AppTestCase(TestCase):
     
@@ -28,6 +28,20 @@ class AppTestCase(TestCase):
               display_text="%s(s)" % r, creator_id=self.admin_user.id)
             self.ROLE_IDS[r] = _r.id
         librarian.db.session.commit()
+
+    def make_current_user(self):
+        """
+        Create a random current user (other than the default admin user).
+
+        Returns the random user which is now "current user". Note that some tests
+        may opt not to catch this return value and just call this method for the
+        side effects.
+        """
+        _user = LibrarianFactory()
+        librarian.db.session.add(_user)
+        librarian.db.session.flush()
+        self.set_current_user(_user)
+        return _user
 
     def set_current_user(self, user):
         with self.client.session_transaction() as sesh:

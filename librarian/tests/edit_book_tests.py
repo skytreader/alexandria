@@ -18,11 +18,7 @@ fake.add_provider(BookFieldsProvider)
 class EditBookTests(AppTestCase):
 
     def test_title_edit_book(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -51,11 +47,7 @@ class EditBookTests(AppTestCase):
         self.assertEquals(edit_data.title, edited.title)
 
     def test_edit_book_contrib_add(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         authors = [ContributorFactory().make_plain_person() for _ in range(3)]
         book = BookRecord(isbn=fake.isbn(), title=fake.title(),
           publisher="Mumford and Sons", author=authors, publish_year=2016,
@@ -109,11 +101,7 @@ class EditBookTests(AppTestCase):
         Test deleting a contribution from a book where the contributor ends up
         deactivated for lack of other contributions.
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         authors = [co.make_plain_person() for co in contributor_objs]
@@ -180,11 +168,7 @@ class EditBookTests(AppTestCase):
         Test deleting a contribution from a book where the contributor stays
         active from other books
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         authors = [co.make_plain_person() for co in contributor_objs]
@@ -260,11 +244,7 @@ class EditBookTests(AppTestCase):
         active because it is still a contributor, in another role, for the same
         book.
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         authors = [co.make_plain_person() for co in contributor_objs]
@@ -332,11 +312,7 @@ class EditBookTests(AppTestCase):
         """
         Test that moving contributors between roles produce the desired effect.
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         authors = [co.make_plain_person() for co in contributor_objs]
@@ -487,11 +463,7 @@ class EditBookTests(AppTestCase):
         When editing the Translators role, the Editors field is passed, creating
         the discrepancy.
         """
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
-
+        self.make_current_user()
         # These two are always parallel arrays.
         contributor_objs = [ContributorFactory() for _ in range(3)]
         editors = [co.make_plain_person() for co in contributor_objs]
@@ -706,10 +678,7 @@ class EditBookTests(AppTestCase):
         self.verify_inserted(Contributor, id=the_deleted.id, active=False)
 
     def test_trigger_invalidrequesterror(self):
-        _creator = LibrarianFactory()
-        librarian.db.session.add(_creator)
-        librarian.db.session.flush()
-        self.set_current_user(_creator)
+        self.make_current_user()
         book1 = self.__make_book()
         book2 = self.__make_book()
         self.__basic_edit_test(book1)
