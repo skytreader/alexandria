@@ -4,7 +4,7 @@ from __future__ import division
 from datetime import datetime
 
 from librarian import app, db
-from librarian.errors import InvalidRecordState
+from librarian.errors import ConstraintError, InvalidRecordState
 from librarian.forms import AddBooksForm, EditBookForm
 from librarian.utils import BookRecord, make_equivalent_isbn, has_equivalent_isbn, ISBN_REGEX, NUMERIC_REGEX, Person
 from flask import Blueprint, request
@@ -41,6 +41,9 @@ def __create_bookperson(form_data):
 
     form_data is expected to be a JSON list of objects. Each object should have
     the fields `last_name` and `first_name`.
+
+    Raises ConstraintError if one of the persons in form_data has blank firstname
+    or lastname.
     """
     from flask_login import current_user
     try:
@@ -48,9 +51,22 @@ def __create_bookperson(form_data):
         persons_created = []
 
         for parson in parse:
-            persons_created.insert(0, get_or_create(Contributor, will_commit=True,
-              firstname=parson["firstname"].strip(),
-              lastname=parson["lastname"].strip(), creator=current_user))
+            _firstname = parson.get("firstname", "").strip()
+            _lastname = parson.get("lastname", "").strip()
+
+            if _firstname and _lastname:
+                persons_created.insert(
+                    0, get_or_create(
+                        Contributor, will_commit=True,
+                        firstname=_firstname, lastname=_lastname,
+                        creator=current_user
+                    )
+                )
+            else:
+                raise ConstraintError(
+                    "firstname and lastname are present",
+                    str(parson)
+                )
 
         return persons_created
     except ValueError:
@@ -132,18 +148,19 @@ def book_adder():
         return err_str, 409
 
     if form.validate_on_submit():
+        db.session.execute("SELECT 1")
         try:
             from flask_login import current_user
             # Genre first
-            genre = get_or_create(Genre, will_commit=True, name=form.genre.data,
+            genre = get_or_create(Genre, will_commit=False, name=form.genre.data,
               creator=current_user)
 
             # Publishing information
-            publisher = get_or_create(BookCompany, will_commit=True,
+            publisher = get_or_create(BookCompany, will_commit=False,
               name=form.publisher.data, creator=current_user)
             has_printer = form.printer.data.strip()
             if has_printer:
-                printer = get_or_create(BookCompany, will_commit=True,
+                printer = get_or_create(BookCompany, will_commit=False,
                   name=form.printer.data, creator=current_user)
 
             # Book
@@ -165,9 +182,15 @@ def book_adder():
 
             return "Accepted", 200
         except IntegrityError, ierr:
+            db.session.rollback()
             app.logger.error(traceback.format_exc())
             err_str = '"%s" has been catalogued before. Ignoring.' % (form.title.data)
             return err_str, 409
+        except ConstraintError, cerr:
+            db.session.rollback()
+            app.logger.error(traceback.format_exc())
+            return cerr.message, 400
+        db.session.execute("select 2")
     
     err_str = "Did not validate for %s. Please re-enter book to try again." % (form.title.data)
     return err_str, 400

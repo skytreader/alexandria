@@ -67,6 +67,35 @@ class ApiTests(AppTestCase):
         self.verify_inserted(BookCompany, name="Scholastic")
         self.verify_inserted(BookCompany, name="UP Press")
 
+    def test_book_adder_blank_person(self):
+        _creator = LibrarianFactory()
+        librarian.db.session.add(_creator)
+        librarian.db.session.flush()
+        self.set_current_user(_creator)
+
+        isbn = fake.isbn()
+
+        # Check that the relevant records do not exist yet
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="io9")
+        self.verify_does_not_exist(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="UP Press")
+        author = [Person(lastname="", firstname="")]
+
+        single_author = BookRecord(
+            isbn=isbn, title="The Carpet Makers", genre="io9", author=author,
+            publisher="Scholastic", printer="UP Press", publish_year=2013
+        )
+
+        single_rv = self.client.post("/api/add/books", data=single_author.request_data())
+
+        self.assertEquals(single_rv._status_code, 400)
+
+        self.verify_does_not_exist(Book, isbn=isbn)
+        self.verify_does_not_exist(Genre, name="io9")
+        self.verify_does_not_exist(BookCompany, name="Scholastic")
+        self.verify_does_not_exist(BookCompany, name="UP Press")
+
     def test_book_adder_reactivation(self):
         self.set_current_user(self.admin_user)
         inactive_contributor = ContributorFactory(

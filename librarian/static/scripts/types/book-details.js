@@ -127,6 +127,21 @@ BookDetailsCtrl.prototype.setUp = function(){
     var me = this;
 
     /**
+    Check whether the name currently entered in creatorType is not blank.
+
+    FIXME This assumes that all names are made up of a lastname and a firstname,
+    Which is false. See https://github.com/skytreader/alexandria/issues/73.
+
+    @param {string} creatorType
+    */
+    function creatorNameNotBlank(creatorType){
+        var lastname = $("#" + creatorType + "-proxy-lastname").val().trim();
+        var firstname = $("#" + creatorType + "-proxy-firstname").val().trim();
+
+        return lastname.length != 0 && firstname.length != 0;
+    }
+
+    /**
     Create a list element for displaying a creator's name. The name displayed is
     dependent on what is currently entered in the proxy fields for this creator.
     
@@ -209,10 +224,14 @@ BookDetailsCtrl.prototype.setUp = function(){
     */
     function rendererFactory(creatorType){
         return function(){
-            var name = document.createElement("li");
-            var inputLine = renderContentCreatorListing(creatorType);
+            if (creatorNameNotBlank(creatorType)) {
+                var name = document.createElement("li");
+                var inputLine = renderContentCreatorListing(creatorType);
     
-            document.getElementById(creatorType + "-list").appendChild(inputLine);
+                document.getElementById(creatorType + "-list").appendChild(inputLine);
+            } else{
+                alertify.error("Please provide both a last name and a first name.");
+            }
         }
     }
 
