@@ -224,7 +224,6 @@ BookDetailsCtrl.prototype.setUp = function(){
     */
     function rendererFactory(creatorType){
         return function(){
-            console.debug("renderer called for", creatorType);
             if (creatorNameNotBlank(creatorType)) {
                 var name = document.createElement("li");
                 var inputLine = renderContentCreatorListing(creatorType);
