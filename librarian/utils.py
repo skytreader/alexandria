@@ -3,7 +3,6 @@
 from librarian import app, db
 from librarian.errors import ConstraintError
 
-import config
 import copy
 import re
 

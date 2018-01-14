@@ -13,7 +13,6 @@ from models import get_or_create, Book, BookCompany, BookContribution, Contribut
 from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.exc import IntegrityError
 
-import config
 import flask
 import json
 import pytz

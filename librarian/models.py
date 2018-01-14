@@ -6,8 +6,6 @@ from librarian.utils import isbn_check, Person
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
-import config
-
 """
 Year when ISBN was formalized.
 """
@@ -248,7 +246,7 @@ class Role(Base, UserTags):
         self.last_modifier_id = self.creator.id
 
     @staticmethod
-    @cache.memoize(config.FOREVER_TIMEOUT)
+    @cache.memoize(app.config["FOREVER_TIMEOUT"])
     def get_preset_role(role_name):
         role = Role.query.filter_by(name=role_name).first()
         return role

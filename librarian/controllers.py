@@ -9,7 +9,6 @@ from librarian.utils import BookRecord, StatsDescriptor
 from librarian.models import Book
 from utils import route_exists
 
-import config
 import flask
 import json
 import time
@@ -97,7 +96,7 @@ def add_books():
       "add-books/add-book-details.js", "add-books/stat-counter.js",
       "types/person.js"]
 
-    if config.DEVEL:
+    if app.config["DEVEL"]:
         scripts.insert(0, "add-books/testdata.js")
 
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
@@ -130,7 +129,7 @@ def edit_books():
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js", "types/person.js"]
 
-    if config.DEVEL:
+    if app.config["DEVEL"]:
         scripts.insert(0, "add-books/testdata.js")
 
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
