@@ -15,5 +15,5 @@ install: "pip install -r requirements.txt"
 before_script:
     - pip install -r test-requirements.txt
 script: "sudo docker-compose run web ./runtests --with-xcoverage && ./run_js_tests"
-after_success: "COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
-after_failure: "COVERALS_REPO_TOKEN=$coveralls_token coveralls"
+after_success: "ls librarian/docker_config.py && COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
+after_failure: "ls librarian/docker_config.py && COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
