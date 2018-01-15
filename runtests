@@ -8,7 +8,8 @@ if [[ -z "${is_travis}" ]]; then
     # whatever is collecting filenames will register this instead.
     mkdir -p /home/travis/build/skytreader/alexandria
     ln -s / /home/travis/build/skytreader/alexandria
+    cd /home/travis/build/skytreader/alexandria
+fi
 pwd
-ls /librarian
 
 nosetests $1 $2
