@@ -2,6 +2,7 @@
 
 export alexandria_TESTING=True
 
+pwd
 ls /librarian
 
 nosetests $1 $2
