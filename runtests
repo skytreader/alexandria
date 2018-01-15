@@ -2,6 +2,12 @@
 
 export alexandria_TESTING=True
 
+if [[ -z "${is_travis}" ]]; then
+    # In Travis, this script is supposed to run inside the Docker container.
+    # Recreate the directory structure of the Travis VM so that, hopefully,
+    # whatever is collecting filenames will register this instead.
+    mkdir -p /home/travis/build/skytreader/alexandria
+    ln -s / /home/travis/build/skytreader/alexandria
 pwd
 ls /librarian
 
