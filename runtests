@@ -7,7 +7,7 @@ if [[ -z "${is_travis}" ]]; then
     # Recreate the directory structure of the Travis VM so that, hopefully,
     # whatever is collecting filenames will register this instead.
     mkdir -p /home/travis/build/skytreader/
-    ln -s / /home/travis/build/skytreader/alexandria
+    ln -s /librarian /home/travis/build/skytreader/alexandria
     cd /home/travis/build/skytreader/alexandria
 fi
 pwd
