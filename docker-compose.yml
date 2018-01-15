@@ -15,7 +15,7 @@ services:
     ports:
       - "3309:3306"
   web:
-    image: "skytreader/alexandria:latest"
+    build: .
     command: python run.py
     ports:
       - "80:7070"
