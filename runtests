@@ -2,6 +2,6 @@
 
 export alexandria_TESTING=True
 
-nosetests $1 $2
-
 ls /librarian
+
+nosetests $1 $2
