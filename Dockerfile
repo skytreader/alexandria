@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 COPY . ./librarian
 WORKDIR ./librarian
-ENV ALEXANDRIA_CONFIG='/librarian/docker_config.py'
+ENV ALEXANDRIA_CONFIG='config.DockerConfig'
 # This line is specifically for travis-ci builds.
 RUN useradd --create-home --shell /bin/bash travis
 

@@ -4,8 +4,10 @@ from flask_cache import Cache
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
+import os
+
 app = Flask(__name__)
-app.config.from_envvar("ALEXANDRIA_CONFIG")
+app.config.from_object(os.getenv("ALEXANDRIA_CONFIG", "config.DefaultAlexandriaConfig"))
 cache = Cache(app, config=app.config["CACHE_CONFIG"])
 
 db = SQLAlchemy(app)
