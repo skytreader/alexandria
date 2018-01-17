@@ -28,7 +28,7 @@ account `root`, create the relevant virtualenv and then,
     pip install -r requirements.txt
     fab create_database
     fab create_database:is_test=True
-    export ALEXANDRIA_CONFIG='../config.py'
+    export ALEXANDRIA_CONFIG='config.DefaultAlexandriaConfig'
     python run.py
 
 To load the fixture data,
@@ -46,7 +46,7 @@ Simply install `docker` and `docker-compose` and do `docker-compose up --build`.
 When running the app from a docker set-up, set the `ALEXANDRIA_CONFIG` env var
 to `../docker_config.py`. That is,
 
-    export ALEXANDRIA_CONFIG='../docker_config.py'
+    export ALEXANDRIA_CONFIG='config.DockerConfig'
 
 # Testing Set-up
 
