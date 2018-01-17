@@ -4,6 +4,7 @@ from flask_cache import Cache
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
+import config
 import os
 
 app = Flask(__name__)
