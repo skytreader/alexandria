@@ -25,7 +25,7 @@ services:
       - db
   test:
     build: .
-    pots:
+    ports:
       - "80:7070"
     volumes:
       - .:/librarian
