@@ -23,3 +23,11 @@ services:
       - .:/librarian
     depends_on:
       - db
+  test:
+    build: .
+    pots:
+      - "80:7070"
+    volumes:
+      - .:/librarian
+    depends_on:
+      - db_test

@@ -8,8 +8,8 @@ import config
 import os
 
 app = Flask(__name__)
-print config.DefaultAlexandriaConfig
 app.config.from_object(os.getenv("ALEXANDRIA_CONFIG", "config.DefaultAlexandriaConfig"))
+print(app.config["SQLALCHEMY_TEST_DATABASE_URI"])
 cache = Cache(app, config=app.config["CACHE_CONFIG"])
 
 db = SQLAlchemy(app)
