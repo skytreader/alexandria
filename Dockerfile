@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update
-RUN apt-get install -y libmysqlclient-dev python python-pip
+RUN apt-get update && apt-get install -y libmysqlclient-dev python python-pip
 COPY . ./librarian
 WORKDIR ./librarian
 RUN pip install -r requirements.txt
