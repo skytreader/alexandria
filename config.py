@@ -16,9 +16,9 @@ class DefaultAlexandriaConfig(object):
     TESTING = bool(os.environ.get("_".join((APP_NAME, "TESTING"))))
     SUDO = bool(os.environ.get("_".join((APP_NAME, "SUDO"))))
     
-    SQL_HOST = "127.0.0.1"
+    SQL_HOST = "db"
     SQL_PORT = 3306
-    SQL_TEST_PORT = 3306
+    SQL_TEST_PORT = 3309
     SQL_USERNAME = "root"
     SQL_PASSWORD = ""
     SQL_ENGINE = "mysql"
@@ -26,7 +26,7 @@ class DefaultAlexandriaConfig(object):
     SQL_TEST_DB_NAME = "%s_test" % SQL_DB_NAME
     SQLALCHEMY_DATABASE_URI = '%s://%s:%s@%s:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
       SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_DB_NAME)
-    SQLALCHEMY_TEST_DATABASE_URI = '%s://%s:%s@%s:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
+    SQLALCHEMY_TEST_DATABASE_URI = '%s://%s:%s@%s_test:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
       SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_TEST_DB_NAME)
     SQLALCHEMY_ECHO = not DEVEL
     DATABASE_CONNECT_OPTIONS = {"user":"root"}
