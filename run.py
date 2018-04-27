@@ -1,5 +1,6 @@
 import librarian
-from config import APP_HOST, APP_PORT, DEVEL
+# from config.DefaultAlexandriaConfig import APP_HOST, APP_PORT, DEVEL
+from config import DefaultAlexandriaConfig as cfg
 
 import socket
 import time
@@ -11,7 +12,7 @@ if __name__ == "__main__":
         try:
             librarian.init_blueprints()
             librarian.init_db()
-            librarian.app.run(host=APP_HOST, port=APP_PORT, debug=DEVEL)
+            librarian.app.run(host=cfg.APP_HOST, port=cfg.APP_PORT, debug=cfg.DEVEL)
         # We need to catch socket.error too since it seems that Werkzeug (used
         # Flask's _development_ environment) uses socket.py and somewhere there
         # they already catch KeyboardInterrupt. Not doing this leads to a
