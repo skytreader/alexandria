@@ -20,5 +20,5 @@ before_script:
     - pip install -r test-requirements.txt
     - sudo ln -s . /librarian
 script: "sudo docker-compose run test ./dockertests"
-after_success: "sudo docker-compose run test pwd && COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
-after_failure: "sudo docker-compose run test pwd && COVERALLS_REPO_TOKEN=$coveralls_token coveralls"
+after_success: "sudo docker-compose run test coveralls"
+after_failure: "sudo docker-compose run test coveralls"
