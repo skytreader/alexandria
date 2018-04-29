@@ -17,14 +17,12 @@ services:
       - "3309:3306"
   web:
     build: .
-    command: python run.py
     ports:
       - "80:7070"
     volumes:
       - .:/librarian
     depends_on:
-      db:
-        condition: service_healthy
+      - db
   test:
     build:
       context: ./
