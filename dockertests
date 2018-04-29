@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e -x
+ls
+./runtests --with-xcoverage
+./run_js_tests
