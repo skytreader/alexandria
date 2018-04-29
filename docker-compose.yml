@@ -23,7 +23,8 @@ services:
     volumes:
       - .:/librarian
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   test:
     build:
       context: ./
