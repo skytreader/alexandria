@@ -2,13 +2,14 @@ import librarian
 # from config.DefaultAlexandriaConfig import APP_HOST, APP_PORT, DEVEL
 from config import DefaultAlexandriaConfig as cfg
 
+import os
 import socket
 import time
 import traceback
 
 if __name__ == "__main__":
     exp_backoff = 0
-    while True:
+    while True and os.environ.get("is_travis"):
         try:
             librarian.init_blueprints()
             librarian.init_db()
