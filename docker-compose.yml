@@ -25,7 +25,9 @@ services:
     depends_on:
       - db
   test:
-    build: .
+    build:
+      - context: ./
+      - dockerfile: Dockerfile-test
     volumes:
       - .:/librarian
     depends_on:
