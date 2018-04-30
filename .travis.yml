@@ -20,7 +20,5 @@ before_script:
     - pip install -r test-requirements.txt
     - sudo ln -s . /librarian
 script: "sudo docker-compose run -e CODECOV_TOKEN test ./dockertests"
-after_success: "sudo docker-compose run -e COVERALLS_REPO_TOKEN test coveralls"
-after_failure: "sudo docker-compose run -e COVERALLS_REPO_TOKEN test coveralls"
-#after_success: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
-#after_failure: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
+after_success: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
+after_failure: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
