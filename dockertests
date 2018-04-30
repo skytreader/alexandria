@@ -3,4 +3,3 @@ set -e -x
 ls
 ./runtests --with-coverage
 ./run_js_tests
-codecov

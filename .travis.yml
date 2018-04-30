@@ -22,5 +22,5 @@ before_script:
 script: "sudo docker-compose run -e CODECOV_TOKEN test ./dockertests"
 #after_success: "sudo docker-compose run test coveralls"
 #after_failure: "sudo docker-compose run test coveralls"
-after_success: "sudo docker-compose run test codecov"
-after_failure: "sudo docker-compose run test codecov"
+after_success: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
+after_failure: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
