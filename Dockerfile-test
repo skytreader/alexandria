@@ -1,5 +1,5 @@
 # vim: set ft=dockerfile:
-FROM ubuntu:16.04
+FROM skytreader/alexandria:latest
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -7,14 +7,10 @@ RUN apt-get update && \
     add-apt-repository ppa:webupd8team/java -y && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-get install -y libmysqlclient-dev python python-pip xvfb firefox oracle-java8-installer git && \
+    apt-get install -y xvfb firefox oracle-java8-installer git && \
     apt-get clean
-COPY ./requirements.txt .
 COPY ./test-requirements.txt .
-RUN pip install -r requirements.txt
 RUN pip install -r test-requirements.txt
-COPY . ./librarian
-WORKDIR ./librarian
 ENV ALEXANDRIA_CONFIG='config.DockerConfig'
 # This line is specifically for travis-ci builds.
 RUN useradd --create-home --shell /bin/bash travis
