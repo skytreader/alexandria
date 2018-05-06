@@ -9,7 +9,7 @@ import traceback
 
 if __name__ == "__main__":
     exp_backoff = 0
-    while True and os.environ.get("is_travis"):
+    while True and not os.environ.get("is_travis"):
         try:
             librarian.init_blueprints()
             librarian.init_db()
