@@ -1,9 +1,9 @@
 FROM ubuntu:16.04
-ADD . ./librarian
-WORKDIR ./librarian
-ENV ALEXANDRIA_CONFIG='../docker_config.py'
 
-RUN apt-get update
-RUN apt-get install -y libmysqlclient-dev python python-pip
+RUN apt-get update && apt-get install -y libmysqlclient-dev python python-pip
+COPY ./requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install -r test-requirements.txt
+COPY . ./librarian
+WORKDIR ./librarian
+ENV ALEXANDRIA_CONFIG='config.DefaultAlexandriaConfig'
+RUN python run.py

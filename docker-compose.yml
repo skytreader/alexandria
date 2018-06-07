@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   db:
     image: "mysql:5.7"
@@ -16,10 +16,17 @@ services:
       - "3309:3306"
   web:
     build: .
-    command: python run.py
     ports:
       - "80:7070"
     volumes:
       - .:/librarian
     depends_on:
       - db
+  test:
+    build:
+      context: ./
+      dockerfile: Dockerfile-test
+    volumes:
+      - .:/librarian
+    depends_on:
+      - db_test

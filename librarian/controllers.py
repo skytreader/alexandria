@@ -3,15 +3,15 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.ext.login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
+from librarian import app
 from librarian.errors import InvalidRecordState
 from librarian.utils import BookRecord, StatsDescriptor
 from librarian.models import Book
 from utils import route_exists
 
-import config
 import flask
 import json
-import logging
+import time
 
 librarian_bp = Blueprint('librarian', __name__)
 
@@ -28,7 +28,6 @@ def login():
     from flask_login import current_user
     from models import Librarian
     form = LoginForm()
-    logging.info("Got login form %s" % form)
 
     if form.validate_on_submit():
         user = Librarian.query.filter_by(username=form.librarian_username.data, is_user_active=True).first()
@@ -94,9 +93,10 @@ def add_books():
       "add-books/main.js", "types/book-details.js", "add-books/types.js",
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
       "jquery-ui.min.js", "lodash.js", "alertify.min.js",
-      "add-books/add-book-details.js", "add-books/stat-counter.js"]
+      "add-books/add-book-details.js", "add-books/stat-counter.js",
+      "types/person.js"]
 
-    if config.DEVEL:
+    if app.config["DEVEL"]:
         scripts.insert(0, "add-books/testdata.js")
 
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
@@ -112,24 +112,24 @@ def edit_books():
     if not book_id:
         return flask.abort(400)
 
-    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id).limit(1)
+    book_query = BookRecord.base_assembler_query().filter(Book.id == book_id)
     query_results = book_query.all()
     assembled = BookRecord.assembler(query_results)
 
     if not assembled:
         return flask.abort(400)
     elif len(assembled) > 1:
-        raise InvalidRecordState("Wow. More than one book from a single id.")
+        raise InvalidRecordState("book id %s" % book_id)
 
     book = assembled[0]
-    book_js = "var bookForEditing = JSON.parse('%s')" % json.dumps(book.__dict__)
+    book_js = "var bookForEditing = JSON.parse(%s)" % json.dumps(json.dumps(book.__dict__))
 
     scripts = ["jquery.validate.min.js", "jquery.form.min.js", "Queue.js",
       "types/book-details.js", "edit-book/main.js", "edit-book/controller.js", 
       "utils/visual-queue.js", "utils/misc.js", "utils/isbn-verify.js",
-      "jquery-ui.min.js", "lodash.js", "alertify.min.js"]
+      "jquery-ui.min.js", "lodash.js", "alertify.min.js", "types/person.js"]
 
-    if config.DEVEL:
+    if app.config["DEVEL"]:
         scripts.insert(0, "add-books/testdata.js")
 
     styles = ("add_books.css", "jquery-ui.min.css", "jquery-ui.structure.min.css",
@@ -142,14 +142,16 @@ def edit_books():
 @librarian_bp.route("/books")
 def show_books():
     from flask_login import current_user
+    load_start = time.time()
     books = json.loads(api.get_books().data)["data"]
+    load_end = time.time()
     scripts = ("show-books/main.js",)
     styles = ("books.css",)
 
     user = current_user if current_user.is_authenticated else None
 
     return render_template("books.jinja", scripts=scripts, stylesheets=styles,
-      books=books, user=user)
+      books=books, user=user, perftime=(load_end - load_start))
 
 @librarian_bp.route("/search")
 def search():
@@ -157,7 +159,9 @@ def search():
     user = current_user if current_user.is_authenticated else None
     search_form = SearchForm(request.form)
     searchq = request.args.get("q")
+    search_start = time.time()
     books = api.search(searchq)
+    search_end = time.time()
     styles = ("books.css",)
     return render_template("books.jinja", stylesheets=styles, books=books,
-      query=searchq, search_form=search_form, user=user)
+      query=searchq, search_form=search_form, user=user, perftime=(search_end - search_start))

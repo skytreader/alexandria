@@ -113,11 +113,9 @@ def clone_database():
     engine = create_engine(SQLALCHEMY_DATABASE_URI)
     meta = MetaData(bind=engine)
 
-    alembic_version_table = Table("alembic_version", meta, autoload=True)
-    alembic_version = engine.execute(select([alembic_version_table])
-      .select_from(alembic_version_table)).first()[0]
+    last_commit = local("git log --oneline | head -n1 | awk '{print $1}'", capture=True)
 
-    new_db_name = '_'.join((SQL_DB_NAME, alembic_version))
+    new_db_name = '_'.join((SQL_DB_NAME, last_commit))
     new_test_db_name = '_'.join((new_db_name, "test"))
 
     local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name)

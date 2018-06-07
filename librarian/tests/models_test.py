@@ -71,6 +71,31 @@ class ModelsTest(AppTestCase):
         contrib = get_or_create(Contributor, will_commit=True, firstname="David", lastname="Tennant", creator=self.admin_user)
 
         self.assertTrue(contrib is not None)
+
+    def test_get_or_create_casing(self):
+        milo = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.lastname=="Manara")
+            .first()
+        )
+        self.assertTrue(milo is None)
+        ContributorFactory(firstname="MIlo", lastname="Manara", creator=self.admin_user)
+        librarian.db.session.flush()
+
+        milo = (
+            librarian.db.session.query(Contributor)
+            .filter(Contributor.lastname=="Manara")
+            .first()
+        )
+        self.assertTrue(milo is not None)
+
+        milo_clone = get_or_create(
+            Contributor, will_commit=True, firstname="Milo", lastname="Manara",
+            creator=self.admin_user
+        )
+
+        self.assertEqual("Milo", milo_clone.firstname)
+        self.assertNotEqual("MIlo", milo_clone.firstname)
     
     def test_get_or_create_insuff(self):
         templar = (librarian.db.session.query(Book)

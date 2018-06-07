@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from librarian import app, db
+from librarian.errors import ConstraintError
 
-import config
 import copy
 import re
 
 ISBN_REGEX = re.compile("(\d{13}|\d{9}[\dX])")
 NUMERIC_REGEX = re.compile("\d+")
 
+
+"""
+Contains classes and functions useful for both unit tests and the actual app.
+Methods that are too small for an API endpoint also fall here.
+"""
  
 class RequestData(object):
     
@@ -69,6 +74,8 @@ class BookRecord(RequestData):
                 Contributor.firstname, Role.name, BookCompany.name, Genre.name,
                 Book.publish_year
             ).filter(Book.id == BookContribution.book_id)
+            .filter(BookContribution.active)
+            .filter(Contributor.active)
             .filter(BookContribution.contributor_id == Contributor.id)
             .filter(BookContribution.role_id == Role.id)
             .filter(Book.publisher_id == BookCompany.id)
@@ -76,8 +83,8 @@ class BookRecord(RequestData):
         )
     
     def __init__(
-        self, isbn, title, publisher, publish_year=None, author=None,
-        translator=None, illustrator=None, editor=None, genre=None, id=None,
+        self, isbn, title, publisher, genre, publish_year=None, author=None,
+        translator=None, illustrator=None, editor=None, id=None,
         printer=None
      ):
         """
@@ -195,11 +202,13 @@ class BookRecord(RequestData):
         edits = dict_struct.get("editor")
         person_editors = [Person(**spam) for spam in edits] if edits else []
 
-        return BookRecord(isbn=dict_struct["isbn"], title=dict_struct["title"],
-          publisher=dict_struct["publisher"], author=person_authors,
-          translator=person_translators, illustrator=person_illustrators,
-          editor=person_editors, id=dict_struct["id"],
-          printer=dict_struct["printer"])
+        return BookRecord(
+            isbn=dict_struct["isbn"], title=dict_struct["title"],
+            publisher=dict_struct["publisher"], author=person_authors,
+            translator=person_translators, illustrator=person_illustrators,
+            editor=person_editors, id=dict_struct["id"],
+            printer=dict_struct["printer"], genre="Test"
+        )
 
     def __eq__(self, br):
         return (self.isbn == br.isbn and self.title == br.title and
@@ -319,7 +328,7 @@ def isbn_check(isbn):
     """
     Checks for the valididty of the given ISBN string and returns a boolean to
     indicate validity. If the given string is not exactly either of length 10 or
-    13, raise ConstraintError.
+    13, return False.
     """
     if ISBN_REGEX.match(isbn):
         if len(isbn) == 10:
@@ -346,6 +355,75 @@ def isbn_check(isbn):
             return (check % 10) == 0
 
     return False
+
+def compute_isbn10_checkdigit(isbn):
+    """
+    Takes a string of length 9 and returns the check digit (as a one-character
+    string). If string is not exactly of length 9 or not numeric, raise
+    ConstraintError.
+    """
+    if len(isbn) != 9:
+        raise ConstraintError("should be length 9", isbn)
+    elif not NUMERIC_REGEX.match(isbn):
+        raise ConstraintError("should be a numeric string", isbn)
+
+    check = 0
+    multiplier = 10
+    for d in isbn:
+        check += int(d) * multiplier
+        multiplier -= 1
+
+    checker = (11 - (check % 11)) % 11
+    return 'X' if checker == 10 else str(checker)
+
+def compute_isbn13_checkdigit(isbn):
+    """
+    Takes a string of length 12 and returns the check digit (as a one-character
+    string). If string is not exactly of length 12 or not numeric, raise
+    ConstraintError.
+    """
+    if len(isbn) != 12:
+        raise ConstraintError("should be length 12", isbn)
+    elif not NUMERIC_REGEX.match(isbn):
+        raise ConstraintError("should be a numeric string", isbn)
+
+    check = 0
+    for idx, d in enumerate(isbn):
+        if idx % 2:
+            check += 3 * int(d)
+        else:
+            check += int(d)
+
+    return str((10 - (check % 10)) % 10)
+
+def make_equivalent_isbn(isbn):
+    candidate_equiv = ""
+    isbn_len = len(isbn)
+    if isbn_len == 13:
+        if isbn.startswith("978"):
+            candidate_equiv = isbn[3:-1]
+            checkdigit = compute_isbn10_checkdigit(candidate_equiv)
+            candidate_equiv += checkdigit
+        else:
+            # This is a book issued with no equivalent ISBN 10
+            # (Not sure if this is how ISBN 13 works.)
+            return None
+    else:
+        candidate_equiv = "978" + isbn[:-1]
+        checkdigit = compute_isbn13_checkdigit(candidate_equiv)
+        candidate_equiv += checkdigit
+    
+    return candidate_equiv
+
+def has_equivalent_isbn(isbn):
+    """
+    Check the DB if a book with an equivalent ISBN exists.
+    """
+    from librarian.models import Book
+    candidate_equiv = make_equivalent_isbn(isbn)
+    book_exists = db.session.query(Book).filter(Book.isbn == candidate_equiv).count()
+
+    return book_exists == 1
 
 def route_exists(route):
     return route in map(lambda r: r.rule, librarian.app.url_map.iter_rules())

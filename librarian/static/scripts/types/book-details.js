@@ -127,8 +127,23 @@ BookDetailsCtrl.prototype.setUp = function(){
     var me = this;
 
     /**
+    Check whether the name currently entered in creatorType is not blank.
+
+    FIXME This assumes that all names are made up of a lastname and a firstname,
+    Which is false. See https://github.com/skytreader/alexandria/issues/73.
+
+    @param {string} creatorType
+    */
+    function creatorNameNotBlank(creatorType){
+        var lastname = $("#" + creatorType + "-proxy-lastname").val().trim();
+        var firstname = $("#" + creatorType + "-proxy-firstname").val().trim();
+
+        return lastname.length != 0 && firstname.length != 0;
+    }
+
+    /**
     Create a list element for displaying a creator's name. The name displayed is
-    dependent on what is currently entered in the procy fields for this creator.
+    dependent on what is currently entered in the proxy fields for this creator.
     
     TODO Test me
     
@@ -167,7 +182,7 @@ BookDetailsCtrl.prototype.setUp = function(){
     
         var deleteButton = document.createElement("i");
         $(deleteButton).addClass("fa fa-times-circle")
-          .click(recordDeleterFactory(creatorType));
+          .click(recordDeleterFactory(creatorType, hiddenLastnameProxy, hiddenFirstnameProxy));
     
         delCol.appendChild(deleteButton);
     
@@ -189,24 +204,34 @@ BookDetailsCtrl.prototype.setUp = function(){
 
     /**
     @param {string} creatorType
+    @param {HTMLElement} hiddenLastnameProxy
+        The corresponding lastname field for the element for which the delete
+        function will be attached to.
+    @param {HTMLElement} hiddenFirstnameProxy
+        The corresponding firstname field for the element for which the delete
+        function will be attached to.
     */
-    function recordDeleterFactory(creatorType){
+    function recordDeleterFactory(creatorType, hiddenLastnameProxy, hiddenFirstnameProxy){
         return function() {
             $(this.parentNode.parentNode).remove();
+            $(hiddenLastnameProxy).remove();
+            $(hiddenFirstnameProxy).remove();
         }
     };
 
     /**
-    Return a function that generates an input row for a given creatorType. The
-    generated function was meant to be called for the click event on the add
-    button.
+    Return a function that handles the display of a new creator entry.
     */
     function rendererFactory(creatorType){
         return function(){
-            var name = document.createElement("li");
-            var inputLine = renderContentCreatorListing(creatorType);
+            if (creatorNameNotBlank(creatorType)) {
+                var name = document.createElement("li");
+                var inputLine = renderContentCreatorListing(creatorType);
     
-            document.getElementById(creatorType + "-list").appendChild(inputLine);
+                document.getElementById(creatorType + "-list").appendChild(inputLine);
+            } else{
+                alertify.error("Please provide both a last name and a first name.");
+            }
         }
     }
 
@@ -412,10 +437,17 @@ Reset all name autocomplete based on the BOOK_PERSONS field.
 */
 BookDetailsCtrl.prototype.resetAutocomplete = function(){
     "use strict";
-    this.BOOK_PERSONS_FIRSTNAME = _.map(this.BOOK_PERSONS,
-      function(x){return x["firstname"]});
-    this.BOOK_PERSONS_LASTNAME = _.map(this.BOOK_PERSONS,
-      function(x){return x["lastname"]});
+    var firstnameSet = new Set(_.map(this.BOOK_PERSONS,
+      function(x){return x["firstname"]}));
+    var lastnameSet = new Set(_.map(this.BOOK_PERSONS,
+      function(x){return x["lastname"]}));
+
+    /*
+    At this point we are sure that the autocomplete entries are unique.
+    **However**, actual behavior shows that the firstnames are still repeated. :(
+    */
+    this.BOOK_PERSONS_FIRSTNAME = [...firstnameSet];
+    this.BOOK_PERSONS_LASTNAME = [...lastnameSet];
 
     $(".auto-lastname").autocomplete({
         source: this.BOOK_PERSONS_LASTNAME
@@ -449,6 +481,34 @@ BookDetailsCtrl.prototype.isCreatorPending = function(){
         }
     }
     return false;
+}
+
+/**
+Get all the names entered for the given creator.
+
+This relies _a lot_ on the guaranteed return order of jQuery selectors. At least,
+it must be guaranteed that the order of lastnames and firstnames returned is the
+same.
+
+@param {string} creator
+    The name given to the creator type.
+@return {Array.Person} An array of persons.
+@private
+*/
+BookDetailsCtrl.prototype.getCreatorNames = function(creator){
+    var creatorsLastname = $("[name='" + creator + "-proxy-lastname']");
+    var creatorsFirstname = $("[name='" + creator + "-proxy-firstname']");
+    var persons = [];
+
+    for(var i = 0; i < creatorsLastname.length; i++){
+        var firstname = creatorsFirstname[i].value.trim();
+        var lastname = creatorsLastname[i].value.trim();
+        if(firstname != "" && lastname != ""){
+            persons.push(new Person(lastname, firstname));
+        }
+    }
+
+    return persons;
 }
 
 /**

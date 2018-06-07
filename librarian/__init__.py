@@ -5,10 +5,12 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 import config
+import os
 
 app = Flask(__name__)
-cache = Cache(app, config=config.CACHE_CONFIG)
-app.config.from_envvar("ALEXANDRIA_CONFIG")
+app.config.from_object(os.getenv("ALEXANDRIA_CONFIG", "config.DefaultAlexandriaConfig"))
+print(app.config["SQLALCHEMY_TEST_DATABASE_URI"])
+cache = Cache(app, config=app.config["CACHE_CONFIG"])
 
 db = SQLAlchemy(app)
 

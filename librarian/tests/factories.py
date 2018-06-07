@@ -73,6 +73,7 @@ class ContributorFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda x: x)
     lastname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
     firstname = factory.LazyAttribute(lambda x: fuzzy_text.fuzz())
+    active = factory.LazyAttribute(lambda x: True)
     creator = factory.SubFactory(LibrarianFactory)
 
 
@@ -95,6 +96,7 @@ class BookContributionFactory(factory.alchemy.SQLAlchemyModelFactory):
     book = factory.SubFactory(BookFactory)
     contributor = factory.SubFactory(ContributorFactory)
     role = factory.SubFactory(RoleFactory)
+    active = factory.LazyAttribute(lambda x: True)
     creator = factory.SubFactory(LibrarianFactory)
 
 

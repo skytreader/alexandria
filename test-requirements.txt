@@ -1,3 +1,2 @@
-coverage==4.4.1
-nosexcover==1.0.11
-python-coveralls==2.9.1
+codecov
+coverage==3.7.1
