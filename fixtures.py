@@ -1,5 +1,5 @@
 from librarian.models import get_or_create, Librarian, Role
-from config import SQLALCHEMY_DATABASE_URI
+from config import DefaultAlexandriaConfig
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -15,7 +15,7 @@ def insert_fixtures(engine, session):
           display_text="%s(s)" % r, creator=admin_user)
 
 if __name__ == "__main__":
-    engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+    engine = create_engine(DefaultAlexandriaConfig.SQLALCHEMY_DATABASE_URI, echo=True)
     session = sessionmaker(bind=engine)()
 
     insert_fixtures(engine, session)

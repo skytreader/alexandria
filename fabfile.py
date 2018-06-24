@@ -1,7 +1,4 @@
-from config import (
-  DEVEL, SQL_DB_NAME, SQL_TEST_DB_NAME, SQLALCHEMY_DATABASE_URI,
-  SQLALCHEMY_TEST_DATABASE_URI, TESTING
-)
+from config import DefaultAlexandriaConfig as def_cfg
 from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
@@ -12,7 +9,7 @@ def __env_safeguard(fab_method):
     This is not a fabric method per se. Useless to call this.
     """
     def check(*args, **kwargs):
-        if DEVEL or TESTING:
+        if def_cfg.DEVEL or def_cfg.TESTING:
             fab_method(*args, **kwargs)
         else:
             print "Prevented by env_safeguard"
@@ -25,9 +22,9 @@ def reset_db_data(is_test=False):
     Truncate all database tables. Pass `is_test:True` to reset test db.
     """
     if is_test:
-        engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
+        engine = create_engine(def_cfg.SQLALCHEMY_TEST_DATABASE_URI)
     else:
-        engine = create_engine(SQLALCHEMY_DATABASE_URI)
+        engine = create_engine(def_cfg.SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
     engine.execute("TRUNCATE alembic_version;")
@@ -52,9 +49,9 @@ def destroy_db_tables(is_test=False):
     Drop all database tables.
     """
     if is_test:
-        engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
+        engine = create_engine(def_cfg.SQLALCHEMY_TEST_DATABASE_URI)
     else:
-        engine = create_engine(SQLALCHEMY_DATABASE_URI)
+        engine = create_engine(def_cfg.SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
     engine.execute("DROP TABLE IF EXISTS alembic_version;")
@@ -75,7 +72,7 @@ def manual_test_cleanup():
     """
     Delete all tables in test database.
     """
-    engine = create_engine(SQLALCHEMY_TEST_DATABASE_URI)
+    engine = create_engine(def_cfg.SQLALCHEMY_TEST_DATABASE_URI)
     session = sessionmaker(bind=engine)()
     engine.execute("SET FOREIGN_KEY_CHECKS = 0;")
     engine.execute("DELETE FROM alembic_version;")
@@ -110,17 +107,17 @@ def clone_database():
     from sqlalchemy import Table, MetaData
     from sqlalchemy.sql import select
 
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    engine = create_engine(def_cfg.SQLALCHEMY_DATABASE_URI)
     meta = MetaData(bind=engine)
 
     last_commit = local("git log --oneline | head -n1 | awk '{print $1}'", capture=True)
 
-    new_db_name = '_'.join((SQL_DB_NAME, last_commit))
+    new_db_name = '_'.join((def_cfg.SQL_DB_NAME, last_commit))
     new_test_db_name = '_'.join((new_db_name, "test"))
 
     local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name)
     local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
-    local("mysqldump -u root %s | mysql -u root %s" % (SQL_DB_NAME, new_db_name))
+    local("mysqldump -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name))
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
@@ -132,9 +129,9 @@ def destroy_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test:
-        local('mysql -u root -e "DROP DATABASE %s"' % SQL_TEST_DB_NAME)
+        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_TEST_DB_NAME)
     else:
-        local('mysql -u root -e "DROP DATABASE %s"' % SQL_DB_NAME)
+        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME)
 
 def create_database(is_test=False):
     """
@@ -143,6 +140,6 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_TEST_DB_NAME)
+        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_TEST_DB_NAME)
     else:
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % SQL_DB_NAME)
+        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_DB_NAME)
