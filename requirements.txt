@@ -19,7 +19,6 @@ fake-factory==9999.9.9
 itsdangerous==0.24
 nose==1.3.7
 paramiko==2.3.1
-pycrypto==2.6.1
 python-dateutil==2.6.1
 pytz==2017.3
 python-editor==1.0.3
