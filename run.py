@@ -7,11 +7,9 @@ import socket
 import time
 import traceback
 
-print("hello")
 
 if __name__ == "__main__":
     exp_backoff = 0
-    print("DEBUG %s" % os.environ.get("is_travis"))
     while int(os.environ.get("is_travis", "0")) != 1:
         try:
             librarian.init_blueprints()
