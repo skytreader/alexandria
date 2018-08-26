@@ -5,5 +5,6 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 COPY . ./librarian
 WORKDIR ./librarian
-ENV ALEXANDRIA_CONFIG='config.DefaultAlexandriaConfig'
-RUN python run.py
+# ENV ALEXANDRIA_CONFIG='config.DefaultAlexandriaConfig'
+ENV ALEXANDRIA_CONFIG='config.DockerConfig'
+ENTRYPOINT python run.py
