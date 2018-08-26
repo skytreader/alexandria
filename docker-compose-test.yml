@@ -1,17 +1,17 @@
 version: '2.1'
 services:
-  db:
+  db_test:
     image: "mysql:5.7"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=alexandria
+      - MYSQL_DATABASE=alexandria_test
     ports:
-      - "3308:3306"
-  web:
-    build: .
-    ports:
-      - "80:7070"
+      - "3309:3306"
+  test:
+    build:
+      context: ./
+      dockerfile: Dockerfile-test
     volumes:
       - .:/librarian
     depends_on:
-      - db
+      - db_test
