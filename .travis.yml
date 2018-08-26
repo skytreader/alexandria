@@ -14,11 +14,11 @@ before_install:
     - chmod +x docker-compose
     - sudo mv docker-compose /usr/local/bin
     - docker-compose version
-    - sudo docker-compose up -d
+    - sudo docker-compose up -f docker-compose-test.yml -d
 install: "pip install -r requirements.txt"
 before_script:
     - pip install -r test-requirements.txt
     - sudo ln -s . /librarian
-script: "sudo docker-compose run -e CODECOV_TOKEN test ./dockertests"
-after_success: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
-after_failure: "sudo docker-compose run -e CODECOV_TOKEN test codecov"
+script: "sudo docker-compose run -f docker-compose-test.yml -e CODECOV_TOKEN test ./dockertests"
+after_success: "sudo docker-compose run -f docker-compose-test.yml -e CODECOV_TOKEN test codecov"
+after_failure: "sudo docker-compose run -f docker-compose-test.yml -e CODECOV_TOKEN test codecov"
