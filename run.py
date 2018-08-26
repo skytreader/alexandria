@@ -7,9 +7,10 @@ import socket
 import time
 import traceback
 
+
 if __name__ == "__main__":
     exp_backoff = 0
-    while int(os.environ.get("is_travis", "0")) != 0:
+    while int(os.environ.get("is_travis", "0")) != 1:
         try:
             librarian.init_blueprints()
             librarian.init_db()
