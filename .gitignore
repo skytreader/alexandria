@@ -13,3 +13,5 @@ db_playground.py
 node_modules/
 out/
 *.sql
+.coverage
+coverage.xml
