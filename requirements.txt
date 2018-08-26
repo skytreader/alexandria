@@ -22,5 +22,5 @@ paramiko==2.4.1
 python-dateutil==2.7.3
 pytz==2018.5
 python-editor==1.0.3
-ipaddress==1.0.18
+ipaddress==1.0.21
 ecdsa==0.13
