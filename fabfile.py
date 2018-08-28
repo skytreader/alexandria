@@ -89,12 +89,17 @@ def manual_test_cleanup():
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
 
+def __docker_compose_run(entrypoint, service):
+    local("docker-compose run --entrypoint '%s' %s" % (entrypoint, service))
+
+def load_fixtures():
+    __docker_compose_run("python fixtures.py", "web")
+
 def dbdump(dump_name="alexandria.sql"):
     """
-    Dump out local database to file. Assumes access to local mysql db via
-    passwordless root.
+    Dump out local database to file.
     """
-    local("mysqldump -u root alexandria > %s" % dump_name)
+    local('docker-compose run --entrypoint "mysqldump alexandria" db > %s' % dump_name)
 
 def clone_database():
     """
@@ -115,7 +120,11 @@ def clone_database():
     new_db_name = '_'.join((def_cfg.SQL_DB_NAME, last_commit))
     new_test_db_name = '_'.join((new_db_name, "test"))
 
-    local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name)
+    local(
+        """
+        docker-composemysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"
+        """ % new_test_db_name
+    )
     local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
     local("mysqldump -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name))
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)

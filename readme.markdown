@@ -11,16 +11,9 @@ Install `docker` and `docker-compose` and do `docker-compose up --build`.
 
 Note that at this point, you don't have fixture data yet. So do
 
-    docker-compose run --entrypoing "python fixtures.py" web
+    fab load_fixtures
 
 # Testing Set-up
-
-Assuming you have a local mysql database `alexandria_test` accessible by
-passwordless account `root`, in the relevant virtualenv invoke `runtests`.
-
-The test suite runner is ultimately, nose, but there are some envionment
-variables that need to be set in order for tests to be successful. The script
-takes care of that.
 
 More relevant information can be found at `.travis.yml`.
 
