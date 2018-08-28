@@ -97,9 +97,10 @@ def load_fixtures():
 
 def dbdump(dump_name="alexandria.sql"):
     """
-    Dump out local database to file. Invoke as "fab dbdump > alexandria.sql".
+    Dump out local database to file.
     """
-    __docker_compose_run("mysqldump -h db alexandria", "db_runner")
+    # Wow. Such hax. Kids, don't try this at home.
+    __docker_compose_run("mysqldump -h db alexandria", "db_runner > alexandria.sql")
 
 def clone_database():
     """
