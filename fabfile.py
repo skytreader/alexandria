@@ -1,4 +1,4 @@
-from config import DefaultAlexandriaConfig as def_cfg
+from config import DockerConfig as def_cfg
 from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
@@ -97,9 +97,9 @@ def load_fixtures():
 
 def dbdump(dump_name="alexandria.sql"):
     """
-    Dump out local database to file.
+    Dump out local database to file. Invoke as "fab dbdump > alexandria.sql".
     """
-    local('docker-compose run --entrypoint "mysqldump alexandria" db > %s' % dump_name)
+    __docker_compose_run("mysqldump -h db alexandria", "db_runner")
 
 def clone_database():
     """
@@ -120,13 +120,18 @@ def clone_database():
     new_db_name = '_'.join((def_cfg.SQL_DB_NAME, last_commit))
     new_test_db_name = '_'.join((new_db_name, "test"))
 
-    local(
-        """
-        docker-composemysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"
-        """ % new_test_db_name
+    __docker_compose_run(
+        'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name,
+        "db"
     )
-    local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
-    local("mysqldump -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name))
+    __docker_compose_run(
+        'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name,
+        "db"
+    )
+    __docker_compose_run(
+        "mysqldump -h db -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name),
+        "db"
+    )
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
