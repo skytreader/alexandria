@@ -4,6 +4,8 @@ from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+import time
+
 def __env_safeguard(fab_method):
     """
     This is not a fabric method per se. Useless to call this.
@@ -90,7 +92,10 @@ def manual_test_cleanup():
     session.commit()
 
 def __docker_compose_run(entrypoint, service):
-    local("docker-compose run --entrypoint '%s' %s" % (entrypoint, service))
+    local(__docker_compose_runstr(entrypoint, service))
+
+def __docker_compose_runstr(entrypoint, service):
+    return "docker-compose run --entrypoint '%s' %s" % (entrypoint, service)
 
 def load_fixtures():
     __docker_compose_run("python fixtures.py", "web")
@@ -100,7 +105,7 @@ def dbdump(dump_name="alexandria.sql"):
     Dump out local database to file.
     """
     # Wow. Such hax. Kids, don't try this at home.
-    __docker_compose_run("mysqldump -h db alexandria", "db_runner > alexandria.sql")
+    __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
 
 def clone_database():
     """
@@ -125,14 +130,24 @@ def clone_database():
         'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name,
         "db"
     )
+
+
     __docker_compose_run(
         'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name,
         "db"
     )
-    __docker_compose_run(
-        "mysqldump -h db -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name),
-        "db"
+
+    local(
+        "%s | %s" %
+        (
+            __docker_compose_runstr("mysqldump -h db -u root %s" % def_cfg.SQL_DB_NAME, "db_runner_1"),
+            __docker_compose_runstr("mysql -h db -u root %s" % new_db_name, "db_runner_2")
+        )
     )
+    #__docker_compose_run(
+    #    "mysqldump -h db -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name),
+    #    "db"
+    #)
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
