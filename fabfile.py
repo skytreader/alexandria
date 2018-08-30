@@ -130,13 +130,10 @@ def clone_database():
         'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name,
         "db"
     )
-
-
     __docker_compose_run(
         'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name,
         "db"
     )
-
     local(
         "%s | %s" %
         (
@@ -144,10 +141,6 @@ def clone_database():
             __docker_compose_runstr("mysql -h db -u root %s" % new_db_name, "db_runner_2")
         )
     )
-    #__docker_compose_run(
-    #    "mysqldump -h db -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name),
-    #    "db"
-    #)
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
@@ -155,13 +148,11 @@ def clone_database():
 def destroy_database(is_test=False):
     """
     Drop the database. Pass `:is_test=True` to drop the test database instead.
-
-    Assumes access to local mysql db via passwordless root.
     """
     if is_test:
-        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_TEST_DB_NAME)
+        __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_TEST_DB_NAME, "db_runner_1")
     else:
-        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME)
+        __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME, "db_runner_1")
 
 def create_database(is_test=False):
     """
@@ -170,6 +161,12 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_TEST_DB_NAME)
+        __docker_compose_run(
+            'mysql -h db -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_TEST_DB_NAME,
+            "db_runner_1"
+        )
     else:
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_DB_NAME)
+        __docker_compose_run(
+            'mysql -h db -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_DB_NAME,
+            "db_runner_1"
+        )
