@@ -107,6 +107,9 @@ def dbdump(dump_name="alexandria.sql"):
     # Wow. Such hax. Kids, don't try this at home.
     __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
 
+def load_db(dump_name="alexandria.sql"):
+    __docker_compose_run("mysql -h db alexandria", "db_runner_1 < alexandria.sql")
+
 def clone_database():
     """
     Clone the database specified in config.py. Use when working with migrations.
