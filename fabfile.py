@@ -108,7 +108,10 @@ def dbdump(dump_name="alexandria.sql"):
     __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
 
 def load_db(dump_name="alexandria.sql"):
-    __docker_compose_run("mysql -h db alexandria", "db_runner_1 < alexandria.sql")
+    # Wow. Such hax. Kids, don't try this at home.
+    # Also, this is known to fail sometimes, for reasons unknown (Can't connect
+    # to db). So just retry.
+    __docker_compose_run("mysql -h db alexandria", "db_runner_1 < %s" % dump_name)
 
 def clone_database():
     """
