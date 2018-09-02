@@ -1,4 +1,4 @@
-from config import DefaultAlexandriaConfig as def_cfg
+from config import DockerConfig as def_cfg
 from fabric.api import local
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
@@ -89,12 +89,27 @@ def manual_test_cleanup():
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
 
+def __docker_compose_run(entrypoint, service):
+    local(__docker_compose_runstr(entrypoint, service))
+
+def __docker_compose_runstr(entrypoint, service):
+    return "docker-compose run --entrypoint '%s' %s" % (entrypoint, service)
+
+def load_fixtures():
+    __docker_compose_run("python fixtures.py", "web")
+
 def dbdump(dump_name="alexandria.sql"):
     """
-    Dump out local database to file. Assumes access to local mysql db via
-    passwordless root.
+    Dump out local database to file.
     """
-    local("mysqldump -u root alexandria > %s" % dump_name)
+    # Wow. Such hax. Kids, don't try this at home.
+    __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
+
+def load_db(dump_name="alexandria.sql"):
+    # Wow. Such hax. Kids, don't try this at home.
+    # Also, this is known to fail sometimes, for reasons unknown (Can't connect
+    # to db). So just retry.
+    __docker_compose_run("mysql -h db alexandria", "db_runner_1 < %s" % dump_name)
 
 def clone_database():
     """
@@ -115,9 +130,21 @@ def clone_database():
     new_db_name = '_'.join((def_cfg.SQL_DB_NAME, last_commit))
     new_test_db_name = '_'.join((new_db_name, "test"))
 
-    local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name)
-    local('mysql -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name)
-    local("mysqldump -u root %s | mysql -u root %s" % (def_cfg.SQL_DB_NAME, new_db_name))
+    __docker_compose_run(
+        'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_test_db_name,
+        "db"
+    )
+    __docker_compose_run(
+        'mysql -h db -u root -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % new_db_name,
+        "db"
+    )
+    local(
+        "%s | %s" %
+        (
+            __docker_compose_runstr("mysqldump -h db -u root %s" % def_cfg.SQL_DB_NAME, "db_runner_1"),
+            __docker_compose_runstr("mysql -h db -u root %s" % new_db_name, "db_runner_2")
+        )
+    )
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
@@ -125,13 +152,11 @@ def clone_database():
 def destroy_database(is_test=False):
     """
     Drop the database. Pass `:is_test=True` to drop the test database instead.
-
-    Assumes access to local mysql db via passwordless root.
     """
     if is_test:
-        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_TEST_DB_NAME)
+        __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_TEST_DB_NAME, "db_runner_1")
     else:
-        local('mysql -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME)
+        __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME, "db_runner_1")
 
 def create_database(is_test=False):
     """
@@ -140,6 +165,12 @@ def create_database(is_test=False):
     Assumes access to local mysql db via passwordless root.
     """
     if is_test: 
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_TEST_DB_NAME)
+        __docker_compose_run(
+            'mysql -h db -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_TEST_DB_NAME,
+            "db_runner_1"
+        )
     else:
-        local('mysql -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_DB_NAME)
+        __docker_compose_run(
+            'mysql -h db -u root --protocol=tcp -e "CREATE DATABASE %s DEFAULT CHARACTER SET = utf8"' % def_cfg.SQL_DB_NAME,
+            "db_runner_1"
+        )
