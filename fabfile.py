@@ -4,8 +4,6 @@ from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import time
-
 def __env_safeguard(fab_method):
     """
     This is not a fabric method per se. Useless to call this.
