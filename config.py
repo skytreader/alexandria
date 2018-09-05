@@ -34,7 +34,9 @@ class DefaultAlexandriaConfig(object):
     # Caching, see: https://pythonhosted.org/Flask-Cache/
     # a dictionary containing all the config for Flask-Cache.
     CACHE_CONFIG = {
-        "CACHE_TYPE": "simple"
+        "CACHE_TYPE": "redis",
+        "CACHE_KEY_PREFIX": "alexandria_",
+        "CACHE_REDIS_HOST": "redis"
     }
     
     CACHE_TIMEOUT = 88
@@ -59,6 +61,3 @@ class DefaultAlexandriaConfig(object):
     
     APP_HOST="0.0.0.0"
     APP_PORT=7070
-
-class DockerConfig(DefaultAlexandriaConfig):
-    SQL_HOST = "db"
