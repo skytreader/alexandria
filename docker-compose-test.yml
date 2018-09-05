@@ -15,3 +15,7 @@ services:
       - .:/librarian
     depends_on:
       - db_test
+      - redis_test
+
+  redis_test:
+    image: "redis:4.0.11"
