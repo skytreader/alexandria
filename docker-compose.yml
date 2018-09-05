@@ -25,6 +25,10 @@ services:
       - .:/librarian
     depends_on:
       - db
+      - redis
+
+  redis:
+    image: "redis:4.0.11"
 
 volumes:
   mysql-data-volume:
