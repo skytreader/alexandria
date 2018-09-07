@@ -29,6 +29,9 @@ services:
 
   redis:
     image: "redis:4.0.11"
+    volumes:
+      - redis-data-volume:/data
 
 volumes:
   mysql-data-volume:
+  redis-data-volume:
