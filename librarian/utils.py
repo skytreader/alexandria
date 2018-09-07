@@ -90,7 +90,7 @@ class BookRecord(RequestData):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
-        whatever you gave for `author` is accessible via `self.author`).
+        whatever you gave for `author` is accessible via `self.authors`).
 
         id: integer
             The book id.
@@ -268,7 +268,8 @@ class BookRecord(RequestData):
         7 - Genre.name
         8 - Book.publish_year
     
-        And arranges them as an instance of this class. Returned as a ist.
+        (Basically, as ordered in base_assembler_query). And arranges them as an
+        instance of this class. Returned as a ist.
 
         Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`

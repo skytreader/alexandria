@@ -382,14 +382,6 @@ def get_books():
         400 - Parameters not as expected.
         500 - Standard server error.
     """
-    def subq_generator(role):
-        return (db.session.query(Book.id, Contributor.lastname, Contributor.firstname)
-          .filter(Contributor.id == BookContribution.contributor_id)
-          .filter(BookContribution.role_id == Role.id)
-          .filter(Role.name == role)
-          .filter(Book.id == BookContribution.book_id)
-          .subqery())
-
     offset = request.args.get("offset")
     limit = request.args.get("limit")
 
