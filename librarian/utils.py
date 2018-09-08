@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from librarian import app, db
+from librarian import app, cache, db
 from librarian.errors import ConstraintError
 
 import copy
@@ -115,6 +115,13 @@ class BookRecord(RequestData):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
+
+    @staticmethod
+    @cache.memoize(app.config["MONTH_TIMEOUT"])
+    def get_bookrecord(book_id):
+        from librarian.models import Book
+        query = BookRecord.base_assembler_query().filter(Book.id == book_id)
+        return BookRecord.assembler(query.all())
 
     @classmethod
     def factory(

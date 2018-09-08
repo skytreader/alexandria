@@ -42,6 +42,7 @@ class DefaultAlexandriaConfig(object):
     CACHE_TIMEOUT = 88
     # A little less than 3 years.
     FOREVER_TIMEOUT = 88888888 if not TESTING else 0
+    MONTH_TIMEOUT = 2629000
     
     # Application threads. A common general assumption is
     # using 2 per available processor cores - to handle
