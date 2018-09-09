@@ -116,8 +116,8 @@ class BookRecord(RequestData):
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
 
-    # TODO Cache this
     @staticmethod
+    @cache.memoize(app.config["MONTH_TIMEOUT"])
     def get_bookrecord(book_id):
         from librarian.models import Book
         query = BookRecord.base_assembler_query().filter(Book.id == book_id)
