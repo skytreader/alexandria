@@ -116,12 +116,12 @@ class BookRecord(RequestData):
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
 
+    # TODO Cache this
     @staticmethod
-    @cache.memoize(app.config["MONTH_TIMEOUT"])
     def get_bookrecord(book_id):
         from librarian.models import Book
         query = BookRecord.base_assembler_query().filter(Book.id == book_id)
-        return BookRecord.assembler(query.all())
+        return BookRecord.assembler(query.all(), as_obj=False)[0]
 
     @classmethod
     def factory(
@@ -281,7 +281,9 @@ class BookRecord(RequestData):
         Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`
         is True, return instances of this class. Otherwise, return maps.
-        Note that maps are non-hashable but instances of this class is.
+
+        Note that maps are non-hashable but instances of this class is. On the
+        other hand, maps translate directly to JSON, but this class does not.
         """
         structured_catalog = {}
         
