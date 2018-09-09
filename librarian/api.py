@@ -394,7 +394,7 @@ def get_books():
     if order not in ("desc", "asc"):
         return "order can only be either 'desc' or 'asc', given %s" % order, 400
 
-    bookq = BookRecord.base_assembler_query()
+    bookq = db.session.query(Book)
 
     if order == "desc":
         bookq = bookq.order_by(desc("title"))
