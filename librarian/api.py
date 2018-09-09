@@ -369,7 +369,7 @@ def get_books():
         limit - Integer. The number of records to return. Default 8.
         order - String, either "desc" or "asc". The order in which to return
         records. Sorting is always alphabetical by the title of the book.
-        Default "desc".
+        Default "asc".
 
     Possible responses:
         200 - Will have accompanying JSON data of the books.
@@ -389,7 +389,7 @@ def get_books():
             400
         )
 
-    order = request.args.get("order", "desc")
+    order = request.args.get("order", "asc")
 
     if order not in ("desc", "asc"):
         return "order can only be either 'desc' or 'asc', given %s" % order, 400
