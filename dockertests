@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -x
+set -e -x -v
 ls
 ./runtests --with-coverage
 ./run_js_tests

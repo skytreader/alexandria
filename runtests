@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e -x -v
 
 export alexandria_TESTING=True
 
