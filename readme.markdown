@@ -11,7 +11,7 @@ Install `docker` and `docker-compose` and do `docker-compose up --build`.
 
 Note that at this point, you don't have fixture data yet. So do
 
-    fab load_fixtures
+    invoke load_fixtures
 
 # Testing Set-up
 
