@@ -68,6 +68,7 @@ def destroy_db_tables(is_test=False):
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
 
+# FIXME
 def manual_test_cleanup():
     """
     Delete all tables in test database.
@@ -152,6 +153,7 @@ def clone_database(ctx):
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
+@task
 @__env_safeguard
 def destroy_database(is_test=False):
     """
@@ -162,6 +164,7 @@ def destroy_database(is_test=False):
     else:
         __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME, "db_runner_1")
 
+@task
 def create_database(is_test=False):
     """
     Create the database. Pass `:is_test=True` to create the test database.
