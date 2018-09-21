@@ -7,7 +7,7 @@ TESTING environment on the other hand is understood as running the unit tests
 for the app.
 
 SUDO environment should only be triggered for running privileged admin commands,
-usually via Fabric.
+usually via Invoke.
 """
 
 class DefaultAlexandriaConfig(object):
