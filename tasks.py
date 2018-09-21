@@ -1,5 +1,5 @@
 from config import DockerConfig as def_cfg
-from fabric.api import local
+from invoke import run as local, task
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -95,23 +95,27 @@ def __docker_compose_run(entrypoint, service):
 def __docker_compose_runstr(entrypoint, service):
     return "docker-compose run --entrypoint '%s' %s" % (entrypoint, service)
 
-def load_fixtures():
+@task
+def load_fixtures(ctx):
     __docker_compose_run("python fixtures.py", "web")
 
-def dbdump(dump_name="alexandria.sql"):
+@task
+def dbdump(ctx, dump_name="alexandria.sql"):
     """
     Dump out local database to file.
     """
     # Wow. Such hax. Kids, don't try this at home.
     __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
 
-def load_db(dump_name="alexandria.sql"):
+@task
+def load_db(ctx, dump_name="alexandria.sql"):
     # Wow. Such hax. Kids, don't try this at home.
     # Also, this is known to fail sometimes, for reasons unknown (Can't connect
     # to db). So just retry.
     __docker_compose_run("mysql -h db alexandria", "db_runner_1 < %s" % dump_name)
 
-def clone_database():
+@task
+def clone_database(ctx):
     """
     Clone the database specified in config.py. Use when working with migrations.
 
