@@ -1,5 +1,5 @@
 from config import DockerConfig as def_cfg
-from fabric.api import local
+from invoke import run as local, task
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -68,6 +68,7 @@ def destroy_db_tables(is_test=False):
     engine.execute("SET FOREIGN_KEY_CHECKS = 1;")
     session.commit()
 
+# FIXME
 def manual_test_cleanup():
     """
     Delete all tables in test database.
@@ -95,23 +96,27 @@ def __docker_compose_run(entrypoint, service):
 def __docker_compose_runstr(entrypoint, service):
     return "docker-compose run --entrypoint '%s' %s" % (entrypoint, service)
 
-def load_fixtures():
+@task
+def load_fixtures(ctx):
     __docker_compose_run("python fixtures.py", "web")
 
-def dbdump(dump_name="alexandria.sql"):
+@task
+def dbdump(ctx, dump_name="alexandria.sql"):
     """
     Dump out local database to file.
     """
     # Wow. Such hax. Kids, don't try this at home.
     __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
 
-def load_db(dump_name="alexandria.sql"):
+@task
+def load_db(ctx, dump_name="alexandria.sql"):
     # Wow. Such hax. Kids, don't try this at home.
     # Also, this is known to fail sometimes, for reasons unknown (Can't connect
     # to db). So just retry.
     __docker_compose_run("mysql -h db alexandria", "db_runner_1 < %s" % dump_name)
 
-def clone_database():
+@task
+def clone_database(ctx):
     """
     Clone the database specified in config.py. Use when working with migrations.
 
@@ -148,6 +153,7 @@ def clone_database():
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
+@task
 @__env_safeguard
 def destroy_database(is_test=False):
     """
@@ -158,6 +164,7 @@ def destroy_database(is_test=False):
     else:
         __docker_compose_run('mysql -h db -u root -e "DROP DATABASE %s"' % def_cfg.SQL_DB_NAME, "db_runner_1")
 
+@task
 def create_database(is_test=False):
     """
     Create the database. Pass `:is_test=True` to create the test database.
