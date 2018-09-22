@@ -13,11 +13,7 @@ cache = Cache(app, config=app.config["CACHE_CONFIG"])
 
 db = SQLAlchemy(app)
 
-def init_db(sql_string=None):
-    if sql_string:
-        # This is done for Flask SQLAlchemy
-        app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_TEST_DATABASE_URI"]
-
+def init_db():
     db.create_all()
     db.session.commit()
 
