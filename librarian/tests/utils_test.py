@@ -80,7 +80,8 @@ class BookRecordTests(AppTestCase):
     def test_assembler(self):
         # Create the DB records
         booka = BookFactory()
-        r = Role(name="administrator", creator=self.admin_user, display_text="Administrator")
+        #r = Role(name="administrator", creator=self.admin_user, display_text="Administrator")
+        r = Role.get_preset_role("Illustrator")
         librarian.db.session.add(booka)
         librarian.db.session.flush()
 
