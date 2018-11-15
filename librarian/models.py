@@ -245,8 +245,10 @@ class Role(Base, UserTags):
         self.last_modifier = kwargs["creator"]
         self.last_modifier_id = self.creator.id
 
+    # This method should be cached, but it is not so for the meantime because
+    # caching is running into problems with unit tests. See:
+    # https://github.com/skytreader/alexandria/issues/120
     @staticmethod
-    @cache.memoize(app.config["FOREVER_TIMEOUT"])
     def get_preset_role(role_name):
         role = Role.query.filter_by(name=role_name).first()
         return role
