@@ -80,59 +80,20 @@ class BookRecordTests(AppTestCase):
     def test_assembler(self):
         # Create the DB records
         booka = BookFactory()
-        #r = Role(name="administrator", creator=self.admin_user, display_text="Administrator")
-        r = Role.get_preset_role("Illustrator")
-        librarian.db.session.add(booka)
-        librarian.db.session.flush()
 
-        authora = Contributor(firstname="Arthur", lastname="McAuthor", creator=self.admin_user)
-        translatora = Contributor(firstname="Terrence", lastname="McTranslator", creator=self.admin_user)
-        illus1a = Contributor(firstname="Illy I", lastname="McIllustrator", creator=self.admin_user)
-        illus2a = Contributor(firstname="Illy II", lastname="McIllustrator", creator=self.admin_user)
-        librarian.db.session.add_all((
-            authora, translatora, illus1a, illus2a
-        ))
-        librarian.db.session.flush()
-
-        booka_author = BookContribution(
-            book=booka, contributor=authora, creator=self.admin_user,
-            role=Role.get_preset_role("Author")
-        )
-        booka_translator = BookContribution(
-            book=booka, contributor=translatora, creator=self.admin_user,
-            role=Role.get_preset_role("Translator")
-        )
-        booka_illus1 = BookContribution(
-            book=booka, contributor=illus1a, creator=self.admin_user,
-            #role=Role.get_preset_role("Illustrator")
-            role=r
-        )
-        booka_illus2 = BookContribution(
-            book=booka, contributor=illus2a, creator=self.admin_user,
-            #role=Role.get_preset_role("Illustrator")
-            role=r
-        )
-        #librarian.db.session.add_all((
-        #    booka_author, booka_translator, booka_illus1, booka_illus2
-        #))
+        booka_author = BookContributionFactory(role=Role.get_preset_role("Author"),
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_author)
+        booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_translator)
+        booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_illus1)
+        librarian.db.session.commit()
+        booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
+          book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_illus2)
-
-        #booka_author = BookContributionFactory(role=Role.get_preset_role("Author"),
-        #  book=booka, creator=self.admin_user)
-        #librarian.db.session.add(booka_author)
-        #booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
-        #  book=booka, creator=self.admin_user)
-        #librarian.db.session.add(booka_translator)
-        #booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-        #  book=booka, creator=self.admin_user)
-        #librarian.db.session.add(booka_illus1)
-        #librarian.db.session.commit()
-        #booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-        #  book=booka, creator=self.admin_user)
-        #librarian.db.session.add(booka_illus2)
         librarian.db.session.commit()
 
         bookb = BookFactory()
