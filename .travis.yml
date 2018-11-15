@@ -19,6 +19,6 @@ install: "pip install -r requirements.txt"
 before_script:
     - pip install -r test-requirements.txt
     - sudo ln -s . /librarian
-script: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint ./dockertests test ./dockertests"
+script: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint ./dockertests test"
 after_success: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint codecov test"
 after_failure: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint codecov test"
