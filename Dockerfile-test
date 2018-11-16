@@ -1,5 +1,5 @@
 # vim: set ft=dockerfile:
-FROM skytreader/alexandria:latest
+FROM skytreader/alexandria
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -12,5 +12,6 @@ RUN apt-get update && \
 COPY ./test-requirements.txt .
 RUN pip install -r test-requirements.txt
 ENV ALEXANDRIA_CONFIG='config.DockerConfig'
+ENV is_travis='1'
 # This line is specifically for travis-ci builds.
 RUN useradd --create-home --shell /bin/bash travis
