@@ -17,7 +17,7 @@ before_install:
     - sudo docker-compose -f docker-compose-test.yml up -d
 install: "pip install -r requirements.txt"
 before_script:
-    - pip install -r test-requirements.txt
+    - docker build -t local/alexandria:current .
     - sudo ln -s . /librarian
 script: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint ./dockertests test"
 after_success: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint codecov test"
