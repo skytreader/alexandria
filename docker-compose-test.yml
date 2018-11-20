@@ -1,6 +1,6 @@
 version: '2.1'
 services:
-  db_test:
+  db:
     image: "mysql:5.7"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
@@ -14,7 +14,7 @@ services:
     volumes:
       - .:/librarian
     depends_on:
-      - db_test
+      - db
       - redis_test
 
   redis_test:
