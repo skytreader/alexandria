@@ -28,6 +28,7 @@ class DefaultAlexandriaConfig(object):
       SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_DB_NAME)
     SQLALCHEMY_TEST_DATABASE_URI = '%s://%s:%s@%s_test:%d/%s' % (SQL_ENGINE, SQL_USERNAME,
       SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_TEST_DB_NAME)
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = not DEVEL
     DATABASE_CONNECT_OPTIONS = {"user":"root"}
     
