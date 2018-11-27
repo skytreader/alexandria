@@ -1,5 +1,4 @@
 import librarian
-# from config.DefaultAlexandriaConfig import APP_HOST, APP_PORT, DEVEL
 from config import DefaultAlexandriaConfig as cfg
 
 import os
