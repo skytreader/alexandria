@@ -1,7 +1,7 @@
 # Alexandria
 
 [![Build Status](https://travis-ci.org/skytreader/alexandria.svg?branch=master)](https://travis-ci.org/skytreader/alexandria)
-[![Coverage Status](https://coveralls.io/repos/skytreader/alexandria/badge.svg?branch=master&service=github)](https://coveralls.io/github/skytreader/alexandria?branch=master)
+[![codecov](https://codecov.io/gh/skytreader/alexandria/branch/master/graph/badge.svg)](https://codecov.io/gh/skytreader/alexandria)
 
 Citing related repos compels me to mention [this one](https://github.com/skytreader/Librarian).
 
