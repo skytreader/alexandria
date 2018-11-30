@@ -3,7 +3,7 @@ from config import DefaultAlexandriaConfig
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-def insert_fixtures(engine, session):
+def insert_fixtures(session):
     admin_user = get_or_create(Librarian, session=session, will_commit=True,
       username="admin", password="admin", is_user_active=True, can_read=True,
       can_write=True, can_exec=True)
@@ -18,4 +18,4 @@ if __name__ == "__main__":
     engine = create_engine(DefaultAlexandriaConfig.SQLALCHEMY_DATABASE_URI, echo=True)
     session = sessionmaker(bind=engine)()
 
-    insert_fixtures(engine, session)
+    insert_fixtures(session)
