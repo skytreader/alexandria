@@ -404,7 +404,9 @@ def get_books():
     bookq = bookq.limit(limit).offset(offset)
         
     books = bookq.all()
+    #book_listing = BookRecord.assembler(books, as_obj=False)
     book_listing = [BookRecord.get_bookrecord(book.id) for book in books]
+    book_listing = [book for book in book_listing if book is not None]
     app.logger.debug("Got these books" + str(books))
     return flask.jsonify({"data": book_listing})
 

@@ -30,6 +30,12 @@ class Person(RequestData):
         self.lastname = lastname
         self.firstname = firstname
 
+    def to_dict(self):
+        return {
+            "firstname": self.firstname,
+            "lastname": self.lastname
+        }
+
     def __eq__(self, p):
         return p.lastname == self.lastname and p.firstname == self.firstname
 
@@ -121,7 +127,12 @@ class BookRecord(RequestData):
     def get_bookrecord(book_id):
         from librarian.models import Book
         query = BookRecord.base_assembler_query().filter(Book.id == book_id)
-        return BookRecord.assembler(query.all(), as_obj=False)[0]
+        all_query = query.all()
+
+        if all_query:
+            return BookRecord.assembler(query.all(), as_obj=False)[0]
+        else:
+            return None
 
     @classmethod
     def factory(
@@ -276,7 +287,7 @@ class BookRecord(RequestData):
         8 - Book.publish_year
     
         (Basically, as ordered in base_assembler_query). And arranges them as an
-        instance of this class. Returned as a ist.
+        instance of this class. Returned as a list.
 
         Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`
