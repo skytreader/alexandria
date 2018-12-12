@@ -153,9 +153,8 @@ def clone_database(ctx):
     print "NOTE: Must reconfigure this branch to use %s and %s instead" % (new_db_name, new_test_db_name)
     print "Don't forget to reconfigure alembic.ini as well!"
 
-@task
 @__env_safeguard
-def destroy_database(is_test=False):
+def destroy_database(ctx, is_test=False):
     """
     Drop the database. Pass `:is_test=True` to drop the test database instead.
     """

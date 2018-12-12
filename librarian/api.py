@@ -147,7 +147,6 @@ def book_adder():
         return err_str, 409
 
     if form.validate_on_submit():
-        db.session.execute("SELECT 1")
         try:
             from flask_login import current_user
             # Genre first
