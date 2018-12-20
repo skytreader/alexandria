@@ -68,4 +68,3 @@ class DefaultAlexandriaConfig(object):
 class TestAlexandriaConfig(DefaultAlexandriaConfig):
     SQL_HOST = "db_test"
     SQL_DB_NAME = "alexandria_test"
-    #SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s_test
