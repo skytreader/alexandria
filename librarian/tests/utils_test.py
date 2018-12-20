@@ -190,19 +190,19 @@ class BookRecordTests(AppTestCase):
         )
         librarian.db.session.add(author)
 
-        #translator = BookContributionFactory(
-        #    role=Role.get_preset_role("Translator"),
-        #    book=book,
-        #    creator=self.admin_user
-        #)
-        #librarian.db.session.add(translator)
+        translator = BookContributionFactory(
+            role=Role.get_preset_role("Translator"),
+            book=book,
+            creator=self.admin_user
+        )
+        librarian.db.session.add(translator)
 
-        #illustrator = BookContributionFactory(
-        #    role=Role.get_preset_role("Illustrator"),
-        #    book=book,
-        #    creator=self.admin_user
-        #)
-        #librarian.db.session.add(illustrator)
+        illustrator = BookContributionFactory(
+            role=Role.get_preset_role("Illustrator"),
+            book=book,
+            creator=self.admin_user
+        )
+        librarian.db.session.add(illustrator)
         
         librarian.db.session.commit()
         librarian.app.logger.debug("book has id %s" % book.id)
@@ -212,10 +212,8 @@ class BookRecordTests(AppTestCase):
             "title": book.title,
             "publisher": book.publisher.name,
             "author": [author.contributor.make_plain_person().to_dict()],
-            #"translator": [translator.contributor.make_plain_person().to_dict()],
-            #"illustrator": [illustrator.contributor.make_plain_person().to_dict()],
-            "translator": [],
-            "illustrator": [],
+            "translator": [translator.contributor.make_plain_person().to_dict()],
+            "illustrator": [illustrator.contributor.make_plain_person().to_dict()],
             "editor": [],
             "id": book.id,
             "genre": book.genre.name,
