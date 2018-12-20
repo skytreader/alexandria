@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask.ext.login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user
 from forms import AddBooksForm, EditBookForm, LoginForm, SearchForm
 from librarian import api
 from librarian import app

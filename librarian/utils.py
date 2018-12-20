@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from librarian import app, db
+from librarian import app, cache, db
 from librarian.errors import ConstraintError
 
 import copy
@@ -29,6 +29,12 @@ class Person(RequestData):
     def __init__(self, lastname, firstname):
         self.lastname = lastname
         self.firstname = firstname
+
+    def to_dict(self):
+        return {
+            "firstname": self.firstname,
+            "lastname": self.lastname
+        }
 
     def __eq__(self, p):
         return p.lastname == self.lastname and p.firstname == self.firstname
@@ -90,7 +96,7 @@ class BookRecord(RequestData):
         """
         Note that because language is a b*tch, the actual fields for the
         Person list parameters are accessible via their plural form (e.g.,
-        whatever you gave for `author` is accessible via `self.author`).
+        whatever you gave for `author` is accessible via `self.authors`).
 
         id: integer
             The book id.
@@ -115,6 +121,18 @@ class BookRecord(RequestData):
         self.illustrators = frozenset(illustrator if illustrator else [])
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
+
+    #@cache.memoize(app.config["MONTH_TIMEOUT"])
+    @staticmethod
+    def get_bookrecord(book_id):
+        from librarian.models import Book
+        query = BookRecord.base_assembler_query().filter(Book.id == book_id)
+        all_query = query.all()
+
+        if all_query:
+            return BookRecord.assembler(query.all(), as_obj=False)[0]
+        else:
+            return None
 
     @classmethod
     def factory(
@@ -268,12 +286,15 @@ class BookRecord(RequestData):
         7 - Genre.name
         8 - Book.publish_year
     
-        And arranges them as an instance of this class. Returned as a ist.
+        (Basically, as ordered in base_assembler_query). And arranges them as an
+        instance of this class. Returned as a list.
 
         Type of list items will vary depending on the `as_obj` parameter but will
         essentially contain the same data in the same structure. If `as_obj`
         is True, return instances of this class. Otherwise, return maps.
-        Note that maps are non-hashable but instances of this class is.
+
+        Note that maps are non-hashable but instances of this class is. On the
+        other hand, maps translate directly to JSON, but this class does not.
         """
         structured_catalog = {}
         

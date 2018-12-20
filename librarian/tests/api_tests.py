@@ -565,11 +565,12 @@ class ApiTests(AppTestCase):
 
     def test_get_books(self):
         roles = librarian.db.session.query(Role).all()
+        book_count = 12
 
         library = create_library(librarian.db.session, self.admin_user, roles,
-          book_person_c=12, company_c=8, book_c=12, participant_c=32)
+          book_person_c=12, company_c=8, book_c=book_count, participant_c=32)
 
-        get_books = self.client.get("/api/read/books")
+        get_books = self.client.get("/api/read/books?limit=%s" % book_count)
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]
         return_set = set()

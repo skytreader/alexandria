@@ -15,6 +15,10 @@ Note that at this point, you don't have fixture data yet. So do
 
 # Testing Set-up
 
+To run unit tests just do,
+
+    docker-compose -f docker-compose-test.yml run test ./dockertests
+
 More relevant information can be found at `.travis.yml`.
 
 # Documentation

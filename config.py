@@ -7,7 +7,7 @@ TESTING environment on the other hand is understood as running the unit tests
 for the app.
 
 SUDO environment should only be triggered for running privileged admin commands,
-usually via Fabric.
+usually via Invoke.
 """
 
 class DefaultAlexandriaConfig(object):
@@ -35,11 +35,15 @@ class DefaultAlexandriaConfig(object):
     # Caching, see: https://pythonhosted.org/Flask-Cache/
     # a dictionary containing all the config for Flask-Cache.
     CACHE_CONFIG = {
-        "CACHE_TYPE": "simple"
+        "CACHE_TYPE": "redis",
+        "CACHE_KEY_PREFIX": "alexandria_",
+        "CACHE_REDIS_HOST": "redis"
     }
     
     CACHE_TIMEOUT = 88
+    # A little less than 3 years.
     FOREVER_TIMEOUT = 88888888 if not TESTING else 0
+    MONTH_TIMEOUT = 2629000 if not TESTING else 0
     
     # Application threads. A common general assumption is
     # using 2 per available processor cores - to handle
@@ -61,5 +65,6 @@ class DefaultAlexandriaConfig(object):
     APP_HOST="0.0.0.0"
     APP_PORT=7070
 
-class DockerConfig(DefaultAlexandriaConfig):
-    SQL_HOST = "db"
+class TestAlexandriaConfig(DefaultAlexandriaConfig):
+    SQL_HOST = "db_test"
+    SQL_DB_NAME = "alexandria_test"

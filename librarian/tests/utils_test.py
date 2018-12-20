@@ -178,6 +178,53 @@ class BookRecordTests(AppTestCase):
         self.assertTrue(factory_made is not None)
         self.assertTrue(factory_made.id is not None)
 
+    def test_get_bookrecord(self):
+        book = BookFactory()
+        librarian.db.session.add(book)
+        librarian.db.session.flush()
+
+        author = BookContributionFactory(
+            role=Role.get_preset_role("Author"),
+            book=book,
+            creator=self.admin_user
+        )
+        librarian.db.session.add(author)
+
+        translator = BookContributionFactory(
+            role=Role.get_preset_role("Translator"),
+            book=book,
+            creator=self.admin_user
+        )
+        librarian.db.session.add(translator)
+
+        illustrator = BookContributionFactory(
+            role=Role.get_preset_role("Illustrator"),
+            book=book,
+            creator=self.admin_user
+        )
+        librarian.db.session.add(illustrator)
+        
+        librarian.db.session.commit()
+        librarian.app.logger.debug("book has id %s" % book.id)
+        
+        expected_book_record = {
+            "isbn": book.isbn, 
+            "title": book.title,
+            "publisher": book.publisher.name,
+            "author": [author.contributor.make_plain_person().to_dict()],
+            "translator": [translator.contributor.make_plain_person().to_dict()],
+            "illustrator": [illustrator.contributor.make_plain_person().to_dict()],
+            "editor": [],
+            "id": book.id,
+            "genre": book.genre.name,
+            "printer": None,
+            "year": book.publish_year
+        }
+        retrieved_book_record = BookRecord.get_bookrecord(book.id)
+
+        self.assertEqual({"spam": "spammy", "cling": "clingy"}, {"cling": "clingy", "spam": "spammy"})
+        self.assertEqual(expected_book_record, retrieved_book_record)
+
 class PersonTests(AppTestCase):
     
     def test_deepcopy(self):

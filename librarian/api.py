@@ -10,7 +10,7 @@ from librarian.utils import BookRecord, make_equivalent_isbn, has_equivalent_isb
 from flask import Blueprint, request
 from flask_login import login_required
 from models import get_or_create, Book, BookCompany, BookContribution, Contributor, Genre, Printer, Role
-from sqlalchemy import and_, desc, func, or_
+from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.exc import IntegrityError
 
 import flask
@@ -363,49 +363,48 @@ def get_books():
     """
     Get a listing of books in the database.
 
-    Specifying any one of the paramets `offset`, `limit`, or `order` will
-    automatically trigger defaults for the other parameters if they are not
-    specified. The defaults are as follows:
-
-    offset = 0
-    limit = 8
-
-    NOTE: If none of them is present, this will query ALL records.
-
     Request parameters:
-        offset - Integer. The "page number" used for pagination.
-        limit - Integer. The number of records to return.
+        offset - Integer. The "page number" used for pagination. Default 0.
+        limit - Integer. The number of records to return. Default 8.
+        order - String, either "desc" or "asc". The order in which to return
+        records. Sorting is always alphabetical by the title of the book.
+        Default "asc".
 
     Possible responses:
         200 - Will have accompanying JSON data of the books.
-        400 - Parameters not as expected.
+        400 - Parameters not as expected. An accompanying error message will
+        specify the unexpected parameters.
         500 - Standard server error.
     """
-    def subq_generator(role):
-        return (db.session.query(Book.id, Contributor.lastname, Contributor.firstname)
-          .filter(Contributor.id == BookContribution.contributor_id)
-          .filter(BookContribution.role_id == Role.id)
-          .filter(Role.name == role)
-          .filter(Book.id == BookContribution.book_id)
-          .subqery())
+    offset = "0"
+    limit = "8"
 
-    offset = request.args.get("offset")
-    limit = request.args.get("limit")
+    try:
+        offset = int(request.args.get("offset", "0"))
+        limit = int(request.args.get("limit", "8"))
+    except ValueError:
+        return (
+            "offset and limit must be integers, given (offset: %s, limit: %s)" % (offset, limit),
+            400
+        )
 
-    if offset and not limit:
-        limit = "8"
-    elif limit and not offset:
-        offset = "0"
+    order = request.args.get("order", "asc")
 
-    bookq = BookRecord.base_assembler_query()
+    if order not in ("desc", "asc"):
+        return "order can only be either 'desc' or 'asc', given %s" % order, 400
 
-    if offset and limit and NUMERIC_REGEX.match(offset) and NUMERIC_REGEX.match(limit):
-        bookq = bookq.limit(limit).offset(offset)
-    elif offset and limit:
-        return "Error", 400
+    bookq = db.session.query(Book)
+
+    if order == "desc":
+        bookq = bookq.order_by(desc("title"))
+    elif order == "asc":
+        bookq = bookq.order_by(asc("title"))
+
+    bookq = bookq.limit(limit).offset(offset)
         
     books = bookq.all()
-    book_listing = BookRecord.assembler(books, as_obj=False)
+    book_listing = [BookRecord.get_bookrecord(book.id) for book in books]
+    book_listing = [book for book in book_listing if book is not None]
     app.logger.debug("Got these books" + str(books))
     return flask.jsonify({"data": book_listing})
 

@@ -1,7 +1,6 @@
 #! /bin/bash
+set -e -x -v
 
 export alexandria_TESTING=True
-ALEXANDRIA_CONFIG='config.DockerConfig'
-echo $ALEXANDRIA_CONFIG
 
 nosetests $1 $2

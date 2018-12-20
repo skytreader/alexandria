@@ -309,7 +309,8 @@ $(document).ready(function(){
     @param queue
         The queue object from which we fetch a book.
     @return
-        True if a book record was loaded successfuly into the actual form.
+        The dequeued record if a book record was loaded successfuly into the
+        actual form, false otherwise.
     */
     function loadFromQueueToForm(queue){
         clearActualForm();
