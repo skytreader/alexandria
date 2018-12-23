@@ -1,4 +1,4 @@
-from config import DockerConfig as def_cfg
+from config import DefaultAlexandriaConfig as def_cfg
 from invoke import run as local, task
 from fixtures import insert_fixtures
 from sqlalchemy import create_engine
