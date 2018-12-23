@@ -25,9 +25,21 @@ Or, if you already have a database dump you want to load into the app,
 In general, have a look at `tasks.py` (or just `invoke -l`) for a bunch of
 useful routines.
 
-## Testing Set-up
+## Testing
 
-To run unit tests just do,
+### Set-up
+
+Build the Dockerfile without a username (so it stays local) and tag it as
+current:
+
+    docker build -t alexandria:current .
+
+This will be used by the image in `Dockerfile-test` (which is only referenced
+in `docker-compose-test.yml`).
+
+### Running
+
+Just do,
 
     docker-compose -f docker-compose-test.yml run test ./dockertests
 
