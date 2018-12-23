@@ -1,5 +1,5 @@
 # vim: set ft=dockerfile:
-FROM local/alexandria:current
+FROM alexandria:current
 
 RUN apt-get update && \
     apt-get upgrade -y && \
