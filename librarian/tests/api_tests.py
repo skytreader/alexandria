@@ -580,6 +580,30 @@ class ApiTests(AppTestCase):
 
         self.assertEquals(set(library), return_set)
 
+    def test_get_books_offset(self):
+        roles = librarian.db.session.query(Role).all()
+        book_count = 12
+
+        library = create_library(librarian.db.session, self.admin_user, roles,
+          book_person_c=12, company_c=8, book_c=book_count, participant_c=32)
+
+        returned_books = 0
+        offset = 0
+        return_set = set()
+
+        while returned_books < book_count:
+            get_books = self.client.get("/api/read/books?offset=%s" % offset)
+            self.assertEquals(200, get_books._status_code)
+            ret_data = json.loads(get_books.data)["data"]
+            returned_books += len(ret_data)
+            
+            for book in ret_data:
+                return_set.add(BookRecord.make_hashable(book))
+
+            offset += 1
+
+        self.assertEquals(set(library), return_set)
+
     def test_stats(self):
         person_count = 44
         company_count = 9

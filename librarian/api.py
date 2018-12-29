@@ -400,8 +400,7 @@ def get_books():
     elif order == "asc":
         bookq = bookq.order_by(asc("title"))
 
-    bookq = bookq.limit(limit).offset(offset)
-        
+    bookq = bookq.limit(limit).offset(offset * limit)
     books = bookq.all()
     book_listing = [BookRecord.get_bookrecord(book.id) for book in books]
     book_listing = [book for book in book_listing if book is not None]
