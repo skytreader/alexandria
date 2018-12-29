@@ -41,7 +41,7 @@ in `docker-compose-test.yml`).
 
 Just do,
 
-    docker-compose -f docker-compose-test.yml run test ./dockertests
+    docker-compose -f docker-compose-test.yml run --entrypoint ./dockertests test
 
 More relevant information can be found at `.travis.yml`.
 
