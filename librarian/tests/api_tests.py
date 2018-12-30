@@ -21,6 +21,7 @@ import flask_login
 import json
 import librarian
 import librarian.api as api
+import math
 import random
 import re
 import string
@@ -583,6 +584,7 @@ class ApiTests(AppTestCase):
     def test_get_books_offset(self):
         roles = librarian.db.session.query(Role).all()
         book_count = 12
+        limit = 8
 
         library = create_library(librarian.db.session, self.admin_user, roles,
           book_person_c=12, company_c=8, book_c=book_count, participant_c=32)
@@ -590,9 +592,14 @@ class ApiTests(AppTestCase):
         returned_books = 0
         offset = 0
         return_set = set()
+        max_iters = int(math.ceil(book_count / limit))
 
-        while returned_books < book_count:
-            get_books = self.client.get("/api/read/books?offset=%s" % offset)
+        # There is a flaky issue with this test that sometimes, the first get
+        # books returns one less record than is supposedly available. I have no
+        # idea why it happens so I added the max_iters limiter so that this loop
+        # has an explicit bound. Oddly, that seems to have solved the problem.
+        while returned_books < book_count and offset < max_iters:
+            get_books = self.client.get("/api/read/books?offset=%s&limit=%s" % (offset, 8))
             self.assertEquals(200, get_books._status_code)
             ret_data = json.loads(get_books.data)["data"]
             returned_books += len(ret_data)
@@ -602,6 +609,7 @@ class ApiTests(AppTestCase):
 
             offset += 1
 
+        self.assertEquals(returned_books, book_count)
         self.assertEquals(set(library), return_set)
 
     def test_stats(self):
