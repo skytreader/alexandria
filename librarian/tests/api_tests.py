@@ -594,10 +594,6 @@ class ApiTests(AppTestCase):
         return_set = set()
         max_iters = int(math.ceil(book_count / limit))
 
-        # There is a flaky issue with this test that sometimes, the first get
-        # books returns one less record than is supposedly available. I have no
-        # idea why it happens so I added the max_iters limiter so that this loop
-        # has an explicit bound. Oddly, that seems to have solved the problem.
         while returned_books < book_count and offset < max_iters:
             get_books = self.client.get("/api/read/books?offset=%s&limit=%s" % (offset, 8))
             self.assertEquals(200, get_books._status_code)
