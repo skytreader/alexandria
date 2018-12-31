@@ -21,6 +21,7 @@ import flask_login
 import json
 import librarian
 import librarian.api as api
+import logging
 import math
 import random
 import re
@@ -565,6 +566,7 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
+        self.app.logger.setLevel(logging.INFO)
         roles = librarian.db.session.query(Role).all()
         book_count = 12
 
