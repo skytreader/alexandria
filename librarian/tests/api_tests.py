@@ -592,6 +592,7 @@ class ApiTests(AppTestCase):
         self.assertEquals(set(library), return_set)
 
     def test_get_books_offset(self):
+        self.app.logger.setLevel(logging.INFO)
         roles = librarian.db.session.query(Role).all()
         all_db_books = librarian.db.session.query(Book).all()
         self.assertEquals(0, len(all_db_books))
@@ -615,6 +616,7 @@ class ApiTests(AppTestCase):
             get_books = self.client.get("/api/read/books?offset=%s&limit=%s" % (offset, 8))
             self.assertEquals(200, get_books._status_code)
             ret_data = json.loads(get_books.data)["data"]
+            self.app.logger.info("Offset %s returned %s books" % (offset, len(ret_data)))
             returned_books += len(ret_data)
             
             for book in ret_data:
@@ -622,7 +624,7 @@ class ApiTests(AppTestCase):
 
             offset += 1
 
-        self.assertEquals(returned_books, book_count)
+        self.assertEquals(len(return_set), book_count)
         self.assertEquals(set(library), return_set)
 
     def test_stats(self):
