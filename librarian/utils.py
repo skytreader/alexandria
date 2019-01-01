@@ -60,6 +60,9 @@ class BookRecord(RequestData):
     Class to consolidate DB records for easier listing. Each BookRecord instance
     consolidates the records of a single book.
     """
+    # FIXME: BookRecord should describe a more-canonical form for books which
+    # the rest of the code could make assumptions on. For instance, it should
+    # always feature the fixtured roles.
 
     """
     When an instance of this class is converted to a dictionary, the following
