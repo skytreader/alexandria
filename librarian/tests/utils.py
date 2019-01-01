@@ -103,8 +103,8 @@ def create_library(
     isbn_id_map = {isbn: book_id for book_id, isbn in books}
 
     library = {}
-    # Randomly assign persons to books as roles
 
+    # Randomly assign persons to books as roles
     for _ in range(participant_c):
         rand_isbn = random.choice(book_isbns)
         rand_book = session.query(Book).filter(Book.isbn == rand_isbn).first()
@@ -114,12 +114,8 @@ def create_library(
         _role = rand_role.name.lower()
 
         if library.get(rand_isbn):
-            if library[rand_isbn].get(_role):
-                library[rand_isbn][_role].append(Person(lastname=rand_person.lastname,
-                  firstname=rand_person.firstname))
-            else:
-                library[rand_isbn][_role] = [Person(lastname=rand_person. lastname,
-                  firstname=rand_person.firstname),]
+            library[rand_isbn][_role].append(Person(lastname=rand_person.lastname,
+              firstname=rand_person.firstname))
 
             bp = BookContribution(book=rand_book, contributor=rand_person,
               role=rand_role, creator=admin)
@@ -128,8 +124,8 @@ def create_library(
         else:
             library[rand_isbn] = {}
             library[rand_isbn]["title"] = rand_book.title
-            library[rand_isbn][_role] = [Person(**{"lastname": rand_person.lastname,
-              "firstname": rand_person.firstname})]
+            library[rand_isbn][_role].append(Person(**{"lastname": rand_person.lastname,
+              "firstname": rand_person.firstname}))
             library[rand_isbn]["publisher"] = rand_book.publisher.name
 
             book = session.query(Book).filter(Book.id == rand_book.id).first()
