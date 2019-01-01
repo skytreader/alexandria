@@ -150,8 +150,6 @@ class BookRecord(RequestData):
                 ).filter(Book.publisher_id == BookCompany.id)
                 .filter(Book.genre_id == Genre.id)
             ).first()
-            app.logger.info("le book %s" % str(book))
-            app.logger.info("listify? %s" % str(list(book)))
             # <3 duck typing
             book = list(book)
 
@@ -162,9 +160,9 @@ class BookRecord(RequestData):
                 book.insert(4, None)
                 # Role.name
                 book.insert(5, None)
-                app.logger.info("Asking to assemble %s" % book)
                 return BookRecord.assembler((book,), as_obj=False)[0]
             else:
+                app.logger.info("Still can't find anything for %s" % book_id)
                 return None
 
     @classmethod

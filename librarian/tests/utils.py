@@ -100,14 +100,17 @@ def create_library(
 
     # Query books for their ids. Note that this bit assumes that the only books
     # in the DB right now are those just-created.
-    books = session.query(Book.id, Book.isbn).all()
-    isbn_id_map = {isbn: book_id for book_id, isbn in books}
+    books = session.query(Book).all()
+    isbn_book_map = {book.isbn: book for book in books}
 
     library = {}
     
     # initialize the role fields
     for isbn in book_isbns:
-        library[isbn] = {}
+        library[isbn] = {
+            "title": isbn_book_map[isbn].title,
+            "publisher": isbn_book_map[isbn].publisher.name
+        }
         for role in roles:
             library[isbn][role.name.lower()] = []
 
@@ -120,10 +123,6 @@ def create_library(
         rand_role = random.choice(roles)
         _role = rand_role.name.lower()
 
-        # slightly uneconomical: keep reassigning the same value, over and over
-        library[rand_isbn]["title"] = rand_book.title
-        library[rand_isbn]["publisher"] = rand_book.publisher.name
-        # these bits are NOT repeated
         library[rand_isbn][_role].append(Person(lastname=rand_person.lastname,
           firstname=rand_person.firstname))
 
@@ -139,9 +138,8 @@ def create_library(
     for isbn in library.keys():
         book = library[isbn]
         book["isbn"] = isbn
-        book["id"] = isbn_id_map[isbn]
+        book["id"] = isbn_book_map[isbn].id
         book["genre"] = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
-        app.logger.info("the book %s" % str(book))
         library_list.insert(0, BookRecord(**book))
 
     return library_list
