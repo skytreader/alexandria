@@ -584,10 +584,14 @@ class ApiTests(AppTestCase):
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]
         return_set = set()
+        # This is solely for debugging only. Remove eventually!
+        return_list = []
         
         for book in ret_data:
             return_set.add(BookRecord.make_hashable(book))
+            return_list.append(BookRecord.make_hashable(book))
 
+        self.app.logger.info("Everything returned: %s" % str(return_list))
         self.assertEquals(book_count, len(return_set))
         self.assertEquals(set(library), return_set)
 
