@@ -568,6 +568,8 @@ class ApiTests(AppTestCase):
     def test_get_books(self):
         self.app.logger.setLevel(logging.INFO)
         roles = librarian.db.session.query(Role).all()
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(all_db_books))
         book_count = 12
 
         library = create_library(
@@ -591,6 +593,8 @@ class ApiTests(AppTestCase):
 
     def test_get_books_offset(self):
         roles = librarian.db.session.query(Role).all()
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(all_db_books))
         book_count = 12
         limit = 8
 
