@@ -10,6 +10,10 @@ librarian.app.config["TESTING"] = True
 librarian.init_db()
 librarian.init_blueprints()
 
+# Do not remove this line, else CI builds will have very verbose logs. I'm not
+# sure why it doesn't manifest in local testing though.
+logging.getLogger("factory").setLevel(logging.WARN)
+
 class AppTestCase(TestCase):
     
     def create_app(self):
