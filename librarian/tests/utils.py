@@ -109,7 +109,8 @@ def create_library(
     for isbn in book_isbns:
         library[isbn] = {
             "title": isbn_book_map[isbn].title,
-            "publisher": isbn_book_map[isbn].publisher.name
+            "publisher": isbn_book_map[isbn].publisher.name,
+            "genre": isbn_book_map[isbn].genre.name
         }
         for role in roles:
             library[isbn][role.name.lower()] = []
@@ -139,7 +140,6 @@ def create_library(
         book = library[isbn]
         book["isbn"] = isbn
         book["id"] = isbn_book_map[isbn].id
-        book["genre"] = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
         library_list.insert(0, BookRecord(**book))
 
     return library_list

@@ -256,7 +256,7 @@ class BookRecord(RequestData):
             publisher=dict_struct["publisher"], author=person_authors,
             translator=person_translators, illustrator=person_illustrators,
             editor=person_editors, id=dict_struct["id"],
-            printer=dict_struct["printer"], genre="Test"
+            printer=dict_struct["printer"], genre=dict_struct["genre"]
         )
 
     def __eq__(self, br):
@@ -264,17 +264,34 @@ class BookRecord(RequestData):
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
           self.illustrators == br.illustrators and self.editors == br.editors
-          and self.id == br.id and self.printer == br.printer)
+          and self.id == br.id and self.printer == br.printer
+          and self.genre == br.genre)
 
     def __hash__(self):
-        return hash((self.isbn, self.title, self.publisher, self.authors,
-          self.translators, self.illustrators, self.editors))
+        return hash((
+            self.isbn,
+            self.title,
+            self.publisher,
+            self.authors,
+            self.translators,
+            self.illustrators,
+            self.editors,
+            self.genre
+        ))
 
     def __str__(self):
-        return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
-          "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher),
-          "printer": str(self.printer), "id": self.id})
+        return str({
+            "isbn": self.isbn,
+            "title": self.title,
+            "author": str(self.authors),
+            "illustrator": str(self.illustrators),
+            "editor": str(self.editors),
+            "translator": str(self.translators),
+            "publisher": str(self.publisher),
+            "printer": str(self.printer),
+            "id": self.id,
+            "genre": self.genre
+        })
 
     def request_data(self):
         def create_person_request_data(persons):
