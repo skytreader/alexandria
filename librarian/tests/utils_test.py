@@ -87,12 +87,17 @@ class BookRecordTests(AppTestCase):
         booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
           book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_translator)
-        booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka, creator=self.admin_user)
+        illustrator_id = Role.get_preset_role_id("Illustrator")
+        booka_illus1 = BookContributionFactory(
+            role=Role.query.filter_by(id=illustrator_id).first(),
+            book=booka, creator=self.admin_user
+        )
         librarian.db.session.add(booka_illus1)
-        librarian.db.session.commit()
-        booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka, creator=self.admin_user)
+        librarian.db.session.flush()
+        booka_illus2 = BookContributionFactory(
+            role=Role.query.filter_by(id=illustrator_id).first(),
+            book=booka, creator=self.admin_user
+        )
         librarian.db.session.add(booka_illus2)
         librarian.db.session.commit()
 
