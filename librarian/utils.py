@@ -276,6 +276,8 @@ class BookRecord(RequestData):
             self.translators,
             self.illustrators,
             self.editors,
+            self.id,
+            self.printer,
             self.genre
         ))
 
