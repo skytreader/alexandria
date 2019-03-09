@@ -246,9 +246,8 @@ class Role(Base, UserTags):
         self.last_modifier_id = self.creator.id
 
     @staticmethod
-    @cache.memoize(app.config["FOREVER_TIMEOUT"])
     def get_preset_role(role_name):
-        role = Role.query.filter_by(name=role_name).first()
+        role = Role.query.filter_by(id=Role.get_preset_role_id(role_name)).first()
         return role
 
     @staticmethod
