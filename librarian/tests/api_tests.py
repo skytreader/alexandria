@@ -611,17 +611,14 @@ class ApiTests(AppTestCase):
         all_db_books = librarian.db.session.query(Book).all()
         self.assertEquals(book_count, len(all_db_books))
 
-        returned_books = 0
         offset = 0
         return_set = set()
         max_iters = int(math.ceil(book_count / limit))
 
-        while returned_books < book_count and offset < max_iters:
-            get_books = self.client.get("/api/read/books?offset=%s&limit=%s" % (offset, 8))
+        while len(return_set) < book_count and offset < max_iters:
+            get_books = self.client.get("/api/read/books?offset=%s" % offset)
             self.assertEquals(200, get_books._status_code)
             ret_data = json.loads(get_books.data)["data"]
-            self.app.logger.info("Offset %s returned %s books" % (offset, len(ret_data)))
-            returned_books += len(ret_data)
             
             for book in ret_data:
                 return_set.add(BookRecord.make_hashable(book))
