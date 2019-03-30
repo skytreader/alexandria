@@ -149,6 +149,7 @@ class BookRecord(RequestData):
                     BookCompany.name, Genre.name, Book.publish_year
                 ).filter(Book.publisher_id == BookCompany.id)
                 .filter(Book.genre_id == Genre.id)
+                .filter(Book.id == book_id)
             ).first()
             # <3 duck typing
             book = list(book)
