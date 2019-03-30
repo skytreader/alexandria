@@ -21,6 +21,8 @@ import flask_login
 import json
 import librarian
 import librarian.api as api
+import logging
+import math
 import random
 import re
 import string
@@ -564,33 +566,56 @@ class ApiTests(AppTestCase):
         self.assertEqual(expected_person_set, person_set)
 
     def test_get_books(self):
+        self.app.logger.setLevel(logging.INFO)
         roles = librarian.db.session.query(Role).all()
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(all_db_books))
         book_count = 12
 
-        library = create_library(librarian.db.session, self.admin_user, roles,
-          book_person_c=12, company_c=8, book_c=book_count, participant_c=32)
+        library = create_library(
+            librarian.db.session, self.admin_user, roles,
+            book_person_c=12, company_c=8, book_c=book_count, participant_c=32
+        )
+
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(book_count, len(all_db_books))
 
         get_books = self.client.get("/api/read/books?limit=%s" % book_count)
         self.assertEquals(200, get_books._status_code)
         ret_data = json.loads(get_books.data)["data"]
         return_set = set()
+        # This is solely for debugging only. Remove eventually!
+        return_list = []
         
         for book in ret_data:
             return_set.add(BookRecord.make_hashable(book))
+            return_list.append(BookRecord.make_hashable(book))
 
+        self.app.logger.info("Everything returned: %s" % str(return_list))
+        self.assertEquals(book_count, len(return_set))
         self.assertEquals(set(library), return_set)
 
     def test_get_books_offset(self):
+        self.app.logger.setLevel(logging.INFO)
         roles = librarian.db.session.query(Role).all()
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(0, len(all_db_books))
         book_count = 12
+        limit = 8
 
-        library = create_library(librarian.db.session, self.admin_user, roles,
-          book_person_c=12, company_c=8, book_c=book_count, participant_c=32)
+        library = create_library(
+            librarian.db.session, self.admin_user, roles,
+            book_person_c=12, company_c=8, book_c=book_count, participant_c=32
+        )
+
+        all_db_books = librarian.db.session.query(Book).all()
+        self.assertEquals(book_count, len(all_db_books))
 
         offset = 0
         return_set = set()
+        max_iters = int(math.ceil(book_count / limit))
 
-        while len(return_set) < book_count:
+        while len(return_set) < book_count and offset < max_iters:
             get_books = self.client.get("/api/read/books?offset=%s" % offset)
             self.assertEquals(200, get_books._status_code)
             ret_data = json.loads(get_books.data)["data"]
@@ -600,6 +625,7 @@ class ApiTests(AppTestCase):
 
             offset += 1
 
+        self.assertEquals(len(return_set), book_count)
         self.assertEquals(set(library), return_set)
 
     def test_stats(self):

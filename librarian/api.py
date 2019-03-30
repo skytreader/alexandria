@@ -403,6 +403,8 @@ def get_books():
     bookq = bookq.limit(limit).offset(offset * limit)
     books = bookq.all()
     book_listing = [BookRecord.get_bookrecord(book.id) for book in books]
+    none_count = sum([1 for book in book_listing if book is None])
+    app.logger.info("none count: %s" % none_count)
     book_listing = [book for book in book_listing if book is not None]
     app.logger.debug("Got these books" + str(books))
     return flask.jsonify({"data": book_listing})
