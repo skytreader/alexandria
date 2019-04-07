@@ -2,6 +2,7 @@
 
 from librarian import app, cache, db
 from librarian.errors import ConstraintError
+from operator import xor
 
 import copy
 import re
@@ -59,6 +60,9 @@ class BookRecord(RequestData):
     Class to consolidate DB records for easier listing. Each BookRecord instance
     consolidates the records of a single book.
     """
+    # FIXME: BookRecord should describe a more-canonical form for books which
+    # the rest of the code could make assumptions on. For instance, it should
+    # always feature the fixtured roles.
 
     """
     When an instance of this class is converted to a dictionary, the following
@@ -72,6 +76,9 @@ class BookRecord(RequestData):
         Use this when the results of your query is meant to be assembled via
         BookRecord.assembler. This is just a query that enumerates the result set
         as expected by BookRecord.assembler. Filter as necessary.
+
+        NOTE Books without any Contributors attached to them are not going to be
+        covered when this query is executed.
         """
         from librarian.models import Book, BookCompany, BookContribution, Contributor, Role, Genre
         return (
@@ -122,17 +129,42 @@ class BookRecord(RequestData):
         self.editors = frozenset(editor if editor else [])
         self.genre = genre
 
-    #@cache.memoize(app.config["MONTH_TIMEOUT"])
     @staticmethod
+    @cache.memoize(app.config["MONTH_TIMEOUT"])
     def get_bookrecord(book_id):
         from librarian.models import Book
+        app.logger.info("Cache miss with book_id %s" % book_id)
         query = BookRecord.base_assembler_query().filter(Book.id == book_id)
-        all_query = query.all()
+        all_query_results = query.all()
 
-        if all_query:
-            return BookRecord.assembler(query.all(), as_obj=False)[0]
+        if all_query_results:
+            return BookRecord.assembler(all_query_results, as_obj=False)[0]
         else:
-            return None
+            from librarian.models import Book, BookCompany, Genre
+            app.logger.info("base assembler query returned None for book_id %s" % book_id)
+            app.logger.info("Trying without Contributors...")
+            book = (
+                db.session.query(
+                    Book.id, Book.isbn, Book.title,
+                    BookCompany.name, Genre.name, Book.publish_year
+                ).filter(Book.publisher_id == BookCompany.id)
+                .filter(Book.genre_id == Genre.id)
+                .filter(Book.id == book_id)
+            ).first()
+            # <3 duck typing
+            book = list(book)
+
+            if book:
+                # Contributor.lastname
+                book.insert(3, None)
+                # Contributor.firstname
+                book.insert(4, None)
+                # Role.name
+                book.insert(5, None)
+                return BookRecord.assembler((book,), as_obj=False)[0]
+            else:
+                app.logger.info("Still can't find anything for %s" % book_id)
+                return None
 
     @classmethod
     def factory(
@@ -225,7 +257,7 @@ class BookRecord(RequestData):
             publisher=dict_struct["publisher"], author=person_authors,
             translator=person_translators, illustrator=person_illustrators,
             editor=person_editors, id=dict_struct["id"],
-            printer=dict_struct["printer"], genre="Test"
+            printer=dict_struct["printer"], genre=dict_struct["genre"]
         )
 
     def __eq__(self, br):
@@ -233,17 +265,36 @@ class BookRecord(RequestData):
           self.publisher == br.publisher and self.authors == br.authors
           and self.translators == br.translators and
           self.illustrators == br.illustrators and self.editors == br.editors
-          and self.id == br.id and self.printer == br.printer)
+          and self.id == br.id and self.printer == br.printer
+          and self.genre == br.genre)
 
     def __hash__(self):
-        return hash((self.isbn, self.title, self.publisher, self.authors,
-          self.translators, self.illustrators, self.editors))
+        return hash((
+            self.isbn,
+            self.title,
+            self.publisher,
+            self.authors,
+            self.translators,
+            self.illustrators,
+            self.editors,
+            self.id,
+            self.printer,
+            self.genre
+        ))
 
     def __str__(self):
-        return str({"isbn": self.isbn, "title": self.title, "author": str(self.authors),
-          "illustrator": str(self.illustrators), "editor": str(self.editors),
-          "translator": str(self.translators), "publisher": str(self.publisher),
-          "printer": str(self.printer), "id": self.id})
+        return str({
+            "isbn": self.isbn,
+            "title": self.title,
+            "author": str(self.authors),
+            "illustrator": str(self.illustrators),
+            "editor": str(self.editors),
+            "translator": str(self.translators),
+            "publisher": str(self.publisher),
+            "printer": str(self.printer),
+            "id": self.id,
+            "genre": self.genre
+        })
 
     def request_data(self):
         def create_person_request_data(persons):
@@ -302,22 +353,45 @@ class BookRecord(RequestData):
             id, isbn, title, contrib_lastname, contrib_firstname, role,
             publisher, genre, publish_year
         ) in book_rows:
+            no_contrib = (
+                contrib_lastname is None and
+                contrib_firstname is None and
+                role is None
+            )
+            has_contrib = (
+                contrib_lastname is not None and
+                contrib_firstname is not None and
+                role is not None
+            )
+            if not xor(no_contrib, has_contrib):
+                raise ValueError("Partial contributor records can't be compiled.")
             record_exists = structured_catalog.get(isbn)
-            role = role.lower()
-
-            if record_exists:
-                if structured_catalog[isbn].get(role):
-                    structured_catalog[isbn][role].append(Person(
-                      lastname=contrib_lastname, firstname=contrib_firstname))
-                else:
-                    structured_catalog[isbn][role] = [Person(
-                      lastname=contrib_lastname, firstname=contrib_firstname)]
+            if no_contrib:
+                # If a no_contrib record appears, we are sure that it will not
+                # have other records (with other contributor combinations).
+                structured_catalog[isbn] = {
+                    "title": title,
+                    "id": id,
+                    "genre": genre,
+                    "publisher": publisher,
+                    "publish_year": publish_year,
+                }
             else:
-                fmt = {"title": title, "id": id, "genre": genre,
-                  role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
-                  "publisher": publisher, "publish_year": publish_year}
+                role = role.lower()
 
-                structured_catalog[isbn] = fmt
+                if record_exists:
+                    if structured_catalog[isbn].get(role):
+                        structured_catalog[isbn][role].append(Person(
+                          lastname=contrib_lastname, firstname=contrib_firstname))
+                    else:
+                        structured_catalog[isbn][role] = [Person(
+                          lastname=contrib_lastname, firstname=contrib_firstname)]
+                else:
+                    fmt = {"title": title, "id": id, "genre": genre,
+                      role: [Person(lastname=contrib_lastname, firstname=contrib_firstname)],
+                      "publisher": publisher, "publish_year": publish_year}
+
+                    structured_catalog[isbn] = fmt
 
         book_listing = []
 
