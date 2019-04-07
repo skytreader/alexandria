@@ -87,12 +87,17 @@ class BookRecordTests(AppTestCase):
         booka_translator = BookContributionFactory(role=Role.get_preset_role("Translator"),
           book=booka, creator=self.admin_user)
         librarian.db.session.add(booka_translator)
-        booka_illus1 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka, creator=self.admin_user)
+        illustrator_id = Role.get_preset_role_id("Illustrator")
+        booka_illus1 = BookContributionFactory(
+            role=Role.query.filter_by(id=illustrator_id).first(),
+            book=booka, creator=self.admin_user
+        )
         librarian.db.session.add(booka_illus1)
-        librarian.db.session.commit()
-        booka_illus2 = BookContributionFactory(role=Role.get_preset_role("Illustrator"),
-          book=booka, creator=self.admin_user)
+        librarian.db.session.flush()
+        booka_illus2 = BookContributionFactory(
+            role=Role.query.filter_by(id=illustrator_id).first(),
+            book=booka, creator=self.admin_user
+        )
         librarian.db.session.add(booka_illus2)
         librarian.db.session.commit()
 
@@ -114,7 +119,7 @@ class BookRecordTests(AppTestCase):
         booka_record = BookRecord(
             isbn=booka.isbn, title=booka.title, publisher=booka.publisher.name,
             author=booka_authors, translator=booka_translators,
-            illustrator=booka_illustrators, id=booka.id, genre="Test")
+            illustrator=booka_illustrators, id=booka.id, genre=booka.genre.name)
 
         bookb_authors = [bookb_author.contributor.make_plain_person()]
         bookb_translators = [bookb_translator.contributor.make_plain_person()]
@@ -122,11 +127,13 @@ class BookRecordTests(AppTestCase):
         bookb_record = BookRecord(
             isbn=bookb.isbn, title=bookb.title, publisher=bookb.publisher.name,
             author=bookb_authors, translator=bookb_translators,
-            illustrator=bookb_illustrators, id=bookb.id, genre="Test")
+            illustrator=bookb_illustrators, id=bookb.id, genre=bookb.genre.name)
 
         expected_records = [booka_record, bookb_record]
+        librarian.db.session.flush()
 
         books = BookRecord.base_assembler_query().all()
+        assembled = BookRecord.assembler(books)
         
         self.assertEqual(set(expected_records), set(BookRecord.assembler(books)))
 

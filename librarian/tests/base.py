@@ -10,6 +10,8 @@ librarian.app.config["TESTING"] = True
 librarian.init_db()
 librarian.init_blueprints()
 
+# Do not remove this line, else CI builds will have very verbose logs. I'm not
+# sure why it doesn't manifest in local testing though.
 logging.getLogger("factory").setLevel(logging.WARN)
 
 class AppTestCase(TestCase):
@@ -19,6 +21,7 @@ class AppTestCase(TestCase):
     
     def setUp(self):
         self.app = self.create_app()
+        self.ORIGINAL_LOG_LEVEL = self.app.logger.level
         self.ROLE_IDS = {}
         self.admin_user = get_or_create(Librarian, will_commit=True, username="admin", password="admin", is_user_active=True, can_read=True, can_write=True, can_exec=True)
         roles = ("Author", "Illustrator", "Editor", "Translator")
@@ -98,3 +101,5 @@ class AppTestCase(TestCase):
 
         with librarian.app.app_context():
             librarian.cache.clear()
+
+        self.app.logger.setLevel(self.ORIGINAL_LOG_LEVEL)
