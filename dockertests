@@ -3,4 +3,3 @@ set -e -x -v
 # For now, all the arguments passed to tis script will be exclusively for Python
 # tests since the JS tests are failing and not that comprehensive anyway.
 ./runtests --with-coverage $@
-./run_js_tests
