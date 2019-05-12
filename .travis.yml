@@ -8,7 +8,6 @@ services:
     - docker
 dist: trusty
 before_install:
-    - switch_to_oraclejdk7
     - sudo rm /usr/local/bin/docker-compose
     - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
     - chmod +x docker-compose
@@ -18,6 +17,6 @@ install: "pip install -r requirements.txt"
 before_script:
     - docker build -t alexandria:current .
     - sudo ln -s . /librarian
-script: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint './dockertests -v' test"
+script: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN test"
 after_success: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint codecov test"
 after_failure: "sudo docker-compose -f docker-compose-test.yml run -e CODECOV_TOKEN --entrypoint codecov test"

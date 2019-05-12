@@ -106,7 +106,7 @@ def dbdump(ctx, dump_name="alexandria.sql"):
     Dump out local database to file.
     """
     # Wow. Such hax. Kids, don't try this at home.
-    __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > alexandria.sql")
+    __docker_compose_run("mysqldump -h db alexandria", "db_runner_1 > %s" % dump_name)
 
 @task
 def load_db(ctx, dump_name="alexandria.sql"):

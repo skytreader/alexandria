@@ -14,8 +14,10 @@ services:
     volumes:
       - .:/librarian
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   redis:
     image: "redis:4.0.11"

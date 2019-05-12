@@ -1,3 +1,4 @@
+from __future__ import print_function
 import librarian
 from config import DefaultAlexandriaConfig as cfg
 
@@ -9,7 +10,8 @@ import traceback
 
 if __name__ == "__main__":
     exp_backoff = 0
-    while int(os.environ.get("is_travis", "0")) != 1:
+    print("Welcome to Alexandria. Starting up...")
+    while True:
         try:
             librarian.init_blueprints()
             librarian.init_db()
@@ -23,6 +25,6 @@ if __name__ == "__main__":
             raise
         except Exception as e:
             traceback.print_exc()
-            print "Can't start app, retrying..."
+            print("Can't start app, retrying...")
             exp_backoff += 1
             time.sleep(3 ** exp_backoff)
