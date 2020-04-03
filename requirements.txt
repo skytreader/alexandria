@@ -1,5 +1,5 @@
 click==7.0
-Flask==1.0.2
+Flask==1.1.2
 Flask-Caching==1.7.1
 Flask-Login==0.4.1
 Flask-SQLAlchemy==2.4.0
