@@ -1,6 +1,6 @@
 click==7.0
 Flask==1.0.2
-Flask-Caching==1.7.1
+Flask-Caching==1.11.0
 Flask-Login==0.4.1
 Flask-SQLAlchemy==2.4.0
 Flask-Testing==0.7.1
